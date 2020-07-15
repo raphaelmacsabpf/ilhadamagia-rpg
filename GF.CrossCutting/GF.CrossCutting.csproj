@@ -47,9 +47,10 @@
     <Compile Include="ChatColorValue.cs" />
     <Compile Include="CommandCode.cs" />
     <Compile Include="CommandPacket.cs" />
+    <Compile Include="Dto\InteractionTargetDto.cs" />
     <Compile Include="Dto\MarkerDto.cs" />
     <Compile Include="Dto\PlayerVarDto.cs" />
-    <Compile Include="Dto\TargetDto.cs" />
+    <Compile Include="Dto\ProximityTargetDto.cs" />
     <Compile Include="Dto\VehicleDto.cs" />
     <Compile Include="PayloadType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

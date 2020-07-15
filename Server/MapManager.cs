@@ -9,7 +9,8 @@ namespace Server
     {
         private List<MarkerDto> staticMarkers;
         private List<VehicleDto> staticVehicles;
-        private List<TargetDto> staticTargets;
+        private List<ProximityTargetDto> staticProximityTargets;
+        private List<InteractionTargetDto> staticInteractionTargets;
 
         public int lastHandle = 0;
 
@@ -17,17 +18,24 @@ namespace Server
         {
             this.staticMarkers = new List<MarkerDto>();
             this.staticVehicles = new List<VehicleDto>();
-            this.staticTargets = new List<TargetDto>();
+            this.staticProximityTargets = new List<ProximityTargetDto>();
+            this.staticInteractionTargets = new List<InteractionTargetDto>();
 
             Console.WriteLine("[IM MapManager] Started MapManager");
 
             this.AddDefaultMarker(307.8857f, -727.8989f, 29.3136f - 0.5f);
-            this.AddNotificationTarget(307.8857f, -727.8989f, 29.3136f - 0.5f, "Bem vindo ao ~b~Ilha da Magia RPG~s~, aperte ~o~E~s~ para interagir.");
+            this.AddProximityNotificationTarget(307.8857f, -727.8989f, 29.3136f - 0.5f, "Bem vindo ao ~b~Ilha da Magia RPG~s~, aperte ~o~E~s~ para interagir.");
+            this.AddInteractionNotificationTarget(307.8857f, -727.8989f, 29.3136f - 0.5f, "Você interagiu com sucesso.");
         }
 
-        public void AddNotificationTarget(float x, float y, float z, string message)
+        public void AddProximityNotificationTarget(float x, float y, float z, string message)
         {
-            this.staticTargets.Add(new TargetDto(x, y, z, 1.5f, 0, "INFO_TO_PLAYER", "Bem vindo ao ~b~Ilha da Magia RPG~s~, aperte ~o~E~s~ para interagir.", ""));
+            this.staticProximityTargets.Add(new ProximityTargetDto(x, y, z, 1.5f, 0, "INFO_TO_PLAYER", message, ""));
+        }
+
+        public void AddInteractionNotificationTarget(float x, float y, float z, string message)
+        {
+            this.staticInteractionTargets.Add(new InteractionTargetDto(x, y, z, "INFO_TO_PLAYER", message));
         }
 
         public void AddDefaultMarker(float x, float y, float z)
@@ -40,9 +48,14 @@ namespace Server
             return this.staticMarkers;
         }
 
-        public List<TargetDto> PopUpdatedStaticTargetsPayload()
+        public List<ProximityTargetDto> PopUpdatedStaticProximityTargetsPayload()
         {
-            return this.staticTargets;
+            return this.staticProximityTargets;
+        }
+
+        public List<InteractionTargetDto> PopUpdatedStaticInteractionTargetsPayload()
+        {
+            return this.staticInteractionTargets;
         }
 
         public void PlayerCreatedVehicle([FromSource] Player player, int vehicleHandle)

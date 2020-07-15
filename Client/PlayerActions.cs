@@ -13,7 +13,7 @@ namespace Client
         {
         }
 
-        public void GFPushNotification(string message, int periodInMs)
+        public void PushNotification(string message, int periodInMs)
         {
             var notification = Screen.ShowNotification(message);
             Task.Factory.StartNew(async () =>

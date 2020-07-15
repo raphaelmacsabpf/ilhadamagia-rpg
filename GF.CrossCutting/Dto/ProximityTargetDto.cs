@@ -1,8 +1,8 @@
 ﻿namespace GF.CrossCutting.Dto
 {
-    public class TargetDto
+    public class ProximityTargetDto
     {
-        public TargetDto(float x, float y, float z, float radius, int periodInMs, string actionName, string onEnterActionPayload, string onExitActionPayload)
+        public ProximityTargetDto(float x, float y, float z, float radius, int periodInMs, string actionName, string onEnterActionPayload, string onExitActionPayload)
         {
             X = x;
             Y = y;
