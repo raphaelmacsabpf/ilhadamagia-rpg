@@ -1,10 +1,5 @@
 ﻿using CitizenFX.Core;
 using GF.CrossCutting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Server
 {
@@ -12,7 +7,6 @@ namespace Server
     {
         public NetworkManager()
         {
-
         }
 
         public void SendPayloadToPlayer(Player player, PayloadType payloadType, string jsonPayload)

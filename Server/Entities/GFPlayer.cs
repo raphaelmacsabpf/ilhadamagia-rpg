@@ -1,9 +1,6 @@
 ﻿using CitizenFX.Core;
-using GF.CrossCutting;
 using GF.CrossCutting.Dto;
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 
 namespace Server.Entities
 {
@@ -12,7 +9,7 @@ namespace Server.Entities
         public event EventHandler<PlayerUpdateVarsEventArgs> OnPlayerVarsUpdate;
 
         private int money;
-        
+
         public GFPlayer(Player player)
         {
             this.PlayerId = Int32.Parse(player.Handle);
@@ -35,6 +32,7 @@ namespace Server.Entities
                 OnPlayerVarsUpdate?.Invoke(this, new PlayerUpdateVarsEventArgs("Username", value));
             }
         }
+
         public string Password { get; }
         public string License { get; }
         public int AdminLevel { get; set; }
@@ -52,6 +50,7 @@ namespace Server.Entities
                 OnPlayerVarsUpdate?.Invoke(this, new PlayerUpdateVarsEventArgs("Money", value.ToString()));
             }
         }
+
         public int Bank { get; }
 
         public PlayerVarsDto PopUpdatedPlayerVarsPayload()

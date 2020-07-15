@@ -1,15 +1,7 @@
 ﻿using CitizenFX.Core;
-using CitizenFX.Core.Native;
 using GF.CrossCutting;
-using GF.CrossCutting.Dto;
-using Newtonsoft.Json;
 using Server.Entities;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Server
 {
@@ -221,7 +213,6 @@ namespace Server
                             this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_GRAD2, "USE: /setcolete [playerid] [valor(0-100)]");
                             return;
                         }
-
                         else if (value < 0 || value > 100)
                         {
                             this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_GRAD2, "USE: /setcolete [playerid] [valor(0-100)]");

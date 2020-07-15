@@ -20,7 +20,7 @@ namespace Client
 
         private static CommandCode GetCommandCode(string command)
         {
-            switch(command)
+            switch (command)
             {
                 case "/gritar": case "/g": return CommandCode.SCREAM;
                 case "/info": return CommandCode.INFO;

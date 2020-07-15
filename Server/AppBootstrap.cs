@@ -1,18 +1,12 @@
 ﻿using Autofac;
-using Autofac.Core;
 using CitizenFX.Core;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Server
 {
     public class AppBootstrap : BaseScript
     {
-
         public AppBootstrap()
         {
             Stopwatch initializationStopwatch = new Stopwatch();
@@ -37,7 +31,6 @@ namespace Server
             builder.RegisterInstance(playerActions).As<PlayerActions>();
             builder.RegisterType<PlayerInfo>().As<PlayerInfo>().SingleInstance();
 
-            
             builder.RegisterType<NetworkManager>().As<NetworkManager>().SingleInstance();
             builder.RegisterType<CommandManager>().As<CommandManager>().SingleInstance();
             builder.RegisterType<MainServer>().As<MainServer>();

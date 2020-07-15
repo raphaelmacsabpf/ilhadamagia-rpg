@@ -1,17 +1,11 @@
 ﻿using CitizenFX.Core;
-using CitizenFX.Core.Native;
 using GF.CrossCutting;
 using GF.CrossCutting.Dto;
 using Newtonsoft.Json;
 using Server.Entities;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Server
 {
@@ -40,7 +34,7 @@ namespace Server
             while (true)
             {
                 Tuple<PlayerVarsDto, GFPlayer> playerVarsTuple;
-                while(playerVarsToUpdateQueue.TryDequeue(out playerVarsTuple))
+                while (playerVarsToUpdateQueue.TryDequeue(out playerVarsTuple))
                 {
                     var json = JsonConvert.SerializeObject(playerVarsTuple.Item1);
                     this.networkManager.SendPayloadToPlayer(playerVarsTuple.Item2.Player, PayloadType.TO_PLAYER_VARS, json);
@@ -60,7 +54,7 @@ namespace Server
                 gfPlayer.OnPlayerVarsUpdate += GfPlayer_OnPlayerVarsUpdate;
                 playerToGFPlayerDictionary.TryAdd(player, gfPlayer);
             }
-            
+
             return playerToGFPlayerDictionary[player];
         }
 
@@ -73,7 +67,7 @@ namespace Server
 
             PlayerVarsDto playerVarsDto = new PlayerVarsDto();
             playerVarsDto.AddOrUpdate(e.PlayerVar, e.Value, (key, oldValue) => e.Value);
-            playerVarsToUpdateQueue.Enqueue(new Tuple<PlayerVarsDto, GFPlayer>(playerVarsDto, gfPlayer));       
+            playerVarsToUpdateQueue.Enqueue(new Tuple<PlayerVarsDto, GFPlayer>(playerVarsDto, gfPlayer));
         }
     }
 }

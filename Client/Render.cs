@@ -2,9 +2,6 @@
 using CitizenFX.Core.Native;
 using GF.CrossCutting.Dto;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Client
@@ -71,7 +68,6 @@ namespace Client
             {
                 if (this.moneyStateRaisingUp && this.lastDisplayedMoney < this.lastMoneyValue)
                 {
-
                     moneyToDisplay = this.lastDisplayedMoney + this.moneyUpdateRate;
                     this.lastDisplayedMoney = moneyToDisplay;
                 }

@@ -1,12 +1,7 @@
 ﻿using CitizenFX.Core;
-using CitizenFX.Core.Native;
 using GF.CrossCutting;
-using GF.CrossCutting.Dto;
 using Newtonsoft.Json;
-using Server.Entities;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 
 namespace Server
@@ -42,7 +37,6 @@ namespace Server
             this.syncThread.Start();*/
 
             Console.WriteLine("[IM MainServer] Started MainServer");
-
         }
 
         /*~MainServer()
@@ -52,7 +46,7 @@ namespace Server
         }*/
         public CommandManager CommandManager { get; }
 
-        public void OnClientReady([FromSource]Player player)
+        public void OnClientReady([FromSource] Player player)
         {
             var gfPlayer = playerInfo.PlayerToGFPlayer(player);
             var json = JsonConvert.SerializeObject(gfPlayer.PopUpdatedPlayerVarsPayload());
@@ -67,7 +61,7 @@ namespace Server
             this.chatManager.SendClientMessage(player, ChatColor.TEAM_VAGOS_COLOR, "Chegou aqui que seu cliente ta suavão");
         }
 
-        public async void OnPlayerConnecting([FromSource]Player player, string playerName, dynamic setKickReason, dynamic deferrals)
+        public async void OnPlayerConnecting([FromSource] Player player, string playerName, dynamic setKickReason, dynamic deferrals)
         {
             deferrals.defer();
 
@@ -75,7 +69,7 @@ namespace Server
             await Delay(0);
 
             Console.WriteLine($"[Connecting] {playerName}, IP: {player.EndPoint}, Identifiers: {player.Identifiers["license"]}");
-            for(int i = 0; i < 100; i++)
+            for (int i = 0; i < 100; i++)
             {
                 deferrals.update("Still checking:" + (i + 1));
 
@@ -87,7 +81,5 @@ namespace Server
             Console.WriteLine($"[Connected] {playerName}, IP: {player.EndPoint}, Identifiers: {player.Identifiers["license"]}");
             deferrals.done();
         }
-
-
     }
 }

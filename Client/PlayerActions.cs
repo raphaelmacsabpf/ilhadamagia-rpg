@@ -1,12 +1,9 @@
-﻿using CitizenFX.Core.UI;
-using CitizenFX.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GF.CrossCutting;
+﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using CitizenFX.Core.UI;
+using GF.CrossCutting;
+using System;
+using System.Threading.Tasks;
 
 namespace Client
 {
@@ -14,7 +11,6 @@ namespace Client
     {
         public PlayerActions(bool ignoreFiveMInitialization)
         {
-
         }
 
         public void GFPushNotification(string message, int periodInMs)
@@ -36,7 +32,7 @@ namespace Client
                 args = new[] { $"[{timestamp}] {message}" }
             });
         }
-        
+
         public void Kill()
         {
             Game.PlayerPed.Kill();

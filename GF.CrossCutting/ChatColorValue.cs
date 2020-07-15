@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GF.CrossCutting
+﻿namespace GF.CrossCutting
 {
     public static class ChatColorValue
     {
         public static dynamic GetRGBA(ChatColor chatColor)
         {
-            switch(chatColor)
+            switch (chatColor)
             {
                 case ChatColor.COLOR_GRAD1: return COLOR_GRAD1;
                 case ChatColor.COLOR_GRAD2: return COLOR_GRAD2;

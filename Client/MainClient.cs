@@ -1,18 +1,11 @@
 ﻿using CitizenFX.Core;
-using CitizenFX.Core.UI;
 using CitizenFX.Core.Native;
-using System;
+using CitizenFX.Core.UI;
 using GF.CrossCutting;
-using System.Threading;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
 using GF.CrossCutting.Dto;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Windows;
-using System.Timers;
-using System.Collections.Concurrent;
-using System.Drawing;
-using System.Runtime.InteropServices;
 
 namespace Client
 {
@@ -62,7 +55,7 @@ namespace Client
             var subStringLenght = payload.Length < 80 ? payload.Length : payload.Length;
             Debug.WriteLine($"Payload[{payload.Length}]: { payload.Substring(0, subStringLenght)}..."); // TODO: Remove before release
             PayloadType payloadType = (PayloadType)payloadTypeInt;
-            switch(payloadType)
+            switch (payloadType)
             {
                 case PayloadType.TO_STATIC_MARKERS:
                     {
@@ -72,7 +65,7 @@ namespace Client
                 case PayloadType.TO_PLAYER_VARS:
                     {
                         var PlayerVar = JsonConvert.DeserializeObject<PlayerVarsDto>(payload);
-                        foreach(var playerVar in PlayerVar)
+                        foreach (var playerVar in PlayerVar)
                         {
                             switch (playerVar.Key)
                             {
@@ -81,7 +74,7 @@ namespace Client
                                         var money = Int32.Parse(playerVar.Value);
                                         GFSetPlayerMoney(money);
                                         break;
-                                    }                                    
+                                    }
                             }
                         }
                         return;
@@ -112,8 +105,8 @@ namespace Client
             API.CancelEvent();
 
             // TODO: Improve!!! Client has to send spawn event to server.
-            // Default SPAWN 
-            playerActions.SpawnPlayer("S_M_Y_MARINE_01", 309.6f, -728.7297f, 29.3136f, 246.6142f); 
+            // Default SPAWN
+            playerActions.SpawnPlayer("S_M_Y_MARINE_01", 309.6f, -728.7297f, 29.3136f, 246.6142f);
         }
 
         public async void OnDie(int killerType, dynamic deathCoords)
@@ -134,7 +127,7 @@ namespace Client
             await Spawn.SpawnPlayer("S_M_Y_MARINE_01", 309.6f, -728.7297f, 29.3136f, 246.6142f);
         }
 
-        // Commands 
+        // Commands
         public void OnInfo() // TODO: REMOVE THIS COMMAND
         {
             Screen.ShowNotification($"~b~ServerInfo~s~: Your are currently on the Tutorial Server By 4444, {Game.Player.Name}!");
@@ -142,7 +135,7 @@ namespace Client
 
         public async void onVeh() // TODO: Add complete /veh command
         {
-            for(int i = 0; i < 1; i++)
+            for (int i = 0; i < 1; i++)
             {
                 var model = new Model(VehicleHash.Infernus);
                 // create the vehicle
@@ -206,7 +199,6 @@ namespace Client
 //------API.PlaySound(-1, "Zoom_In", "MUGSHOT_CHARACTER_CREATION_SOUNDS", false, 0, true);
 //API.PlaySound(-1, "Zoom_Out", "MUGSHOT_CHARACTER_CREATION_SOUNDS", false, 0, true);
 
-
 // cachorro louco ataca player ped
 //var position = Game.PlayerPed.Position;
 //API.RequestModel((uint)PedHash.Chop);
@@ -227,9 +219,9 @@ namespace Client
 //API.SetPedAsEnemy(handle, true);
 //API.SetPedRelationshipGroupHash(handle, (uint)API.GetHashKey("HATES_PLAYER"));
 ////API.SetPedAsCop(handle, true);
-                    
+
 ////API.GiveWeaponToPed(handle, (uint)WeaponHash.AssaultSMG, 300, false, true);
-                    
+
 ////API.SetPedAmmo(handle, (uint)WeaponHash.AssaultSMG, 300);
-                    
+
 //GFSendClientMessage((int)ChatColor.COLOR_LIGHTRED, $"Foi criado PED com handle: {handle}");

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GF.CrossCutting.Dto
+﻿namespace GF.CrossCutting.Dto
 {
     public class TargetDto
     {
@@ -19,6 +13,7 @@ namespace GF.CrossCutting.Dto
             OnEnterActionPayload = onEnterActionPayload;
             OnExitActionPayload = onExitActionPayload;
         }
+
         public float X { get; set; }
         public float Y { get; set; }
         public float Z { get; set; }

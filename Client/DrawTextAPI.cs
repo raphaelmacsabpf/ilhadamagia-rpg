@@ -1,11 +1,6 @@
 ﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Client
 {
@@ -44,7 +39,6 @@ namespace Client
             CitizenFX.Core.Native.API.DrawSprite(dict, txtName, x, y, w, h, heading, r, g, b, alpha);
         }
 
-
         public void DrawRectangle(float xPos, float yPos, float wSize, float hSize, int r, int g, int b, int alpha, int vAlig = 0, int hAlig = 0)
         {
             if (!API.IsHudPreferenceSwitchedOn() || !CitizenFX.Core.UI.Screen.Hud.IsVisible) return;
@@ -75,6 +69,7 @@ namespace Client
                 case 1:
                     API.SetTextCentre(true);
                     break;
+
                 case 2:
                     API.SetTextRightJustify(true);
                     API.SetTextWrap(0, x);

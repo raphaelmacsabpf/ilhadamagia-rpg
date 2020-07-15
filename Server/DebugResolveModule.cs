@@ -3,10 +3,7 @@ using Autofac.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Server
 {
@@ -57,7 +54,6 @@ namespace Server
             Console.Write(node.CreationTime.TotalMilliseconds.ToString("F1"));
             Console.Write(" ms.)");
 
-
             Console.WriteLine("");
 
             foreach (var dependency in node.Dependencies)
@@ -89,6 +85,7 @@ namespace Server
 
             // Time it took to create the type excluding its dependencies
             public TimeSpan CreationTime { get; private set; }
+
             public ResolveInfo Parent { get; }
 
             public List<ResolveInfo> Dependencies { get; }
