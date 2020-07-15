@@ -13,8 +13,9 @@ namespace Server
         private List<InteractionTargetDto> staticInteractionTargets;
 
         public int lastHandle = 0;
+        private readonly PlayerInfo playerInfo;
 
-        public MapManager(bool ignoreFivemInitialization) // TODO: Verify constructor to prevent to start from fivem
+        public MapManager(PlayerInfo playerInfo) // TODO: Verify constructor to prevent to start from fivem
         {
             this.staticMarkers = new List<MarkerDto>();
             this.staticVehicles = new List<VehicleDto>();
@@ -25,7 +26,8 @@ namespace Server
 
             this.AddDefaultMarker(307.8857f, -727.8989f, 29.3136f - 0.5f);
             this.AddProximityNotificationTarget(307.8857f, -727.8989f, 29.3136f - 0.5f, "Bem vindo ao ~b~Ilha da Magia RPG~s~, aperte ~o~E~s~ para interagir.");
-            this.AddInteractionNotificationTarget(307.8857f, -727.8989f, 29.3136f - 0.5f, "Você interagiu com sucesso.");
+            this.AddInteractionToServerCallbackTarget(307.8857f, -727.8989f, 29.3136f - 0.5f, "MAIN_SPAWN_INTERACTION"); // TODO: Remover interação se necessário
+            this.playerInfo = playerInfo;
         }
 
         public void AddProximityNotificationTarget(float x, float y, float z, string message)
@@ -36,6 +38,11 @@ namespace Server
         public void AddInteractionNotificationTarget(float x, float y, float z, string message)
         {
             this.staticInteractionTargets.Add(new InteractionTargetDto(x, y, z, "INFO_TO_PLAYER", message));
+        }
+
+        public void AddInteractionToServerCallbackTarget(float x, float y, float z, string serverCallback)
+        {
+            this.staticInteractionTargets.Add(new InteractionTargetDto(x, y, z, "SERVER_CALLBACK", serverCallback));
         }
 
         public void AddDefaultMarker(float x, float y, float z)
@@ -62,6 +69,18 @@ namespace Server
         {
             this.lastHandle = vehicleHandle;
             Console.WriteLine($"--------- CARRINHO CRIADO por {player.Name}, handle: {this.lastHandle}");
+        }
+
+        public void OnPlayerTargetActionServerCallback([FromSource] Player player, string actionName, string payload)
+        {
+            switch (actionName)
+            {
+                case "MAIN_SPAWN_INTERACTION":
+                    {
+                        // TODO: Create main spawn interaction
+                        break;
+                    }
+            }
         }
     }
 }

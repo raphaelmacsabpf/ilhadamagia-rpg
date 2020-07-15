@@ -9,7 +9,6 @@ namespace Server
     public class MainServer : BaseScript
     {
         private readonly PlayerInfo playerInfo;
-        private readonly MapManager mapManager;
         private readonly NetworkManager networkManager;
         private readonly PlayerActions playerActions;
         private readonly ChatManager chatManager;
@@ -20,7 +19,7 @@ namespace Server
         {
             this.playerInfo = playerInfo;
             this.CommandManager = commandManager;
-            this.mapManager = mapManager;
+            this.MapManager = mapManager;
             this.networkManager = networkManager;
             this.playerActions = playerActions;
             this.chatManager = chatManager;
@@ -46,19 +45,21 @@ namespace Server
         }*/
         public CommandManager CommandManager { get; }
 
+        public MapManager MapManager { get; }
+
         public void OnClientReady([FromSource] Player player)
         {
             var gfPlayer = playerInfo.PlayerToGFPlayer(player);
             var json = JsonConvert.SerializeObject(gfPlayer.PopUpdatedPlayerVarsPayload());
             this.networkManager.SendPayloadToPlayer(gfPlayer.Player, PayloadType.TO_PLAYER_VARS, json);
 
-            json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticMarkersPayload());
+            json = JsonConvert.SerializeObject(this.MapManager.PopUpdatedStaticMarkersPayload());
             this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_STATIC_MARKERS, json);
 
-            json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticProximityTargetsPayload());
+            json = JsonConvert.SerializeObject(this.MapManager.PopUpdatedStaticProximityTargetsPayload());
             this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_STATIC_PROXIMITY_TARGETS, json);
 
-            json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticInteractionTargetsPayload());
+            json = JsonConvert.SerializeObject(this.MapManager.PopUpdatedStaticInteractionTargetsPayload());
             this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_STATIC_INTERACTION_TARGETS, json);
 
             this.chatManager.SendClientMessage(player, ChatColor.TEAM_VAGOS_COLOR, "Chegou aqui que seu cliente ta suavão");

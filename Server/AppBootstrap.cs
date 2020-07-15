@@ -21,13 +21,12 @@ namespace Server
 
             Console.WriteLine("[IM AppBootstrap] Building DI Container");
             ChatManager chatManager = new ChatManager(true);
-            MapManager mapManager = new MapManager(true);
             PlayerActions playerActions = new PlayerActions(true);
 
             var builder = new ContainerBuilder();
 
             builder.RegisterInstance(chatManager).As<ChatManager>();
-            builder.RegisterInstance(mapManager).As<MapManager>();
+            builder.RegisterType<MapManager>().As<MapManager>().SingleInstance();
             builder.RegisterInstance(playerActions).As<PlayerActions>();
             builder.RegisterType<PlayerInfo>().As<PlayerInfo>().SingleInstance();
 
@@ -50,7 +49,8 @@ namespace Server
                 EventHandlers["GF:Server:OnClientReady"] += new Action<Player>(mainServer.OnClientReady);
                 EventHandlers["GF:Server:OnChatMessage"] += new Action<Player, string>(chatManager.OnChatMessage);
                 EventHandlers["GF:Server:OnClientCommand"] += new Action<Player, int, bool, string>(mainServer.CommandManager.OnClientCommand);
-                EventHandlers["GF:Server:CreatedVehicle"] += new Action<Player, int>(mapManager.PlayerCreatedVehicle);
+                EventHandlers["GF:Server:CreatedVehicle"] += new Action<Player, int>(mainServer.MapManager.PlayerCreatedVehicle);
+                EventHandlers["GF:Server:OnPlayerTargetActionServerCallback"] += new Action<Player, string, string>(mainServer.MapManager.OnPlayerTargetActionServerCallback);
             }
 
             initializationStopwatch.Stop();

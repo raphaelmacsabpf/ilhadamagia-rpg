@@ -36,16 +36,21 @@ namespace Client
                 await Delay(1);
                 RenderPlayerMoney();
                 RenderMarkers();
-                if (this.inputEventsSemaphoreEnable && API.IsControlPressed(0, 46)) // Key E
+                ProcessInputs();
+            }
+        }
+
+        private async void ProcessInputs()
+        {
+            if (this.inputEventsSemaphoreEnable && API.IsControlPressed(0, 46)) // Key E
+            {
+                this.inputEventsSemaphoreEnable = false;
+                this.targetsManager.OnInteractionKeyPressed();
+                await Task.Factory.StartNew(async () =>
                 {
-                    this.inputEventsSemaphoreEnable = false;
-                    this.targetsManager.OnInteractionKeyPressed();
-                    await Task.Factory.StartNew(async () =>
-                    {
-                        await Delay(1000);
-                        this.inputEventsSemaphoreEnable = true;
-                    });
-                }
+                    await Delay(1000);
+                    this.inputEventsSemaphoreEnable = true;
+                });
             }
         }
 

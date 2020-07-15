@@ -1,5 +1,6 @@
 ﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using CitizenFX.Core.UI;
 using System.Drawing;
 
 namespace Client
@@ -14,19 +15,19 @@ namespace Client
         public DrawTextAPI(bool ignoreFiveMInitialization)
         {
             this.resolution = GetScreenResolutionMaintainRatio();
-            this.height = CitizenFX.Core.UI.Screen.Resolution.Height;
+            this.height = Screen.Resolution.Height;
             this.ratio = resolution.Width / resolution.Height;
             this.width = height * ratio;
         }
 
         public SizeF GetScreenResolutionMaintainRatio()
         {
-            return new SizeF(CitizenFX.Core.UI.Screen.Resolution.Height * ((float)CitizenFX.Core.UI.Screen.Resolution.Width / (float)CitizenFX.Core.UI.Screen.Resolution.Height), CitizenFX.Core.UI.Screen.Resolution.Height);
+            return new SizeF(Screen.Resolution.Height * ((float)Screen.Resolution.Width / (float)Screen.Resolution.Height), Screen.Resolution.Height);
         }
 
         public async void DrawGameSprite(string dict, string txtName, float xPos, float yPos, float width, float height, float heading, int r, int g, int b, int alpha, int vAlig = 0, int hAlig = 0)
         {
-            if (!API.IsHudPreferenceSwitchedOn() || !CitizenFX.Core.UI.Screen.Hud.IsVisible) return;
+            if (!API.IsHudPreferenceSwitchedOn() || !Screen.Hud.IsVisible) return;
 
             if (!API.HasStreamedTextureDictLoaded(dict))
                 API.RequestStreamedTextureDict(dict, true);
@@ -36,12 +37,12 @@ namespace Client
             float x = ToHorizontalAlignment(hAlig, xPos) / this.width + w * 0.5f;
             float y = ToVerticalAlignment(vAlig, yPos) / this.height + h * 0.5f;
 
-            CitizenFX.Core.Native.API.DrawSprite(dict, txtName, x, y, w, h, heading, r, g, b, alpha);
+            API.DrawSprite(dict, txtName, x, y, w, h, heading, r, g, b, alpha);
         }
 
         public void DrawRectangle(float xPos, float yPos, float wSize, float hSize, int r, int g, int b, int alpha, int vAlig = 0, int hAlig = 0)
         {
-            if (!API.IsHudPreferenceSwitchedOn() || !CitizenFX.Core.UI.Screen.Hud.IsVisible) return;
+            if (!API.IsHudPreferenceSwitchedOn() || !Screen.Hud.IsVisible) return;
 
             float w = wSize / width;
             float h = hSize / height;
@@ -53,7 +54,7 @@ namespace Client
 
         public void DrawText(string caption, float xPos, float yPos, float scale, int r, int g, int b, int alpha, int font, int justify, bool shadow, bool outline, int wordWrap, int vAlig = 0, int hAlig = 0)
         {
-            if (!API.IsHudPreferenceSwitchedOn() || !CitizenFX.Core.UI.Screen.Hud.IsVisible) return;
+            if (!API.IsHudPreferenceSwitchedOn() || !Screen.Hud.IsVisible) return;
 
             float x = ToHorizontalAlignment(hAlig, xPos) / width;
             float y = ToVerticalAlignment(vAlig, yPos) / height;

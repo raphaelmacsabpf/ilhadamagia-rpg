@@ -126,9 +126,17 @@ namespace Client
             switch (actionName)
             {
                 case "INFO_TO_PLAYER":
-                    this.playerActions.PushNotification(payload, 2000);
+                    string message = payload;
+                    this.playerActions.PushNotification(message, 2000);
                     API.PlaySound(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false, 0, true);
                     break;
+
+                case "SERVER_CALLBACK":
+                    {
+                        string serverCallback = payload;
+                        TriggerServerEvent("GF:Server:OnPlayerTargetActionServerCallback", serverCallback);
+                        break;
+                    }
             }
         }
     }
