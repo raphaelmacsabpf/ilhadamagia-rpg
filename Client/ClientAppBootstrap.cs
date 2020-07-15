@@ -10,9 +10,9 @@ namespace Client
             var playerInfo = new PlayerInfo();
             var markersManager = new MarkersManager();
             var drawTextAPI = new DrawTextAPI(true);
-            var render = new Render(drawTextAPI, markersManager);
             var playerActions = new PlayerActions(true);
             var targetsManager = new TargetsManager(playerActions);
+            var render = new Render(drawTextAPI, markersManager, targetsManager);
             var mainClient = new MainClient(playerInfo, markersManager, render, playerActions, targetsManager);
 
             this.Tick += render.RenderTickHandler;

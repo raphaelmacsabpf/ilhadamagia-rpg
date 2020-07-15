@@ -15,14 +15,18 @@ namespace Client
         private bool moneyStateRaisingUp;
         private readonly DrawTextAPI drawTextAPI;
         private readonly MarkersManager markersManager;
+        private readonly TargetsManager targetsManager;
+        private bool inputEventsSemaphoreEnable;
 
-        public Render(DrawTextAPI drawTextAPI, MarkersManager markersManager)
+        public Render(DrawTextAPI drawTextAPI, MarkersManager markersManager, TargetsManager targetsManager)
         {
             this.drawTextAPI = drawTextAPI;
             this.markersManager = markersManager;
+            this.targetsManager = targetsManager;
             this.moneyUpdateRate = 1;
             this.lastDisplayedMoney = 1;
             this.lastMoneyValue = 1;
+            this.inputEventsSemaphoreEnable = true;
         }
 
         public async Task RenderTickHandler()
@@ -32,6 +36,16 @@ namespace Client
                 await Delay(1);
                 RenderPlayerMoney();
                 RenderMarkers();
+                if (this.inputEventsSemaphoreEnable && API.IsControlPressed(0, 46)) // Key E
+                {
+                    this.inputEventsSemaphoreEnable = false;
+                    this.targetsManager.OnInteractionKeyPressed();
+                    await Task.Factory.StartNew(async () =>
+                    {
+                        await Delay(1000);
+                        this.inputEventsSemaphoreEnable = true;
+                    });
+                }
             }
         }
 

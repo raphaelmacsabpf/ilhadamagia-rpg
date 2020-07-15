@@ -9,30 +9,56 @@ namespace Client
 {
     public class TargetsManager : BaseScript
     {
-        private TargetDto currentTarget;
-        private DateTime? lastTargetReached;
-        private bool playerReachedTarget;
+        private ProximityTargetDto currentProximityTarget;
+        private DateTime? lastProximityTargetReached;
+        private bool playerReachedProximityTarget;
         private readonly PlayerActions playerActions;
 
         public TargetsManager(PlayerActions playerActions)
         {
-            this.Targets = new List<TargetDto>();
+            this.ProximityTargets = new List<ProximityTargetDto>();
+            this.InteractionTargets = new List<InteractionTargetDto>();
             this.playerActions = playerActions;
         }
 
-        public List<TargetDto> Targets { get; set; }
+        public List<ProximityTargetDto> ProximityTargets { get; set; }
+        public List<InteractionTargetDto> InteractionTargets { get; set; }
+
+        public void OnInteractionKeyPressed()
+        {
+            var playerPosition = Game.PlayerPed.Position;
+            InteractionTargetDto bestTarget = null;
+            float closestDistance = float.MaxValue;
+
+            foreach (var target in InteractionTargets)
+            {
+                var distanceToClosest = playerPosition.DistanceToSquared(new Vector3(target.X, target.Y, target.Z));
+                if (distanceToClosest < closestDistance)
+                {
+                    bestTarget = target;
+                    closestDistance = distanceToClosest;
+                }
+            }
+
+            if (bestTarget != null)
+            {
+                if (closestDistance < 2)
+                {
+                    OnTargetAction(bestTarget.ActionName, bestTarget.OnInteractionPayload);
+                }
+            }
+        }
 
         public async Task TargetsTickHandler()
         {
             var playerPosition = Game.PlayerPed.Position;
 
-            if (currentTarget == null)
+            if (currentProximityTarget == null)
             {
-                TargetDto bestTarget = null;
-                float pX, pY, pZ;
+                ProximityTargetDto bestTarget = null;
 
                 float closestDistance = float.MaxValue;
-                foreach (var target in Targets)
+                foreach (var target in ProximityTargets)
                 {
                     var distanceToClosest = playerPosition.DistanceToSquared(new Vector3(target.X, target.Y, target.Z));
                     if (distanceToClosest < closestDistance)
@@ -47,46 +73,45 @@ namespace Client
                     var radius = Math.Pow(bestTarget.Radius, 2);
                     if (closestDistance < radius)
                     {
-                        this.currentTarget = bestTarget;
+                        this.currentProximityTarget = bestTarget;
 
                         if (bestTarget.PeriodInMs <= 0)
                         {
-                            if (currentTarget.OnEnterActionPayload.Length > 0)
+                            if (currentProximityTarget.OnEnterActionPayload.Length > 0)
                             {
-                                OnTargetAction(currentTarget.ActionName, currentTarget.OnEnterActionPayload);
+                                OnTargetAction(currentProximityTarget.ActionName, currentProximityTarget.OnEnterActionPayload);
                             }
                         }
-                        else if (bestTarget.PeriodInMs > 0 && this.lastTargetReached == null)
+                        else if (bestTarget.PeriodInMs > 0 && this.lastProximityTargetReached == null)
                         {
-                            this.lastTargetReached = DateTime.Now;
+                            this.lastProximityTargetReached = DateTime.Now;
                         }
                     }
                 }
             }
             else
             {
-                var radius = Math.Pow(currentTarget.Radius, 2);
-                var distance = playerPosition.DistanceToSquared(new Vector3(this.currentTarget.X, this.currentTarget.Y, this.currentTarget.Z));
+                var radius = Math.Pow(currentProximityTarget.Radius, 2);
+                var distance = playerPosition.DistanceToSquared(new Vector3(this.currentProximityTarget.X, this.currentProximityTarget.Y, this.currentProximityTarget.Z));
                 if (distance > radius)
                 {
-                    this.lastTargetReached = null;
+                    this.lastProximityTargetReached = null;
 
-                    this.playerReachedTarget = false;
-                    if (currentTarget.OnExitActionPayload.Length > 0)
+                    this.playerReachedProximityTarget = false;
+                    if (currentProximityTarget.OnExitActionPayload.Length > 0)
                     {
-                        OnTargetAction(currentTarget.ActionName, currentTarget.OnExitActionPayload);
+                        OnTargetAction(currentProximityTarget.ActionName, currentProximityTarget.OnExitActionPayload);
                     }
-                    this.currentTarget = null;
+                    this.currentProximityTarget = null;
                 }
                 else
                 {
-                    // GFSendClientMessage((int)ChatColor.COLOR_ADD, $"Cara vai por aí nao::: distance: {distance}, radius: {radius} ");
-                    if (this.lastTargetReached != null && (DateTime.Now - this.lastTargetReached).Value.TotalMilliseconds > currentTarget.PeriodInMs && playerReachedTarget == false)
+                    if (this.lastProximityTargetReached != null && (DateTime.Now - this.lastProximityTargetReached).Value.TotalMilliseconds > currentProximityTarget.PeriodInMs && playerReachedProximityTarget == false)
                     {
-                        playerReachedTarget = true;
-                        if (currentTarget.OnEnterActionPayload.Length > 0)
+                        playerReachedProximityTarget = true;
+                        if (currentProximityTarget.OnEnterActionPayload.Length > 0)
                         {
-                            OnTargetAction(currentTarget.ActionName, currentTarget.OnEnterActionPayload);
+                            OnTargetAction(currentProximityTarget.ActionName, currentProximityTarget.OnEnterActionPayload);
                         }
                     }
                 }
@@ -101,7 +126,7 @@ namespace Client
             switch (actionName)
             {
                 case "INFO_TO_PLAYER":
-                    this.playerActions.GFPushNotification(payload, 2000);
+                    this.playerActions.PushNotification(payload, 2000);
                     API.PlaySound(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false, 0, true);
                     break;
             }

@@ -79,9 +79,14 @@ namespace Client
                         }
                         return;
                     }
-                case PayloadType.TO_STATIC_TARGETS:
+                case PayloadType.TO_STATIC_PROXIMITY_TARGETS:
                     {
-                        this.targetsManager.Targets = JsonConvert.DeserializeObject<List<TargetDto>>(payload);
+                        this.targetsManager.ProximityTargets = JsonConvert.DeserializeObject<List<ProximityTargetDto>>(payload);
+                        return;
+                    }
+                case PayloadType.TO_STATIC_INTERACTION_TARGETS:
+                    {
+                        this.targetsManager.InteractionTargets = JsonConvert.DeserializeObject<List<InteractionTargetDto>>(payload);
                         return;
                     }
             }

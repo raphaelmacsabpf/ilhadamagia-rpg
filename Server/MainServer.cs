@@ -55,8 +55,11 @@ namespace Server
             json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticMarkersPayload());
             this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_STATIC_MARKERS, json);
 
-            json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticTargetsPayload());
-            this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_STATIC_TARGETS, json);
+            json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticProximityTargetsPayload());
+            this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_STATIC_PROXIMITY_TARGETS, json);
+
+            json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticInteractionTargetsPayload());
+            this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_STATIC_INTERACTION_TARGETS, json);
 
             this.chatManager.SendClientMessage(player, ChatColor.TEAM_VAGOS_COLOR, "Chegou aqui que seu cliente ta suavão");
         }
