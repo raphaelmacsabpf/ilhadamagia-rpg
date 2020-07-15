@@ -1,4 +1,4 @@
-﻿namespace GF.CrossCutting.Dto
+namespace GF.CrossCutting.Dto
 {
     public class InteractionTargetDto
     {
