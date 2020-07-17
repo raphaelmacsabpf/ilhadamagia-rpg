@@ -34,9 +34,9 @@ namespace Client
             while (true)
             {
                 await Delay(1);
+                ProcessInputs();
                 RenderPlayerMoney();
                 RenderMarkers();
-                ProcessInputs();
             }
         }
 

@@ -14,6 +14,7 @@ namespace Server
         private readonly ChatManager chatManager;
         private readonly Thread syncThread;
         private bool scriptStopped;
+        private int activePlayers;
 
         public MainServer(PlayerInfo playerInfo, CommandManager commandManager, MapManager mapManager, NetworkManager networkManager, PlayerActions playerActions, ChatManager chatManager)
         {
@@ -26,7 +27,9 @@ namespace Server
 
             foreach (var player in new PlayerList())
             {
-                this.playerInfo.PlayerToGFPlayer(player);
+                var gfPlayer = this.playerInfo.PlayerToGFPlayer(player);
+                gfPlayer.IsActive = true;
+                activePlayers++;
                 Console.WriteLine($"[IM MainServer] PlayerLoaded: [{player.Handle}] {player.Name}");
             }
 
@@ -47,7 +50,7 @@ namespace Server
 
         public MapManager MapManager { get; }
 
-        public void OnClientReady([FromSource] Player player)
+        public async void OnClientReady([FromSource] Player player)
         {
             var gfPlayer = playerInfo.PlayerToGFPlayer(player);
             var json = JsonConvert.SerializeObject(gfPlayer.PopUpdatedPlayerVarsPayload());
@@ -63,6 +66,16 @@ namespace Server
             this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_STATIC_INTERACTION_TARGETS, json);
 
             this.chatManager.SendClientMessage(player, ChatColor.TEAM_VAGOS_COLOR, "Chegou aqui que seu cliente ta suavão");
+            this.activePlayers++;
+            gfPlayer.IsActive = true;
+        }
+
+        internal void OnPlayerDropped([FromSource] Player player, string reason)
+        {
+            var gfPlayer = this.playerInfo.PlayerToGFPlayer(player);
+            gfPlayer.IsActive = false;
+            activePlayers--;
+            Console.WriteLine($"Player dropped, name: {gfPlayer.Username}, reason: {reason}, activePlayers: {activePlayers}");
         }
 
         public async void OnPlayerConnecting([FromSource] Player player, string playerName, dynamic setKickReason, dynamic deferrals)

@@ -21,7 +21,7 @@ namespace Server
             this.playerToGFPlayerDictionary = new ConcurrentDictionary<Player, GFPlayer>();
             this.playerVarsToUpdateQueue = new ConcurrentQueue<Tuple<PlayerVarsDto, GFPlayer>>();
 
-            this.updatePlayerVarsThread = new Thread(jjjj);
+            this.updatePlayerVarsThread = new Thread(UpdatePlayerVarsThreadHandler);
             this.updatePlayerVarsThread.Priority = ThreadPriority.Lowest;
             this.updatePlayerVarsThread.IsBackground = true;
             this.updatePlayerVarsThread.Start();
@@ -29,7 +29,7 @@ namespace Server
         }
 
         // TODO: Arrumar a porcaria do nome desse método
-        private void jjjj()
+        private void UpdatePlayerVarsThreadHandler()
         {
             while (true)
             {
@@ -63,11 +63,11 @@ namespace Server
         {
             var gfPlayer = sender as GFPlayer;
 
-            Tuple<PlayerVarsDto, GFPlayer> playerVarsTuple;
-
             PlayerVarsDto playerVarsDto = new PlayerVarsDto();
             playerVarsDto.AddOrUpdate(e.PlayerVar, e.Value, (key, oldValue) => e.Value);
-            playerVarsToUpdateQueue.Enqueue(new Tuple<PlayerVarsDto, GFPlayer>(playerVarsDto, gfPlayer));
+
+            Tuple<PlayerVarsDto, GFPlayer> playerVarsTuple = new Tuple<PlayerVarsDto, GFPlayer>(playerVarsDto, gfPlayer);
+            playerVarsToUpdateQueue.Enqueue(playerVarsTuple);
         }
     }
 }

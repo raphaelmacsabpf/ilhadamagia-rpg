@@ -1,4 +1,4 @@
-﻿namespace Server
+﻿namespace Server.Enums
 {
     public enum WeaponHash : uint
     {

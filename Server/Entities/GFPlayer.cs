@@ -9,19 +9,19 @@ namespace Server.Entities
         public event EventHandler<PlayerUpdateVarsEventArgs> OnPlayerVarsUpdate;
 
         private int money;
+        private string username;
 
-        public GFPlayer(Player player)
+        public GFPlayer(Player player) // TODO: Rename GFPlayer to GMPlayer
         {
             this.PlayerId = Int32.Parse(player.Handle);
             this.Player = player;
             this.License = player.Identifiers["license"];
-            this.Username = "";
+            this.Username = ""; // TODO: Set sanitized player.Name as GFPlayer.Username
         }
 
+        public bool IsActive { get; set; }
         public Player Player { get; }
         public int PlayerId { get; }
-
-        private string username;
 
         public string Username
         {

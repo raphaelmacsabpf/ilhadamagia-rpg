@@ -46,11 +46,11 @@ namespace Server
                 Console.WriteLine("[IM AppBootstrap] Registering EventHanlders");
 
                 EventHandlers["playerConnecting"] += new Action<Player, string, dynamic, dynamic>(mainServer.OnPlayerConnecting);
+                EventHandlers["playerDropped"] += new Action<Player, string>(mainServer.OnPlayerDropped);
                 EventHandlers["GF:Server:OnClientReady"] += new Action<Player>(mainServer.OnClientReady);
                 EventHandlers["GF:Server:OnChatMessage"] += new Action<Player, string>(chatManager.OnChatMessage);
                 EventHandlers["GF:Server:OnClientCommand"] += new Action<Player, int, bool, string>(mainServer.CommandManager.OnClientCommand);
-                EventHandlers["GF:Server:CreatedVehicle"] += new Action<Player, int>(mainServer.MapManager.PlayerCreatedVehicle);
-                EventHandlers["GF:Server:OnPlayerTargetActionServerCallback"] += new Action<Player, string, string>(mainServer.MapManager.OnPlayerTargetActionServerCallback);
+                EventHandlers["GF:Server:OnPlayerTargetActionServerCallback"] += new Action<Player, string>(mainServer.MapManager.OnPlayerTargetActionServerCallback);
             }
 
             initializationStopwatch.Stop();

@@ -51,7 +51,6 @@
     <Compile Include="Dto\MarkerDto.cs" />
     <Compile Include="Dto\PlayerVarDto.cs" />
     <Compile Include="Dto\ProximityTargetDto.cs" />
-    <Compile Include="Dto\VehicleDto.cs" />
     <Compile Include="PayloadType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TargetActionType.cs" />

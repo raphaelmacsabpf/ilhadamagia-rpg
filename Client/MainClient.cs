@@ -148,7 +148,6 @@ namespace Client
 
                 // set the player ped into the vehicle and driver seat
                 Game.PlayerPed.SetIntoVehicle(vehicle, VehicleSeat.Driver);
-                TriggerServerEvent("GF:Server:CreatedVehicle", vehicle.Handle);
                 // tell the player
                 this.playerActions.SendMessageToPlayerChat(ChatColor.COLOR_GRAD1, $"Woohoo! Enjoy your new ^*{model}!");
                 await Delay(250);

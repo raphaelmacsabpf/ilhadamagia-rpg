@@ -1,5 +1,7 @@
 ﻿using CitizenFX.Core;
+using CitizenFX.Core.Native;
 using GF.CrossCutting.Dto;
+using Server.Entities;
 using System;
 using System.Collections.Generic;
 
@@ -8,26 +10,50 @@ namespace Server
     public class MapManager : BaseScript
     {
         private List<MarkerDto> staticMarkers;
-        private List<VehicleDto> staticVehicles;
+        private List<ServerVehicle> serverVehicles;
         private List<ProximityTargetDto> staticProximityTargets;
         private List<InteractionTargetDto> staticInteractionTargets;
+        private Dictionary<string, Action> interactionTargetsCallbacks;
 
-        public int lastHandle = 0;
         private readonly PlayerInfo playerInfo;
+        private readonly ChatManager chatManager;
 
-        public MapManager(PlayerInfo playerInfo) // TODO: Verify constructor to prevent to start from fivem
+        public MapManager(PlayerInfo playerInfo, ChatManager chatManager) // TODO: Verify constructor to prevent to start from fivem
         {
+            this.playerInfo = playerInfo;
+            this.chatManager = chatManager;
+
             this.staticMarkers = new List<MarkerDto>();
-            this.staticVehicles = new List<VehicleDto>();
+            this.serverVehicles = new List<ServerVehicle>();
             this.staticProximityTargets = new List<ProximityTargetDto>();
             this.staticInteractionTargets = new List<InteractionTargetDto>();
+            this.interactionTargetsCallbacks = new Dictionary<string, Action>();
+
+            var currentVehicles = API.GetAllVehicles() as List<object>;
+
+            foreach (var vehicle in currentVehicles)
+            {
+                API.DeleteEntity(Convert.ToInt32(vehicle));
+            }
+
+            this.AddInterationMarkerWithNotification(307.8857f, -727.8989f, 29.3136f - 0.5f, "Bem vindo ao ~b~Ilha da Magia RPG~s~, aperte ~o~E~s~ para interagir.", () =>
+            {
+                chatManager.SendClientMessageToAll(GF.CrossCutting.ChatColor.COLOR_ROSA, "aeEEEE Atingiu o target tio.");
+            });
+
+            this.AddInterationMarkerWithNotification(319.0022f, -713.1561f, 29.3136f - 0.5f, "Bem vindo ao ~b~Ilha da Magia NEEEWS RPG~s~, aperte ~o~E~s~ para interagir.", () =>
+            {
+                chatManager.SendClientMessageToAll(GF.CrossCutting.ChatColor.COLOR_NEWS, "aeEEEE Atingiu o target NEWS tio.");
+            });
 
             Console.WriteLine("[IM MapManager] Started MapManager");
+        }
 
-            this.AddDefaultMarker(307.8857f, -727.8989f, 29.3136f - 0.5f);
-            this.AddProximityNotificationTarget(307.8857f, -727.8989f, 29.3136f - 0.5f, "Bem vindo ao ~b~Ilha da Magia RPG~s~, aperte ~o~E~s~ para interagir.");
-            this.AddInteractionToServerCallbackTarget(307.8857f, -727.8989f, 29.3136f - 0.5f, "MAIN_SPAWN_INTERACTION"); // TODO: Remover interação se necessário
-            this.playerInfo = playerInfo;
+        public void AddInterationMarkerWithNotification(float x, float y, float z, string notification, Action serverCallback)
+        {
+            this.AddDefaultMarker(x, y, z);
+            this.AddProximityNotificationTarget(x, y, z, notification);
+            this.AddInteractionToServerCallbackTarget(x, y, z, serverCallback);
         }
 
         public void AddProximityNotificationTarget(float x, float y, float z, string message)
@@ -40,9 +66,12 @@ namespace Server
             this.staticInteractionTargets.Add(new InteractionTargetDto(x, y, z, "INFO_TO_PLAYER", message));
         }
 
-        public void AddInteractionToServerCallbackTarget(float x, float y, float z, string serverCallback)
+        public void AddInteractionToServerCallbackTarget(float x, float y, float z, Action serverCallback)
         {
-            this.staticInteractionTargets.Add(new InteractionTargetDto(x, y, z, "SERVER_CALLBACK", serverCallback));
+            Random random = new Random();
+            var callbackId = $"{random.Next()}.{random.Next()}.{random.Next()}.{serverCallback.GetHashCode()}";
+            interactionTargetsCallbacks.Add(callbackId, serverCallback);
+            this.staticInteractionTargets.Add(new InteractionTargetDto(x, y, z, "SERVER_CALLBACK", callbackId));
         }
 
         public void AddDefaultMarker(float x, float y, float z)
@@ -65,21 +94,20 @@ namespace Server
             return this.staticInteractionTargets;
         }
 
-        public void PlayerCreatedVehicle([FromSource] Player player, int vehicleHandle)
+        public void OnPlayerTargetActionServerCallback([FromSource] Player player, string callbackId)
         {
-            this.lastHandle = vehicleHandle;
-            Console.WriteLine($"--------- CARRINHO CRIADO por {player.Name}, handle: {this.lastHandle}");
-        }
-
-        public void OnPlayerTargetActionServerCallback([FromSource] Player player, string actionName, string payload)
-        {
-            switch (actionName)
+            switch (callbackId)
             {
                 case "MAIN_SPAWN_INTERACTION":
                     {
                         // TODO: Create main spawn interaction
-                        break;
+                        return;
                     }
+            }
+
+            if (interactionTargetsCallbacks.TryGetValue(callbackId, out Action serverCallback))
+            {
+                serverCallback();
             }
         }
     }

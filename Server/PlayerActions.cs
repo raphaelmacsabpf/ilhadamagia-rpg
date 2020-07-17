@@ -1,4 +1,5 @@
 ﻿using CitizenFX.Core;
+using Server.Enums;
 using System;
 
 namespace Server

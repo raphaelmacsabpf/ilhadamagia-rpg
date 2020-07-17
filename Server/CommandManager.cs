@@ -1,6 +1,7 @@
 ﻿using CitizenFX.Core;
 using GF.CrossCutting;
 using Server.Entities;
+using Server.Enums;
 using System;
 
 namespace Server
