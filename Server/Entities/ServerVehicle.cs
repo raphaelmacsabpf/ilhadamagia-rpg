@@ -11,7 +11,6 @@ namespace Server.Entities
             SpawnY = spawnY;
             SpawnZ = spawnZ;
             SpawnHeading = spawnHeading;
-            Status = ServerVehicleStatus.NEW;
         }
 
         public int Handle { get; set; }
@@ -20,6 +19,5 @@ namespace Server.Entities
         public float SpawnZ { get; set; }
         public float SpawnHeading { get; set; }
         public VehicleHash Hash { get; set; }
-        public ServerVehicleStatus Status { get; set; }
     }
 }

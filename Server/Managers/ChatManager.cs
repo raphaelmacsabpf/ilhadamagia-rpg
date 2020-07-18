@@ -2,7 +2,7 @@
 using GF.CrossCutting;
 using System;
 
-namespace Server
+namespace Server.Managers
 {
     public class ChatManager : BaseScript
     {

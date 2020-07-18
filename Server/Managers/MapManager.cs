@@ -5,7 +5,7 @@ using Server.Entities;
 using System;
 using System.Collections.Generic;
 
-namespace Server
+namespace Server.Managers
 {
     public class MapManager : BaseScript
     {

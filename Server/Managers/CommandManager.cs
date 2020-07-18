@@ -4,7 +4,7 @@ using Server.Entities;
 using Server.Enums;
 using System;
 
-namespace Server
+namespace Server.Managers
 {
     public class CommandManager : BaseScript
     {
@@ -31,7 +31,7 @@ namespace Server
             commandPacket.HasArgs = hasArgs;
             commandPacket.Text = text;
 
-            GFPlayer sourceGFPlayer = this.playerInfo.PlayerToGFPlayer(sourcePlayer);
+            GFPlayer sourceGFPlayer = this.playerInfo.GetGFPlayer(sourcePlayer);
             string[] args = new string[0];
             if (commandPacket.HasArgs)
             {
@@ -184,7 +184,7 @@ namespace Server
                             return;
                         }*/
 
-                        var targetGFPlayer = this.playerInfo.PlayerToGFPlayer(targetPlayer);
+                        var targetGFPlayer = this.playerInfo.GetGFPlayer(targetPlayer);
                         targetGFPlayer.AdminLevel = level;
                         this.chatManager.SendClientMessage(targetPlayer, ChatColor.COLOR_LIGHTBLUE, $"  Você foi promovido a nivel {level} de admin, pelo admin {sourcePlayer.Name}");
                         this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_LIGHTBLUE, $" Você promoveu {targetPlayer.Name} para nivel {level} de admin.");
@@ -236,7 +236,7 @@ namespace Server
             }
         }
 
-        private Player GetPlayerByIdOrName(string playerStr)
+        private Player GetPlayerByIdOrName(string playerStr) // TODO: Usar o username aqui
         {
             int parsedId;
             bool parseSucceed = Int32.TryParse(playerStr, out parsedId);

@@ -1,6 +1,7 @@
 ﻿using CitizenFX.Core;
 using GF.CrossCutting;
 using Newtonsoft.Json;
+using Server.Managers;
 using System;
 using System.Threading;
 
@@ -12,8 +13,6 @@ namespace Server
         private readonly NetworkManager networkManager;
         private readonly PlayerActions playerActions;
         private readonly ChatManager chatManager;
-        private readonly Thread syncThread;
-        private bool scriptStopped;
         private int activePlayers;
 
         public MainServer(PlayerInfo playerInfo, CommandManager commandManager, MapManager mapManager, NetworkManager networkManager, PlayerActions playerActions, ChatManager chatManager)
@@ -27,16 +26,11 @@ namespace Server
 
             foreach (var player in new PlayerList())
             {
-                var gfPlayer = this.playerInfo.PlayerToGFPlayer(player);
+                var gfPlayer = this.playerInfo.GetGFPlayer(player);
                 gfPlayer.IsActive = true;
                 activePlayers++;
                 Console.WriteLine($"[IM MainServer] PlayerLoaded: [{player.Handle}] {player.Name}");
             }
-
-            /*this.syncThread = new Thread(SyncThreadHandler);
-            this.syncThread.Priority = ThreadPriority.Highest;
-            this.syncThread.IsBackground = true;
-            this.syncThread.Start();*/
 
             Console.WriteLine("[IM MainServer] Started MainServer");
         }
@@ -52,7 +46,7 @@ namespace Server
 
         public async void OnClientReady([FromSource] Player player)
         {
-            var gfPlayer = playerInfo.PlayerToGFPlayer(player);
+            var gfPlayer = playerInfo.GetGFPlayer(player);
             var json = JsonConvert.SerializeObject(gfPlayer.PopUpdatedPlayerVarsPayload());
             this.networkManager.SendPayloadToPlayer(gfPlayer.Player, PayloadType.TO_PLAYER_VARS, json);
 
@@ -72,7 +66,7 @@ namespace Server
 
         internal void OnPlayerDropped([FromSource] Player player, string reason)
         {
-            var gfPlayer = this.playerInfo.PlayerToGFPlayer(player);
+            var gfPlayer = this.playerInfo.GetGFPlayer(player);
             gfPlayer.IsActive = false;
             activePlayers--;
             Console.WriteLine($"Player dropped, name: {gfPlayer.Username}, reason: {reason}, activePlayers: {activePlayers}");
@@ -93,7 +87,7 @@ namespace Server
                 await Delay(20);
             }
 
-            this.playerInfo.PlayerToGFPlayer(player);
+            this.playerInfo.GetGFPlayer(player);
 
             Console.WriteLine($"[Connected] {playerName}, IP: {player.EndPoint}, Identifiers: {player.Identifiers["license"]}");
             deferrals.done();

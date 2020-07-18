@@ -3,6 +3,7 @@ using GF.CrossCutting;
 using GF.CrossCutting.Dto;
 using Newtonsoft.Json;
 using Server.Entities;
+using Server.Managers;
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
@@ -45,7 +46,7 @@ namespace Server
             }
         }
 
-        public GFPlayer PlayerToGFPlayer(Player player)
+        public GFPlayer GetGFPlayer(Player player)
         {
             GFPlayer gfPlayer;
             if (playerToGFPlayerDictionary.TryGetValue(player, out _) == false)
