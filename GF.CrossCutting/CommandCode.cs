@@ -13,5 +13,6 @@
         SET_ADMIN,
         SET_ARMOUR,
         GO_TO_COORDS,
+        PROP_MENU,
     }
 }

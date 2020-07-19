@@ -7,13 +7,14 @@ namespace Client
     {
         public ClientAppBootstrap()
         {
+            var menuManager = new MenuManager(true);
             var playerInfo = new PlayerInfo();
             var markersManager = new MarkersManager();
             var drawTextAPI = new DrawTextAPI(true);
             var playerActions = new PlayerActions(true);
             var targetsManager = new TargetsManager(playerActions);
             var render = new Render(drawTextAPI, markersManager, targetsManager);
-            var mainClient = new MainClient(playerInfo, markersManager, render, playerActions, targetsManager);
+            var mainClient = new MainClient(playerInfo, markersManager, render, playerActions, targetsManager, menuManager);
 
             this.Tick += render.RenderTickHandler;
             this.Tick += targetsManager.TargetsTickHandler;
@@ -39,6 +40,7 @@ namespace Client
             EventHandlers["GF:Client:SendPayload"] += new Action<int, string>(mainClient.OnPayloadReceive);
             EventHandlers["GF:Client:SetPlayerMoney"] += new Action<int>(mainClient.GFSetPlayerMoney);
             EventHandlers["GF:Client:DeleteVehicle"] += new Action<int>(mainClient.GFDeleteVehicle);
+            EventHandlers["GF:Client:OpenMenu"] += new Action<int>(menuManager.OpenMenu);
         }
     }
 }

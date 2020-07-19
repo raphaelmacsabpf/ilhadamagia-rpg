@@ -1,4 +1,6 @@
 ﻿using CitizenFX.Core;
+using GF.CrossCutting;
+using Server.Entities;
 using Server.Enums;
 using System;
 
@@ -34,6 +36,11 @@ namespace Server
         public void SetPlayerMoney(Player player, int money)
         {
             player.TriggerEvent("GF:Client:SetPlayerMoney", money);
+        }
+
+        public void OpenMenu(GFPlayer gfPlayer, MenuType menuType)
+        {
+            gfPlayer.Player.TriggerEvent("GF:Client:OpenMenu", (int)menuType);
         }
     }
 }

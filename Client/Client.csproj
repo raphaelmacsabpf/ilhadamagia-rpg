@@ -31,9 +31,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CitizenFX.Client">
-      <HintPath>.\CitizenFX.Client.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="CitizenFX.Core.Client, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CitizenFX.Core.Client.1.0.2734\lib\net45\CitizenFX.Core.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="MenuAPI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MenuAPI.FiveM.3.1.5\lib\net452\MenuAPI.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json.net, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -43,6 +45,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -55,6 +58,7 @@
     <Compile Include="CommandParser.cs" />
     <Compile Include="MainClient.cs" />
     <Compile Include="MarkersManager.cs" />
+    <Compile Include="MenuManager.cs" />
     <Compile Include="PlayerActions.cs" />
     <Compile Include="PlayerInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -68,6 +72,9 @@
       <Project>{57f6196d-3b31-42a4-b63d-f336f243a9ba}</Project>
       <Name>GF.CrossCutting</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

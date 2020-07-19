@@ -247,6 +247,11 @@ namespace Server.Managers
 
                         return;
                     }
+                case CommandCode.PROP_MENU:
+                    {
+                        this.playerActions.OpenMenu(sourceGFPlayer, MenuType.House);
+                        return;
+                    }
                 default:
                     {
                         this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_LIGHTRED, "Comando não reconhecido, use /ajuda para ver alguns comandos!");

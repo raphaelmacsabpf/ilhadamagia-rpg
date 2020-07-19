@@ -6,6 +6,10 @@ client_scripts {
 	'client/GF.CrossCutting.net.dll',
 	'client/Newtonsoft.Json.net.dll'
 }
+
+files {
+	'client/MenuAPI.dll'
+}
 -- move ..\build\client\Newtonsoft.Json.net.dll ..\build\
 
 server_scripts {

@@ -16,8 +16,9 @@ namespace Client
         private readonly Render render;
         private readonly PlayerActions playerActions;
         private readonly TargetsManager targetsManager;
+        private readonly MenuManager menuManager;
 
-        public MainClient(PlayerInfo playerInfo, MarkersManager markersManager, Render render, PlayerActions playerActions, TargetsManager targetsManager)
+        public MainClient(PlayerInfo playerInfo, MarkersManager markersManager, Render render, PlayerActions playerActions, TargetsManager targetsManager, MenuManager menuManager)
         {
             API.RemoveMultiplayerWalletCash();
             API.RemoveMultiplayerHudCash();
@@ -27,6 +28,7 @@ namespace Client
             this.render = render;
             this.playerActions = playerActions;
             this.targetsManager = targetsManager;
+            this.menuManager = menuManager;
         }
 
         public void GFDeleteVehicle(int vehicleHandle)

@@ -32,6 +32,7 @@ namespace Client
                 case "/setadmin": return CommandCode.SET_ADMIN;
                 case "/setcolete": return CommandCode.SET_ARMOUR;
                 case "/coords": return CommandCode.GO_TO_COORDS;
+                case "/prop": return CommandCode.PROP_MENU;
                 default: return CommandCode.INVALID_COMMAND;
             }
         }

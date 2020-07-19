@@ -24,7 +24,7 @@ namespace Server
             PlayerActions playerActions = new PlayerActions(true);
 
             var builder = new ContainerBuilder();
-
+            builder.RegisterType<MenuManager>().As<MenuManager>().SingleInstance();
             builder.RegisterType<ChatManager>().As<ChatManager>().SingleInstance();
             builder.RegisterType<MapManager>().As<MapManager>().SingleInstance();
             builder.RegisterInstance(playerActions).As<PlayerActions>();
@@ -43,6 +43,7 @@ namespace Server
                 Console.WriteLine("[IM AppBootstrap] Resolving Scope");
                 var mainServer = scope.Resolve<MainServer>();
                 var chatManager = scope.Resolve<ChatManager>();
+                var menuManager = scope.Resolve<MenuManager>();
 
                 Console.WriteLine("[IM AppBootstrap] Registering EventHanlders");
 
@@ -52,6 +53,7 @@ namespace Server
                 EventHandlers["GF:Server:OnChatMessage"] += new Action<Player, string>(chatManager.OnChatMessage);
                 EventHandlers["GF:Server:OnClientCommand"] += new Action<Player, int, bool, string>(mainServer.CommandManager.OnClientCommand);
                 EventHandlers["GF:Server:OnPlayerTargetActionServerCallback"] += new Action<Player, string>(mainServer.MapManager.OnPlayerTargetActionServerCallback);
+                EventHandlers["GF:Server:OnMenuAction"] += new Action<Player, int>(menuManager.OnPlayerMenuAction);
             }
 
             initializationStopwatch.Stop();

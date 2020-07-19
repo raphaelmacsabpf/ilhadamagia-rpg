@@ -68,6 +68,7 @@
     <Compile Include="MainServer.cs" />
     <Compile Include="Managers\MapManager.cs" />
     <Compile Include="Managers\NetworkManager.cs" />
+    <Compile Include="MenuManager.cs" />
     <Compile Include="PlayerInfo.cs" />
     <Compile Include="PlayerActions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
