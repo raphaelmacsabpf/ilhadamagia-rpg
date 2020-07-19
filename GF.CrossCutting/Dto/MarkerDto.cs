@@ -3,7 +3,7 @@
     // TODO: Uppercase first letter in each auto-property
     public class MarkerDto
     {
-        public MarkerDto(int type, float posX, float posY, float posZ, float dirX, float dirY, float dirZ, float rotX, float rotY, float rotZ, float scaleX, float scaleY, float scaleZ, int red, int green, int blue, int alpha, bool bobUpAndDown, bool faceCamera, int p19, bool rotate, string textureDict, string textureName, bool drawOnEnts)
+        public MarkerDto(int type, float posX, float posY, float posZ, float dirX, float dirY, float dirZ, float rotX, float rotY, float rotZ, float scaleX, float scaleY, float scaleZ, MarkerColor color, bool bobUpAndDown, bool faceCamera, int p19, bool rotate, string textureDict, string textureName, bool drawOnEnts)
         {
             this.type = type;
             this.posX = posX;
@@ -18,10 +18,7 @@
             this.scaleX = scaleX;
             this.scaleY = scaleY;
             this.scaleZ = scaleZ;
-            this.red = red;
-            this.green = green;
-            this.blue = blue;
-            this.alpha = alpha;
+            this.Color = color;
             this.bobUpAndDown = bobUpAndDown;
             this.faceCamera = faceCamera;
             this.p19 = p19;
@@ -44,10 +41,7 @@
         public float scaleX { get; set; }
         public float scaleY { get; set; }
         public float scaleZ { get; set; }
-        public int red { get; set; }
-        public int green { get; set; }
-        public int blue { get; set; }
-        public int alpha { get; set; }
+        public MarkerColor Color { get; set; }
         public bool bobUpAndDown { get; set; }
         public bool faceCamera { get; set; }
         public int p19 { get; set; }

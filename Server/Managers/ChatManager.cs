@@ -1,22 +1,31 @@
 ﻿using CitizenFX.Core;
 using GF.CrossCutting;
+using Server.Entities;
 using System;
 
 namespace Server.Managers
 {
     public class ChatManager : BaseScript
     {
-        public ChatManager(bool ignoreFiveMInitialization) // TODO: Improve useless parameter Hack
+        private readonly PlayerInfo playerInfo;
+
+        public ChatManager(PlayerInfo playerInfo)
         {
             Console.WriteLine("[IM ChatManager] Started ChatManager");
+            this.playerInfo = playerInfo;
         }
 
         public void SendClientMessageToAll(ChatColor chatColor, string message)
         {
-            foreach (Player player in new PlayerList())
+            foreach (GFPlayer player in playerInfo.GetGFPlayerList())
             {
                 SendClientMessage(player, chatColor, message);
             }
+        }
+
+        public void SendClientMessage(GFPlayer gfPlayer, ChatColor chatColor, string message)
+        {
+            gfPlayer.Player.TriggerEvent("GF:Client:SendClientMessage", (int)chatColor, message);
         }
 
         public void SendClientMessage(Player player, ChatColor chatColor, string message)

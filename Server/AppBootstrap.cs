@@ -21,12 +21,11 @@ namespace Server
             Console.WriteLine(" ");
 
             Console.WriteLine("[IM AppBootstrap] Building DI Container");
-            ChatManager chatManager = new ChatManager(true);
             PlayerActions playerActions = new PlayerActions(true);
 
             var builder = new ContainerBuilder();
 
-            builder.RegisterInstance(chatManager).As<ChatManager>();
+            builder.RegisterType<ChatManager>().As<ChatManager>().SingleInstance();
             builder.RegisterType<MapManager>().As<MapManager>().SingleInstance();
             builder.RegisterInstance(playerActions).As<PlayerActions>();
             builder.RegisterType<PlayerInfo>().As<PlayerInfo>().SingleInstance();
@@ -43,6 +42,7 @@ namespace Server
             {
                 Console.WriteLine("[IM AppBootstrap] Resolving Scope");
                 var mainServer = scope.Resolve<MainServer>();
+                var chatManager = scope.Resolve<ChatManager>();
 
                 Console.WriteLine("[IM AppBootstrap] Registering EventHanlders");
 

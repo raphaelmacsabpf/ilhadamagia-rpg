@@ -3,7 +3,6 @@ using GF.CrossCutting;
 using Newtonsoft.Json;
 using Server.Managers;
 using System;
-using System.Threading;
 
 namespace Server
 {

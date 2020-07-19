@@ -19,6 +19,7 @@ namespace Server.Entities
             this.Username = ""; // TODO: Set sanitized player.Name as GFPlayer.Username
         }
 
+        public int Id { get; set; }
         public bool IsActive { get; set; }
         public Player Player { get; }
         public int PlayerId { get; }
@@ -52,6 +53,7 @@ namespace Server.Entities
         }
 
         public int Bank { get; }
+        public GFHouse CurrentHouse { get; set; }
 
         public PlayerVarsDto PopUpdatedPlayerVarsPayload()
         {

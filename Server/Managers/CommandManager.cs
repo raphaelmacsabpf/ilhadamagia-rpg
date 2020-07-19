@@ -227,6 +227,26 @@ namespace Server.Managers
                         this.playerActions.GiveWeaponToPlayer(sourcePlayer, WeaponHash.HeavySniperMk2, 200, false, true);
                         return;
                     }
+                case CommandCode.GO_TO_COORDS:
+                    {
+                        if (sourceGFPlayer.AdminLevel < 1)
+                        {
+                            this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_GRAD2, "Você não está autorizado a usar este comando!");
+                            return;
+                        }
+
+                        var vectorStr = commandPacket.Text.Split(new string[] { " " }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
+                        var vectorPositions = vectorStr.Split(',');
+                        var targetVector = new Vector3(
+                            float.Parse(vectorPositions[0]),
+                            float.Parse(vectorPositions[1]),
+                            float.Parse(vectorPositions[2])
+                        );
+
+                        this.playerActions.SetPlayerPos(sourcePlayer, targetVector);
+
+                        return;
+                    }
                 default:
                     {
                         this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_LIGHTRED, "Comando não reconhecido, use /ajuda para ver alguns comandos!");

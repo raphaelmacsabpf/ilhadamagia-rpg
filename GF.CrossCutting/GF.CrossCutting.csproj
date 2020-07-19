@@ -51,6 +51,8 @@
     <Compile Include="Dto\MarkerDto.cs" />
     <Compile Include="Dto\PlayerVarDto.cs" />
     <Compile Include="Dto\ProximityTargetDto.cs" />
+    <Compile Include="MarkerColor.cs" />
+    <Compile Include="MarkerColorValue.cs" />
     <Compile Include="PayloadType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

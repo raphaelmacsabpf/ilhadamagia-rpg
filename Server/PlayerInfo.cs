@@ -6,6 +6,7 @@ using Server.Entities;
 using Server.Managers;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Server
@@ -57,6 +58,11 @@ namespace Server
             }
 
             return playerToGFPlayerDictionary[player];
+        }
+
+        public IEnumerable<GFPlayer> GetGFPlayerList()
+        {
+            return this.playerToGFPlayerDictionary.Values;
         }
 
         // TODO: Rever sistema de atualização de variáveis do jogador.

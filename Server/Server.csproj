@@ -52,6 +52,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\GFHouse.cs" />
+    <Compile Include="Entities\GFProperty.cs" />
+    <Compile Include="Enums\InteriorType.cs" />
+    <Compile Include="Enums\PropertySellState.cs" />
+    <Compile Include="Enums\PropertyType.cs" />
     <Compile Include="Managers\ChatManager.cs" />
     <Compile Include="AppBootstrap.cs" />
     <Compile Include="Managers\CommandManager.cs" />

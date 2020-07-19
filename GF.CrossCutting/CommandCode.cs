@@ -11,6 +11,7 @@
         BRING,
         SAVE,
         SET_ADMIN,
-        SET_ARMOUR
+        SET_ARMOUR,
+        GO_TO_COORDS,
     }
 }

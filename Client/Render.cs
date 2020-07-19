@@ -1,5 +1,6 @@
 ﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using GF.CrossCutting;
 using GF.CrossCutting.Dto;
 using System;
 using System.Threading.Tasks;
@@ -31,12 +32,15 @@ namespace Client
 
         public async Task RenderTickHandler()
         {
-            while (true)
+            API.SetVehicleDensityMultiplierThisFrame(0.01f);
+            API.SetRandomVehicleDensityMultiplierThisFrame(0.01f);
+            API.SetParkedVehicleDensityMultiplierThisFrame(0.0f);
+
+            ProcessInputs();
+            RenderMarkers();
+            RenderPlayerMoney();
+            for (int i = 0; i < 1000000; i++) // HACK: Teste de estabilidade do tick (Remover antes de lançar)
             {
-                await Delay(1);
-                ProcessInputs();
-                RenderPlayerMoney();
-                RenderMarkers();
             }
         }
 
@@ -129,7 +133,13 @@ namespace Client
         {
             foreach (MarkerDto markerdto in this.markersManager.Markers)
             {
-                API.DrawMarker(markerdto.type, markerdto.posX, markerdto.posY, markerdto.posZ, markerdto.dirX, markerdto.dirY, markerdto.dirZ, markerdto.rotX, markerdto.rotY, markerdto.rotZ, markerdto.scaleX, markerdto.scaleY, markerdto.scaleZ, markerdto.red, markerdto.green, markerdto.blue, markerdto.alpha, markerdto.bobUpAndDown, markerdto.faceCamera, markerdto.p19, markerdto.rotate, markerdto.textureDict, markerdto.textureName, markerdto.drawOnEnts);
+                var colorRgba = MarkerColorValue.GetRGBA(markerdto.Color);
+                int r = colorRgba[0];
+                int g = colorRgba[1];
+                int b = colorRgba[2];
+                int a = colorRgba[3];
+
+                API.DrawMarker(markerdto.type, markerdto.posX, markerdto.posY, markerdto.posZ, markerdto.dirX, markerdto.dirY, markerdto.dirZ, markerdto.rotX, markerdto.rotY, markerdto.rotZ, markerdto.scaleX, markerdto.scaleY, markerdto.scaleZ, r, g, b, a, markerdto.bobUpAndDown, markerdto.faceCamera, markerdto.p19, markerdto.rotate, markerdto.textureDict, markerdto.textureName, markerdto.drawOnEnts);
             }
         }
     }
