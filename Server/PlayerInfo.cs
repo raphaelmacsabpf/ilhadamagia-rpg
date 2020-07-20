@@ -52,7 +52,7 @@ namespace Server
             GFPlayer gfPlayer;
             if (playerToGFPlayerDictionary.TryGetValue(player, out _) == false)
             {
-                gfPlayer = new GFPlayer(player);
+                gfPlayer = new GFPlayer(0, player); // TODO: Load GFPlayer GlobalId
                 gfPlayer.OnPlayerVarsUpdate += GfPlayer_OnPlayerVarsUpdate;
                 playerToGFPlayerDictionary.TryAdd(player, gfPlayer);
             }

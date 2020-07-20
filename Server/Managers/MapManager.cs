@@ -6,13 +6,13 @@ using Server.Entities;
 using Server.Enums;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Server.Managers
 {
     public class MapManager : BaseScript
     {
         private List<MarkerDto> staticMarkers;
-        private List<ServerVehicle> serverVehicles;
         private List<ProximityTargetDto> staticProximityTargets;
         private List<InteractionTargetDto> staticInteractionTargets;
         private Dictionary<string, Action<GFPlayer>> interactionTargetsCallbacks;
@@ -30,7 +30,6 @@ namespace Server.Managers
             this.playerActions = playerActions;
 
             this.staticMarkers = new List<MarkerDto>();
-            this.serverVehicles = new List<ServerVehicle>();
             this.staticProximityTargets = new List<ProximityTargetDto>();
             this.staticInteractionTargets = new List<InteractionTargetDto>();
             this.interactionTargetsCallbacks = new Dictionary<string, Action<GFPlayer>>();
@@ -76,8 +75,8 @@ namespace Server.Managers
 
         public void BuildHouses()
         {
-            this.houses.Add(new GFHouse(new Vector3(430.9583f, -1725.626f, 29.59998f), new Vector4(432.3956f, -1736.519f, 28.58899f, 48.18897f)));
-            this.houses.Add(new GFHouse(new Vector3(-141.8901f, -1693.345f, 36.15454f), new Vector4(-141.1253f, -1702.009f, 30.10547f, 138.8976f)));
+            this.houses.Add(new GFHouse(1, new Vector3(430.9583f, -1725.626f, 29.59998f), new Vector4(432.3956f, -1736.519f, 28.58899f, 48.18897f)));
+            this.houses.Add(new GFHouse(2, new Vector3(-141.8901f, -1693.345f, 36.15454f), new Vector4(-141.1253f, -1702.009f, 30.10547f, 138.8976f)));
 
             foreach (var house in this.houses)
             {
@@ -161,6 +160,22 @@ namespace Server.Managers
                 var gfPlayer = this.playerInfo.GetGFPlayer(player);
                 serverCallback(gfPlayer);
             }
+        }
+
+        public bool IsValidHouseId(int houseId)
+        {
+            return this.houses.Exists((house) =>
+            {
+                return house.GlobalId == houseId;
+            });
+        }
+
+        public GFHouse GetGFHouseFromId(int id)
+        {
+            return this.houses.FirstOrDefault((house) =>
+            {
+                return house.GlobalId == id;
+            });
         }
     }
 }

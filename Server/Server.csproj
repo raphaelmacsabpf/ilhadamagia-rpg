@@ -62,8 +62,6 @@
     <Compile Include="Managers\CommandManager.cs" />
     <Compile Include="DebugResolveModule.cs" />
     <Compile Include="Entities\GFPlayer.cs" />
-    <Compile Include="Entities\GFTarget.cs" />
-    <Compile Include="Entities\ServerVehicle.cs" />
     <Compile Include="EventArgs\PlayerUpdateVarsEventArgs.cs" />
     <Compile Include="MainServer.cs" />
     <Compile Include="Managers\MapManager.cs" />

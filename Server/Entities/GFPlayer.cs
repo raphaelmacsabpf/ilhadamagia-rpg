@@ -11,15 +11,16 @@ namespace Server.Entities
         private int money;
         private string username;
 
-        public GFPlayer(Player player) // TODO: Rename GFPlayer to GMPlayer
+        public GFPlayer(int globalId, Player player) // TODO: Rename GFPlayer to GMPlayer
         {
             this.PlayerId = Int32.Parse(player.Handle);
+            GlobalId = globalId;
             this.Player = player;
             this.License = player.Identifiers["license"];
             this.Username = ""; // TODO: Set sanitized player.Name as GFPlayer.Username
         }
 
-        public int Id { get; set; }
+        public int GlobalId { get; set; }
         public bool IsActive { get; set; }
         public Player Player { get; }
         public int PlayerId { get; }
@@ -41,6 +42,7 @@ namespace Server.Entities
         public int Level { get; }
         public int Respect { get; }
         public int ConnectedTime { get; }
+        public int HouseId { get; set; }
 
         public int Money
         {
@@ -53,7 +55,7 @@ namespace Server.Entities
         }
 
         public int Bank { get; }
-        public GFHouse CurrentHouse { get; set; }
+        public GFHouse CurrentHouse { get; set; } // HACK: Não salvar no DB
 
         public PlayerVarsDto PopUpdatedPlayerVarsPayload()
         {

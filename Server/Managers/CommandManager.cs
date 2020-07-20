@@ -26,6 +26,20 @@ namespace Server.Managers
 
         internal void OnClientCommand([FromSource] Player sourcePlayer, int commandCode, bool hasArgs, string text)
         {
+            try
+            {
+                ProcessCommandForPlayer(sourcePlayer, commandCode, hasArgs, text);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("[IM CommandManager] Unhandled command exception: " + ex.Message); // TODO: Inserir informações do player
+                this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_LIGHTRED, "Comando não reconhecido, use /ajuda para ver alguns comandos!");
+                this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_LIGHTBLUE, "Peça ajuda também a um Administrador, use /relatorio."); // This '.' DOT at the end is the trick
+            }
+        }
+
+        private void ProcessCommandForPlayer(Player sourcePlayer, int commandCode, bool hasArgs, string text)
+        {
             CommandPacket commandPacket = new CommandPacket();
             commandPacket.CommandCode = (CommandCode)commandCode;
             commandPacket.HasArgs = hasArgs;
@@ -249,7 +263,51 @@ namespace Server.Managers
                     }
                 case CommandCode.PROP_MENU:
                     {
+                        var playerHouse = this.mapManager.GetGFHouseFromId(sourceGFPlayer.HouseId);
+                        if (playerHouse == null)
+                        {
+                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD1, "Você não possui uma casa válida");
+                            return;
+                        }
+
+                        var distanceFromPlayerToHerHouse = sourcePlayer.Character.Position.DistanceToSquared(playerHouse.Entrance);
+                        if (distanceFromPlayerToHerHouse > Math.Pow(1.5f, 2))
+                        {
+                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD1, "Você está muito longe da sua casa");
+                            return;
+                        }
+
                         this.playerActions.OpenMenu(sourceGFPlayer, MenuType.House);
+                        return;
+                    }
+                case CommandCode.SET_HOUSE:
+                    {
+                        if (sourceGFPlayer.AdminLevel < 3001)
+                        {
+                            this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_GRAD2, "Você não está autorizado a usar este comando!");
+                            return;
+                        }
+
+                        var targetPlayerStr = args[1];
+                        var targetPlayer = GetPlayerByIdOrName(args[1]);
+                        if (targetPlayer == null)
+                        {
+                            this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_GRAD1, $"   {targetPlayerStr} não é um player ativo.");
+                            return;
+                        }
+                        var targetGFPlayer = this.playerInfo.GetGFPlayer(targetPlayer);
+
+                        var houseIdStr = args[2];
+                        int houseId;
+
+                        if (Int32.TryParse(houseIdStr, out houseId) == false || this.mapManager.IsValidHouseId(houseId) == false)
+                        {
+                            this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_GRAD1, $"   {houseIdStr} não é um ID válido para uma casa.");
+                            return;
+                        }
+
+                        targetGFPlayer.HouseId = houseId;
+                        this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_LIGHTBLUE, $" Você setou a casa de {targetPlayer.Name} para ID {houseId}.");
                         return;
                     }
                 default:
