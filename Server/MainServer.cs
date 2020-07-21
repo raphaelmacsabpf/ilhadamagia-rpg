@@ -3,10 +3,10 @@ using GF.CrossCutting;
 using GF.CrossCutting.Dto;
 using Newtonsoft.Json;
 using Server.Domain.Entities;
-using Server.Managers;
+using Server.Application.Managers;
 using System;
 
-namespace Server
+namespace Server.Application
 {
     public class MainServer : BaseScript
     {

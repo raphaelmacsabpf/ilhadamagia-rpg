@@ -1,10 +1,10 @@
 ﻿using Autofac;
 using CitizenFX.Core;
-using Server.Managers;
+using Server.Application.Managers;
 using System;
 using System.Diagnostics;
 
-namespace Server
+namespace Server.Application
 {
     public class AppBootstrap : BaseScript
     {

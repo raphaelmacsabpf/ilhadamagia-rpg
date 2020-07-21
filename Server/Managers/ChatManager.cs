@@ -3,7 +3,7 @@ using GF.CrossCutting;
 using Server.Domain.Entities;
 using System;
 
-namespace Server.Managers
+namespace Server.Application.Managers
 {
     public class ChatManager : BaseScript
     {

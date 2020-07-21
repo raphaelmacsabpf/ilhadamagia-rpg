@@ -1,7 +1,7 @@
 ﻿using CitizenFX.Core;
 using GF.CrossCutting;
 
-namespace Server
+namespace Server.Application
 {
     public class MenuManager : BaseScript
     {

@@ -4,7 +4,7 @@ using Server.Domain.Entities;
 using Server.Domain.Enums;
 using System;
 
-namespace Server
+namespace Server.Application
 {
     public class PlayerActions : BaseScript
     {

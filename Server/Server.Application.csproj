@@ -7,8 +7,8 @@
     <ProjectGuid>{8B7D0416-0ACA-4A5F-B1CE-C151E74C5206}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Server</RootNamespace>
-    <AssemblyName>Server.net</AssemblyName>
+    <RootNamespace>Server.Application</RootNamespace>
+    <AssemblyName>Server.Application.net</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

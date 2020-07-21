@@ -1,7 +1,7 @@
 ﻿using CitizenFX.Core;
 using GF.CrossCutting;
 
-namespace Server.Managers
+namespace Server.Application.Managers
 {
     public class NetworkManager
     {

@@ -3,13 +3,13 @@ using GF.CrossCutting;
 using GF.CrossCutting.Dto;
 using Newtonsoft.Json;
 using Server.Domain.Entities;
-using Server.Managers;
+using Server.Application.Managers;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Server
+namespace Server.Application
 {
     public class PlayerInfo
     {

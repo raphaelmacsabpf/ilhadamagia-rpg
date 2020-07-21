@@ -13,5 +13,5 @@ files {
 -- move ..\build\client\Newtonsoft.Json.net.dll ..\build\
 
 server_scripts {
-    'server/Server.net.dll'
+    'server/Server.Application.net.dll'
 }

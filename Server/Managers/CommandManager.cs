@@ -4,7 +4,7 @@ using Server.Domain.Entities;
 using Server.Domain.Enums;
 using System;
 
-namespace Server.Managers
+namespace Server.Application.Managers
 {
     public class CommandManager : BaseScript
     {
@@ -271,6 +271,7 @@ namespace Server.Managers
                         }
 
                         var distanceFromPlayerToHerHouse = sourcePlayer.Character.Position.DistanceToSquared(new Vector3(playerHouse.EntranceX, playerHouse.EntranceY, playerHouse.EntranceZ));
+                        Console.WriteLine($"Distance is: {distanceFromPlayerToHerHouse}"); // TODO: Remover este LOG quando entender os problemas de sincronia
                         if (distanceFromPlayerToHerHouse > Math.Pow(1.5f, 2))
                         {
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD1, "Você está muito longe da sua casa");

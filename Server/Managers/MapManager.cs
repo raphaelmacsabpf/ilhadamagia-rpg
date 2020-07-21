@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Server.Managers
+namespace Server.Application.Managers
 {
     public class MapManager : BaseScript
     {

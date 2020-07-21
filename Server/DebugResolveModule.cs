@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 
-namespace Server
+namespace Server.Application
 {
     public class DebugResolveModule : Module
     {
