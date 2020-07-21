@@ -2,7 +2,7 @@
 using GF.CrossCutting;
 using GF.CrossCutting.Dto;
 using Newtonsoft.Json;
-using Server.Entities;
+using Server.Domain.Entities;
 using Server.Managers;
 using System;
 

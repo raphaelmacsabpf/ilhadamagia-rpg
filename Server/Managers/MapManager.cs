@@ -2,8 +2,8 @@
 using CitizenFX.Core.Native;
 using GF.CrossCutting;
 using GF.CrossCutting.Dto;
-using Server.Entities;
-using Server.Enums;
+using Server.Domain.Entities;
+using Server.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;

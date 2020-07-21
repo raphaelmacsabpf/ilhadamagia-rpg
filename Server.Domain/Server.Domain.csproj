@@ -44,6 +44,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\GFHouse.cs" />
+    <Compile Include="Entities\GFPlayer.cs" />
+    <Compile Include="Entities\GFProperty.cs" />
+    <Compile Include="Enums\InteriorType.cs" />
+    <Compile Include="Enums\PropertySellState.cs" />
+    <Compile Include="Enums\PropertyType.cs" />
+    <Compile Include="Enums\VehicleHash.cs" />
+    <Compile Include="Enums\WeaponHash.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

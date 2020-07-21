@@ -1,6 +1,5 @@
 ﻿using CitizenFX.Core;
 using GF.CrossCutting;
-using Server.Entities;
 
 namespace Server
 {

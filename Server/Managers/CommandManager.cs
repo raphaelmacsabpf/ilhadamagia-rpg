@@ -1,7 +1,7 @@
 ﻿using CitizenFX.Core;
 using GF.CrossCutting;
-using Server.Entities;
-using Server.Enums;
+using Server.Domain.Entities;
+using Server.Domain.Enums;
 using System;
 
 namespace Server.Managers

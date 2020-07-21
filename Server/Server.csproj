@@ -51,17 +51,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entities\GFHouse.cs" />
-    <Compile Include="Entities\GFProperty.cs" />
-    <Compile Include="Enums\InteriorType.cs" />
-    <Compile Include="Enums\PropertySellState.cs" />
-    <Compile Include="Enums\PropertyType.cs" />
     <Compile Include="Managers\ChatManager.cs" />
     <Compile Include="AppBootstrap.cs" />
     <Compile Include="Managers\CommandManager.cs" />
     <Compile Include="DebugResolveModule.cs" />
-    <Compile Include="Entities\GFPlayer.cs" />
-    <Compile Include="EventArgs\PlayerUpdateVarsEventArgs.cs" />
     <Compile Include="MainServer.cs" />
     <Compile Include="Managers\MapManager.cs" />
     <Compile Include="Managers\NetworkManager.cs" />
@@ -69,13 +62,15 @@
     <Compile Include="PlayerInfo.cs" />
     <Compile Include="PlayerActions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Enums\VehicleHash.cs" />
-    <Compile Include="Enums\WeaponHash.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GF.CrossCutting\GF.CrossCutting.csproj">
       <Project>{57f6196d-3b31-42a4-b63d-f336f243a9ba}</Project>
       <Name>GF.CrossCutting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Server.Domain\Server.Domain.csproj">
+      <Project>{35362e8e-2b61-49bf-b46f-afc21af298c0}</Project>
+      <Name>Server.Domain</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

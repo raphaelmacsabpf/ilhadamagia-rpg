@@ -1,7 +1,6 @@
-﻿using CitizenFX.Core;
-using Server.Enums;
+﻿using Server.Domain.Enums;
 
-namespace Server.Entities
+namespace Server.Domain.Entities
 {
     public abstract class GFProperty
     {

@@ -1,4 +1,4 @@
-﻿namespace Server.Enums
+﻿namespace Server.Domain.Enums
 {
     public enum PropertySellState
     {
