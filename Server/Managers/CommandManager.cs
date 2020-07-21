@@ -136,7 +136,7 @@ namespace Server.Managers
 
                         var targetPosition = targetPlayer.Character.Position + new Vector3(0f, 2f, -1f); // I don't know why this -1f???? WTF???
 
-                        this.playerActions.SetPlayerPos(sourcePlayer, targetPosition);
+                        this.playerActions.SetPlayerPos(playerInfo.GetGFPlayer(sourcePlayer), targetPosition);
                         this.chatManager.ProxDetectorColors(10.0f, targetPlayer, $"*Admin {sourcePlayer.Name} veio até {targetPlayer.Name}", ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE);
                         this.chatManager.ProxDetectorColors(10.0f, sourcePlayer, $"*Admin {sourcePlayer.Name} foi até {targetPlayer.Name}", ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE);
                         return;
@@ -153,7 +153,7 @@ namespace Server.Managers
 
                         var sourcePosition = sourcePlayer.Character.Position + new Vector3(0f, 2f, -1f); // I don't know why this -1f???? WTF???
 
-                        this.playerActions.SetPlayerPos(targetPlayer, sourcePosition);
+                        this.playerActions.SetPlayerPos(playerInfo.GetGFPlayer(targetPlayer), sourcePosition);
                         this.chatManager.ProxDetectorColors(10.0f, sourcePlayer, $"*Admin {sourcePlayer.Name} trouxe {targetPlayer.Name}", ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE);
                         this.chatManager.ProxDetectorColors(10.0f, targetPlayer, $"*Admin {sourcePlayer.Name} levou {targetPlayer.Name}", ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE);
                         return;
@@ -257,7 +257,7 @@ namespace Server.Managers
                             float.Parse(vectorPositions[2])
                         );
 
-                        this.playerActions.SetPlayerPos(sourcePlayer, targetVector);
+                        this.playerActions.SetPlayerPos(playerInfo.GetGFPlayer(sourcePlayer), targetVector);
 
                         return;
                     }
@@ -270,7 +270,7 @@ namespace Server.Managers
                             return;
                         }
 
-                        var distanceFromPlayerToHerHouse = sourcePlayer.Character.Position.DistanceToSquared(playerHouse.Entrance);
+                        var distanceFromPlayerToHerHouse = sourcePlayer.Character.Position.DistanceToSquared(new Vector3(playerHouse.EntranceX, playerHouse.EntranceY, playerHouse.EntranceZ));
                         if (distanceFromPlayerToHerHouse > Math.Pow(1.5f, 2))
                         {
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD1, "Você está muito longe da sua casa");
@@ -323,10 +323,9 @@ namespace Server.Managers
         {
             int parsedId;
             bool parseSucceed = Int32.TryParse(playerStr, out parsedId);
-            var playerList = new PlayerList();
             if (parseSucceed)
             {
-                foreach (Player player in playerList)
+                foreach (Player player in this.Players)
                 {
                     if (Int32.Parse(player.Handle) == parsedId)
                     {
@@ -336,7 +335,7 @@ namespace Server.Managers
             }
             else
             {
-                foreach (Player player in playerList)
+                foreach (Player player in this.Players)
                 {
                     var loweredPlayerName = player.Name.ToLower();
                     if (loweredPlayerName == playerStr || loweredPlayerName.StartsWith(playerStr))

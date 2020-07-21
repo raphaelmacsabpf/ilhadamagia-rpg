@@ -13,11 +13,6 @@ namespace Server
             this.playerInfo = playerInfo;
         }
 
-        public void OpenMenuForPlayer(GFPlayer gfPlayer, MenuType menuType)
-        {
-            gfPlayer.Player.TriggerEvent("GF:Client:OpenMenu", (int)menuType);
-        }
-
         public void OnPlayerMenuAction([FromSource] Player player, int menuActionInt)
         {
             var menuAction = (MenuAction)menuActionInt;

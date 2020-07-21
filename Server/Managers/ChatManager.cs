@@ -25,7 +25,7 @@ namespace Server.Managers
 
         public void SendClientMessage(GFPlayer gfPlayer, ChatColor chatColor, string message)
         {
-            gfPlayer.Player.TriggerEvent("GF:Client:SendClientMessage", (int)chatColor, message);
+            playerInfo.GetPlayer(gfPlayer).TriggerEvent("GF:Client:SendClientMessage", (int)chatColor, message);
         }
 
         public void SendClientMessage(Player player, ChatColor chatColor, string message)
@@ -46,7 +46,7 @@ namespace Server.Managers
 
         public void ProxDetectorColors(float radi, Player player, string message, ChatColor color1, ChatColor color2, ChatColor color3, ChatColor color4, ChatColor color5)
         {
-            foreach (Player i in new PlayerList())
+            foreach (Player i in this.Players)
             {
                 var position = i.Character.Position;
                 var tempposx = player.Character.Position.X - position.X;

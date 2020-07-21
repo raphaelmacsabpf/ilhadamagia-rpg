@@ -1,6 +1,8 @@
 ﻿using CitizenFX.Core;
 using GF.CrossCutting;
+using GF.CrossCutting.Dto;
 using Newtonsoft.Json;
+using Server.Entities;
 using Server.Managers;
 using System;
 
@@ -22,8 +24,7 @@ namespace Server
             this.networkManager = networkManager;
             this.playerActions = playerActions;
             this.chatManager = chatManager;
-
-            foreach (var player in new PlayerList())
+            foreach (var player in this.Players)
             {
                 var gfPlayer = this.playerInfo.GetGFPlayer(player);
                 gfPlayer.IsActive = true;
@@ -46,8 +47,8 @@ namespace Server
         public async void OnClientReady([FromSource] Player player)
         {
             var gfPlayer = playerInfo.GetGFPlayer(player);
-            var json = JsonConvert.SerializeObject(gfPlayer.PopUpdatedPlayerVarsPayload());
-            this.networkManager.SendPayloadToPlayer(gfPlayer.Player, PayloadType.TO_PLAYER_VARS, json);
+            var json = JsonConvert.SerializeObject(PopUpdatedPlayerVarsPayload(gfPlayer));
+            this.networkManager.SendPayloadToPlayer(playerInfo.GetPlayer(gfPlayer), PayloadType.TO_PLAYER_VARS, json);
 
             json = JsonConvert.SerializeObject(this.MapManager.PopUpdatedStaticMarkersPayload());
             this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_STATIC_MARKERS, json);
@@ -90,6 +91,14 @@ namespace Server
 
             Console.WriteLine($"[Connected] {playerName}, IP: {player.EndPoint}, Identifiers: {player.Identifiers["license"]}");
             deferrals.done();
+        }
+
+        private PlayerVarsDto PopUpdatedPlayerVarsPayload(GFPlayer gfPlayer)
+        {
+            PlayerVarsDto playerVars = new PlayerVarsDto();
+            playerVars.TryAdd("Money", gfPlayer.Money.ToString());
+            playerVars.TryAdd("Username", gfPlayer.Username);
+            return playerVars;
         }
     }
 }

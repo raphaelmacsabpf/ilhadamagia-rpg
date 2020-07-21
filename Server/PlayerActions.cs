@@ -8,9 +8,12 @@ namespace Server
 {
     public class PlayerActions : BaseScript
     {
-        public PlayerActions(bool ignoreFiveMStart)
+        private readonly PlayerInfo playerInfo;
+
+        public PlayerActions(PlayerInfo playerInfo)
         {
             Console.WriteLine("[IM PlayerActions] Started PlayerActions");
+            this.playerInfo = playerInfo;
         }
 
         public void KillPlayer(Player player)
@@ -18,8 +21,9 @@ namespace Server
             player.TriggerEvent("GF:Client:Kill");
         }
 
-        public void SetPlayerPos(Player player, Vector3 targetPosition)
+        public void SetPlayerPos(GFPlayer gfPlayer, Vector3 targetPosition)
         {
+            var player = playerInfo.GetPlayer(gfPlayer);
             player.TriggerEvent("GF:Client:SetPlayerPos", targetPosition);
         }
 
@@ -40,7 +44,7 @@ namespace Server
 
         public void OpenMenu(GFPlayer gfPlayer, MenuType menuType)
         {
-            gfPlayer.Player.TriggerEvent("GF:Client:OpenMenu", (int)menuType);
+            playerInfo.GetPlayer(gfPlayer).TriggerEvent("GF:Client:OpenMenu", (int)menuType);
         }
     }
 }

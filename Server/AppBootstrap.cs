@@ -21,13 +21,13 @@ namespace Server
             Console.WriteLine(" ");
 
             Console.WriteLine("[IM AppBootstrap] Building DI Container");
-            PlayerActions playerActions = new PlayerActions(true);
 
             var builder = new ContainerBuilder();
+
             builder.RegisterType<MenuManager>().As<MenuManager>().SingleInstance();
             builder.RegisterType<ChatManager>().As<ChatManager>().SingleInstance();
             builder.RegisterType<MapManager>().As<MapManager>().SingleInstance();
-            builder.RegisterInstance(playerActions).As<PlayerActions>();
+            builder.RegisterType<PlayerActions>().As<PlayerActions>().SingleInstance();
             builder.RegisterType<PlayerInfo>().As<PlayerInfo>().SingleInstance();
 
             builder.RegisterType<NetworkManager>().As<NetworkManager>().SingleInstance();

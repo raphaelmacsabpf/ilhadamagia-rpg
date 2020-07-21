@@ -15,7 +15,7 @@ namespace Server.Managers
         private List<MarkerDto> staticMarkers;
         private List<ProximityTargetDto> staticProximityTargets;
         private List<InteractionTargetDto> staticInteractionTargets;
-        private Dictionary<string, Action<GFPlayer>> interactionTargetsCallbacks;
+        private Dictionary<string, Action<GFPlayer, Player>> interactionTargetsCallbacks;
         private List<GFHouse> houses;
         private Dictionary<InteriorType, Vector3> interiorPositions;
 
@@ -32,7 +32,7 @@ namespace Server.Managers
             this.staticMarkers = new List<MarkerDto>();
             this.staticProximityTargets = new List<ProximityTargetDto>();
             this.staticInteractionTargets = new List<InteractionTargetDto>();
-            this.interactionTargetsCallbacks = new Dictionary<string, Action<GFPlayer>>();
+            this.interactionTargetsCallbacks = new Dictionary<string, Action<GFPlayer, Player>>();
             this.houses = new List<GFHouse>();
             this.interiorPositions = new Dictionary<InteriorType, Vector3>();
 
@@ -40,7 +40,7 @@ namespace Server.Managers
             var currentVehicles = API.GetAllVehicles() as List<object>;
             foreach (var vehicle in currentVehicles)
             {
-                API.DeleteEntity(Convert.ToInt32(vehicle));
+                // HACK: create function to delete all vehicles(Convert.ToInt32(vehicle));
             }
 
             BuildMarkers();
@@ -51,12 +51,12 @@ namespace Server.Managers
 
         public void BuildMarkers()
         {
-            this.AddInterationMarkerWithNotification(307.8857f, -727.8989f, 29.3136f - 0.5f, MarkerColor.COLOR_ORANGE, "Bem vindo ao ~b~Ilha da Magia RPG~s~, aperte ~o~E~s~ para interagir.", (gfPlayer) =>
+            this.AddInterationMarkerWithNotification(307.8857f, -727.8989f, 29.3136f - 0.5f, MarkerColor.COLOR_ORANGE, "Bem vindo ao ~b~Ilha da Magia RPG~s~, aperte ~o~E~s~ para interagir.", (gfPlayer, player) =>
             {
                 chatManager.SendClientMessage(gfPlayer, ChatColor.COLOR_ROSA, "aeEEEE Atingiu o target tio.");
             });
 
-            this.AddInterationMarkerWithNotification(319.0022f, -713.1561f, 29.3136f - 0.5f, MarkerColor.COLOR_GREEN, "Bem vindo ao ~b~Ilha da Magia NEEEWS RPG~s~, aperte ~o~E~s~ para interagir.", (gfPlayer) =>
+            this.AddInterationMarkerWithNotification(319.0022f, -713.1561f, 29.3136f - 0.5f, MarkerColor.COLOR_GREEN, "Bem vindo ao ~b~Ilha da Magia NEEEWS RPG~s~, aperte ~o~E~s~ para interagir.", (gfPlayer, player) =>
             {
                 chatManager.SendClientMessage(gfPlayer, ChatColor.COLOR_NEWS, "aeEEEE Atingiu o target NEWS tio.");
             });
@@ -69,37 +69,38 @@ namespace Server.Managers
 
             foreach (var interiorPosition in this.interiorPositions.Values)
             {
-                this.AddInterationMarkerWithNotification(interiorPosition.X, interiorPosition.Y, interiorPosition.Z, MarkerColor.COLOR_BLUE, "Aperte ~o~E~s~ para sair", (gfPlayer) => HouseExit(gfPlayer));
+                this.AddInterationMarkerWithNotification(interiorPosition.X, interiorPosition.Y, interiorPosition.Z, MarkerColor.COLOR_BLUE, "Aperte ~o~E~s~ para sair", (gfPlayer, player) => HouseExit(gfPlayer));
             }
         }
 
         public void BuildHouses()
         {
-            this.houses.Add(new GFHouse(1, new Vector3(430.9583f, -1725.626f, 29.59998f), new Vector4(432.3956f, -1736.519f, 28.58899f, 48.18897f)));
-            this.houses.Add(new GFHouse(2, new Vector3(-141.8901f, -1693.345f, 36.15454f), new Vector4(-141.1253f, -1702.009f, 30.10547f, 138.8976f)));
+            this.houses.Add(new GFHouse(1, 430.9583f, -1725.626f, 29.59998f, 432.3956f, -1736.519f, 28.58899f, 48.18897f));
+            this.houses.Add(new GFHouse(2, -141.8901f, -1693.345f, 36.15454f, -141.1253f, -1702.009f, 30.10547f, 138.8976f));
 
             foreach (var house in this.houses)
             {
-                this.AddInterationMarkerWithNotification(house.Entrance.X, house.Entrance.Y, house.Entrance.Z, MarkerColor.COLOR_BLUE, $"Casa de {house.Owner}, aperte ~o~E~s~ para entrar", (gfPlayer) => HouseEnter(gfPlayer, house));
+                this.AddInterationMarkerWithNotification(house.EntranceX, house.EntranceY, house.EntranceZ, MarkerColor.COLOR_BLUE, $"Casa de {house.Owner}, aperte ~o~E~s~ para entrar", (gfPlayer, player) => HouseEnter(gfPlayer, house));
             }
         }
 
         public void HouseEnter(GFPlayer gfPlayer, GFHouse house)
         {
             gfPlayer.CurrentHouse = house;
-            this.playerActions.SetPlayerPos(gfPlayer.Player, interiorPositions[house.Interior]);
+            this.playerActions.SetPlayerPos(gfPlayer, interiorPositions[house.Interior]);
         }
 
         private void HouseExit(GFPlayer gfPlayer)
         {
-            if (gfPlayer.CurrentHouse != null)
+            var house = gfPlayer.CurrentHouse;
+            if (house != null)
             {
-                this.playerActions.SetPlayerPos(gfPlayer.Player, gfPlayer.CurrentHouse.Entrance);
+                this.playerActions.SetPlayerPos(gfPlayer, new Vector3(house.EntranceX, house.EntranceY, house.EntranceZ));
                 gfPlayer.CurrentHouse = null;
             }
         }
 
-        public void AddInterationMarkerWithNotification(float x, float y, float z, MarkerColor color, string notification, Action<GFPlayer> serverCallback)
+        public void AddInterationMarkerWithNotification(float x, float y, float z, MarkerColor color, string notification, Action<GFPlayer, Player> serverCallback)
         {
             this.AddDefaultMarker(x, y, z, color);
             this.AddProximityNotificationTarget(x, y, z, notification);
@@ -116,7 +117,7 @@ namespace Server.Managers
             this.staticInteractionTargets.Add(new InteractionTargetDto(x, y, z, "INFO_TO_PLAYER", message));
         }
 
-        public void AddInteractionToServerCallbackTarget(float x, float y, float z, Action<GFPlayer> serverCallback)
+        public void AddInteractionToServerCallbackTarget(float x, float y, float z, Action<GFPlayer, Player> serverCallback)
         {
             Random random = new Random();
             var callbackId = $"{random.Next()}.{random.Next()}.{random.Next()}.{serverCallback.GetHashCode()}";
@@ -155,10 +156,10 @@ namespace Server.Managers
                     }
             }
 
-            if (interactionTargetsCallbacks.TryGetValue(callbackId, out Action<GFPlayer> serverCallback))
+            if (interactionTargetsCallbacks.TryGetValue(callbackId, out Action<GFPlayer, Player> serverCallback))
             {
                 var gfPlayer = this.playerInfo.GetGFPlayer(player);
-                serverCallback(gfPlayer);
+                serverCallback(gfPlayer, player);
             }
         }
 
