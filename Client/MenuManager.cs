@@ -1,5 +1,5 @@
 ﻿using CitizenFX.Core;
-using GF.CrossCutting;
+using Shared.CrossCutting;
 using MenuAPI;
 
 namespace Client

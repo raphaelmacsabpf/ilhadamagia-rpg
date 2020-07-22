@@ -1,6 +1,6 @@
 ﻿using CitizenFX.Core;
-using GF.CrossCutting;
-using GF.CrossCutting.Dto;
+using Shared.CrossCutting;
+using Shared.CrossCutting.Dto;
 using Newtonsoft.Json;
 using Server.Application.Managers;
 using Server.Domain.Entities;

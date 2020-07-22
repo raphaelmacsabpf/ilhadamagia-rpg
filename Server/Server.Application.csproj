@@ -64,9 +64,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GF.CrossCutting\GF.CrossCutting.csproj">
+    <ProjectReference Include="..\GF.CrossCutting\Shared.CrossCutting.csproj">
       <Project>{57f6196d-3b31-42a4-b63d-f336f243a9ba}</Project>
-      <Name>GF.CrossCutting</Name>
+      <Name>Shared.CrossCutting</Name>
     </ProjectReference>
     <ProjectReference Include="..\Server.Database\Server.Database.csproj">
       <Project>{2E295D5E-1FDD-4F2E-B090-7620E49B37F1}</Project>

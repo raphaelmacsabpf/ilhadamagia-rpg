@@ -1,4 +1,4 @@
-﻿namespace GF.CrossCutting
+﻿namespace Shared.CrossCutting
 {
     public enum MarkerColor
     {

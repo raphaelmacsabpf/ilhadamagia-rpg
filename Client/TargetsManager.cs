@@ -1,6 +1,6 @@
 ﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
-using GF.CrossCutting.Dto;
+using Shared.CrossCutting.Dto;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

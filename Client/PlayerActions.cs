@@ -1,7 +1,7 @@
 ﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using CitizenFX.Core.UI;
-using GF.CrossCutting;
+using Shared.CrossCutting;
 using System;
 using System.Threading.Tasks;
 

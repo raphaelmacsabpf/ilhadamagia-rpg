@@ -1,4 +1,4 @@
-﻿using GF.CrossCutting;
+﻿using Shared.CrossCutting;
 
 namespace Client
 {

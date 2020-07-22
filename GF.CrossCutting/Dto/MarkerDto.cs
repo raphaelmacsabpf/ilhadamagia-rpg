@@ -1,4 +1,4 @@
-﻿namespace GF.CrossCutting.Dto
+﻿namespace Shared.CrossCutting.Dto
 {
     // TODO: Uppercase first letter in each auto-property
     public class MarkerDto

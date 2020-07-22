@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.Application", "Server\Server.Application.csproj", "{8B7D0416-0ACA-4A5F-B1CE-C151E74C5206}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GF.CrossCutting", "GF.CrossCutting\GF.CrossCutting.csproj", "{57F6196D-3B31-42A4-B63D-F336F243A9BA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.CrossCutting", "GF.CrossCutting\Shared.CrossCutting.csproj", "{57F6196D-3B31-42A4-B63D-F336F243A9BA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.Domain", "Server.Domain\Server.Domain.csproj", "{35362E8E-2B61-49BF-B46F-AFC21AF298C0}"
 EndProject

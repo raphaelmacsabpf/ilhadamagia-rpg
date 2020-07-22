@@ -1,7 +1,7 @@
 ﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
-using GF.CrossCutting;
-using GF.CrossCutting.Dto;
+using Shared.CrossCutting;
+using Shared.CrossCutting.Dto;
 using Server.Domain.Entities;
 using Server.Domain.Enums;
 using System;

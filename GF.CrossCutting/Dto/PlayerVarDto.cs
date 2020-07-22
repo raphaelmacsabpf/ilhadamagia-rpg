@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace GF.CrossCutting.Dto
+namespace Shared.CrossCutting.Dto
 {
     public class PlayerVarsDto : ConcurrentDictionary<string, string>
     {

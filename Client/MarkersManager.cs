@@ -1,4 +1,4 @@
-﻿using GF.CrossCutting.Dto;
+﻿using Shared.CrossCutting.Dto;
 using System.Collections.Generic;
 
 namespace Client
