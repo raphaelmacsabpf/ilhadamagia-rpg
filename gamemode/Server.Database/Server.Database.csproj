@@ -60,7 +60,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GFPlayerRepository.cs" />
+    <Compile Include="AccountRepository.cs" />
     <Compile Include="MySQLConnectionPool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

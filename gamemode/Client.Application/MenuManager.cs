@@ -1,6 +1,6 @@
 ﻿using CitizenFX.Core;
-using Shared.CrossCutting;
 using MenuAPI;
+using Shared.CrossCutting;
 
 namespace Client.Application
 {

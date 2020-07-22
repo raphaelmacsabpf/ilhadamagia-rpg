@@ -23,7 +23,7 @@ namespace Server.Database
             Console.WriteLine($"[IM MySqlConnectionPool] Database connection pool started successful with size: {poolSize}");
         }
 
-        public MySqlConnection GetOne()
+        public MySqlConnection GetRandomConnection()
         {
             var random = new Random();
             var randomIndex = random.Next(this.availableConnections.Count);

@@ -1,6 +1,6 @@
 ﻿using Server.Domain.Enums;
 
-namespace Server.Domain.Entities
+namespace Server.Application.Entities
 {
     public abstract class GFProperty
     {

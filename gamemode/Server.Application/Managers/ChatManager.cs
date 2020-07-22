@@ -1,6 +1,6 @@
 ﻿using CitizenFX.Core;
+using Server.Application.Entities;
 using Shared.CrossCutting;
-using Server.Domain.Entities;
 using System;
 
 namespace Server.Application.Managers

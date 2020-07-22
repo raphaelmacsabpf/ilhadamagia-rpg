@@ -1,9 +1,9 @@
 ﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using CitizenFX.Core.UI;
+using Newtonsoft.Json;
 using Shared.CrossCutting;
 using Shared.CrossCutting.Dto;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 

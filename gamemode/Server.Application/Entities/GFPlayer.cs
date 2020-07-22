@@ -1,4 +1,6 @@
-﻿namespace Server.Domain.Entities
+﻿using Server.Domain.Entities;
+
+namespace Server.Application.Entities
 {
     public class GFPlayer
     {
@@ -13,6 +15,7 @@
             this.Username = ""; // TODO: Set sanitized player.Name as GFPlayer.Username
         }
 
+        public Account Account { get; set; }
         public int Id { get; set; }
         public bool IsActive { get; set; }
         public int PlayerId { get; }

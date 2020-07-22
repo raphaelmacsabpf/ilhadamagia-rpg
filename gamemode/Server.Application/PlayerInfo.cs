@@ -1,12 +1,15 @@
 ﻿using CitizenFX.Core;
+using Newtonsoft.Json;
+using Server.Application.Entities;
+using Server.Application.Managers;
+using Server.Database;
+using Server.Domain.Entities;
 using Shared.CrossCutting;
 using Shared.CrossCutting.Dto;
-using Newtonsoft.Json;
-using Server.Application.Managers;
-using Server.Domain.Entities;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace Server.Application
@@ -18,8 +21,9 @@ namespace Server.Application
         private ConcurrentQueue<Tuple<PlayerVarsDto, GFPlayer>> playerVarsToUpdateQueue;
         private Thread updatePlayerVarsThread;
         private readonly NetworkManager networkManager;
+        private readonly AccountRepository accountRepository;
 
-        public PlayerInfo(NetworkManager networkManager)
+        public PlayerInfo(NetworkManager networkManager, AccountRepository accountRepository)
         {
             this.playerToGFPlayerDictionary = new ConcurrentDictionary<Player, GFPlayer>();
             this.gfPlayerToPlayerDictionary = new ConcurrentDictionary<GFPlayer, Player>();
@@ -30,9 +34,33 @@ namespace Server.Application
             this.updatePlayerVarsThread.IsBackground = true;
             this.updatePlayerVarsThread.Start();
             this.networkManager = networkManager;
+            this.accountRepository = accountRepository;
         }
 
-        // TODO: Arrumar a porcaria do nome desse método
+        public async void PreparePlayerAccount(Player player)
+        {
+            var license = player.Identifiers["license"];
+            var accounts = (await accountRepository.GetAccountListByLicense(license)).ToList();
+            if (accounts.Count > 0)
+            {
+                foreach (var account in accounts)
+                {
+                    Console.WriteLine($"Encontrada conta #{account.Id} para username: {account.Username}");
+                }
+            }
+            else
+            {
+                var username = "raphael_santos";
+                var password = "123456";
+                Account newAccount = new Account();
+                newAccount.License = license;
+                newAccount.Username = username;
+                newAccount.Password = password;
+                int globalId = await accountRepository.Create(newAccount);
+                Console.WriteLine($"Registrada a conta #{globalId} para o username: {username}");
+            }
+        }
+
         private void UpdatePlayerVarsThreadHandler()
         {
             while (true)

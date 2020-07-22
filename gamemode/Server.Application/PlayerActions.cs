@@ -1,7 +1,7 @@
 ﻿using CitizenFX.Core;
-using Shared.CrossCutting;
-using Server.Domain.Entities;
+using Server.Application.Entities;
 using Server.Domain.Enums;
+using Shared.CrossCutting;
 using System;
 
 namespace Server.Application

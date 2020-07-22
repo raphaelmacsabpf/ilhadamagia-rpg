@@ -25,7 +25,7 @@ namespace Server.Application
 
             var builder = new ContainerBuilder();
             builder.RegisterInstance(new MySqlConnectionPool(20)).As<MySqlConnectionPool>();
-            builder.RegisterType<GFPlayerRepository>().As<GFPlayerRepository>().SingleInstance(); // TODO: Reavaliar se nesse caso se é melhor usar Single Instance
+            builder.RegisterType<AccountRepository>().As<AccountRepository>().SingleInstance();
             builder.RegisterType<MenuManager>().As<MenuManager>().SingleInstance();
             builder.RegisterType<ChatManager>().As<ChatManager>().SingleInstance();
             builder.RegisterType<MapManager>().As<MapManager>().SingleInstance();

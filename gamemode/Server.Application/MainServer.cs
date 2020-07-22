@@ -1,9 +1,9 @@
 ﻿using CitizenFX.Core;
+using Newtonsoft.Json;
+using Server.Application.Entities;
+using Server.Application.Managers;
 using Shared.CrossCutting;
 using Shared.CrossCutting.Dto;
-using Newtonsoft.Json;
-using Server.Application.Managers;
-using Server.Domain.Entities;
 using System;
 
 namespace Server.Application
@@ -86,7 +86,7 @@ namespace Server.Application
 
                 await Delay(20);
             }
-
+            this.playerInfo.PreparePlayerAccount(player);
             this.playerInfo.GetGFPlayer(player);
 
             Console.WriteLine($"[Connected] {playerName}, IP: {player.EndPoint}, Identifiers: {player.Identifiers["license"]}");

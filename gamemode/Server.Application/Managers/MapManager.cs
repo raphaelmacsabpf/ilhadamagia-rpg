@@ -1,9 +1,9 @@
 ﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using Server.Application.Entities;
+using Server.Domain.Enums;
 using Shared.CrossCutting;
 using Shared.CrossCutting.Dto;
-using Server.Domain.Entities;
-using Server.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
