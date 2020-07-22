@@ -2,8 +2,8 @@
 using GF.CrossCutting;
 using GF.CrossCutting.Dto;
 using Newtonsoft.Json;
-using Server.Domain.Entities;
 using Server.Application.Managers;
+using Server.Domain.Entities;
 using System;
 
 namespace Server.Application

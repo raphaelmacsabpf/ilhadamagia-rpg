@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GF.CrossCutting", "GF.Cross
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.Domain", "Server.Domain\Server.Domain.csproj", "{35362E8E-2B61-49BF-B46F-AFC21AF298C0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.Database", "Server.Database\Server.Database.csproj", "{2E295D5E-1FDD-4F2E-B090-7620E49B37F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{35362E8E-2B61-49BF-B46F-AFC21AF298C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35362E8E-2B61-49BF-B46F-AFC21AF298C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35362E8E-2B61-49BF-B46F-AFC21AF298C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E295D5E-1FDD-4F2E-B090-7620E49B37F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E295D5E-1FDD-4F2E-B090-7620E49B37F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E295D5E-1FDD-4F2E-B090-7620E49B37F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E295D5E-1FDD-4F2E-B090-7620E49B37F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

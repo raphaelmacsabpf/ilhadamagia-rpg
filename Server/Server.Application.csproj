@@ -68,6 +68,10 @@
       <Project>{57f6196d-3b31-42a4-b63d-f336f243a9ba}</Project>
       <Name>GF.CrossCutting</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Server.Database\Server.Database.csproj">
+      <Project>{2E295D5E-1FDD-4F2E-B090-7620E49B37F1}</Project>
+      <Name>Server.Database</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Server.Domain\Server.Domain.csproj">
       <Project>{35362e8e-2b61-49bf-b46f-afc21af298c0}</Project>
       <Name>Server.Domain</Name>
@@ -86,6 +90,8 @@
 REM icecon.exe -c "stop TutorialScript" 127.0.0.1:30120 PQPMELANCIAAZEDA
 move ..\.build\server\fxmanifest.lua ..\.build\
 xcopy /S /Y ..\Server\html\ ..\.build\html\
+del /S ..\.build\server\*.pdb
+del /s ..\.build\server\*.xml
 xcopy /S /Y ..\.build G:\dev\fivem\server\server-data\resources\TutorialScript
 REM icecon.exe -c "ensure TutorialScript" 127.0.0.1:30120 PQPMELANCIAAZEDA</PostBuildEvent>
   </PropertyGroup>

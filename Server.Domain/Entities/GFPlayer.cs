@@ -2,14 +2,18 @@
 {
     public class GFPlayer
     {
+        internal GFPlayer()
+        {
+        }
+
         public GFPlayer(int playerId, int globalId) // TODO: Rename GFPlayer to GMPlayer
         {
             this.PlayerId = playerId;
-            this.GlobalId = globalId;
+            this.Id = globalId;
             this.Username = ""; // TODO: Set sanitized player.Name as GFPlayer.Username
         }
 
-        public int GlobalId { get; set; }
+        public int Id { get; set; }
         public bool IsActive { get; set; }
         public int PlayerId { get; }
 
