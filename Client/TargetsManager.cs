@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Client
+namespace Client.Application
 {
     public class TargetsManager : BaseScript
     {

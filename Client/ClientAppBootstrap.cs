@@ -1,7 +1,7 @@
 ﻿using CitizenFX.Core;
 using System;
 
-namespace Client
+namespace Client.Application
 {
     public class ClientAppBootstrap : BaseScript
     {

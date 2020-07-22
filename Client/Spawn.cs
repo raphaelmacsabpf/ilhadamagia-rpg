@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using static CitizenFX.Core.Native.API;
 
-namespace Client
+namespace Client.Application
 {
     public class Spawn : BaseScript
     {

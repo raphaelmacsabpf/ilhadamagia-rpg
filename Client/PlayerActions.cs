@@ -5,7 +5,7 @@ using Shared.CrossCutting;
 using System;
 using System.Threading.Tasks;
 
-namespace Client
+namespace Client.Application
 {
     public class PlayerActions : BaseScript
     {

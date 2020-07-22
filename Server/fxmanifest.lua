@@ -2,7 +2,7 @@ fx_version 'bodacious'
 game 'gta5'
 
 client_scripts {
-    'client/Client.net.dll',
+    'client/Client.Application.net.dll',
 	'client/Shared.CrossCutting.net.dll',
 	'client/Newtonsoft.Json.net.dll'
 }

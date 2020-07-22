@@ -3,7 +3,7 @@ using CitizenFX.Core.Native;
 using CitizenFX.Core.UI;
 using System.Drawing;
 
-namespace Client
+namespace Client.Application
 {
     public class DrawTextAPI : BaseScript
     {

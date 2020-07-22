@@ -1,7 +1,7 @@
 ﻿using Shared.CrossCutting.Dto;
 using System.Collections.Generic;
 
-namespace Client
+namespace Client.Application
 {
     public class MarkersManager
     {

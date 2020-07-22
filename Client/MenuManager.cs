@@ -2,7 +2,7 @@
 using Shared.CrossCutting;
 using MenuAPI;
 
-namespace Client
+namespace Client.Application
 {
     public class MenuManager : BaseScript
     {

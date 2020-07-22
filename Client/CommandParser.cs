@@ -1,6 +1,6 @@
 ﻿using Shared.CrossCutting;
 
-namespace Client
+namespace Client.Application
 {
     public static class CommandParser
     {
