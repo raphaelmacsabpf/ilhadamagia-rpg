@@ -68,7 +68,7 @@
     <Compile Include="TargetsManager.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GF.CrossCutting\Shared.CrossCutting.csproj">
+    <ProjectReference Include="..\Shared.CrossCutting\Shared.CrossCutting.csproj">
       <Project>{57f6196d-3b31-42a4-b63d-f336f243a9ba}</Project>
       <Name>Shared.CrossCutting</Name>
     </ProjectReference>

@@ -3,15 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30225.117
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client.Application", "Client\Client.Application.csproj", "{D89400C2-7C29-4210-B58A-6341B5D2597B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client.Application", "Client.Application\Client.Application.csproj", "{D89400C2-7C29-4210-B58A-6341B5D2597B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.Application", "Server\Server.Application.csproj", "{8B7D0416-0ACA-4A5F-B1CE-C151E74C5206}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.Application", "Server.Application\Server.Application.csproj", "{8B7D0416-0ACA-4A5F-B1CE-C151E74C5206}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.CrossCutting", "GF.CrossCutting\Shared.CrossCutting.csproj", "{57F6196D-3B31-42A4-B63D-F336F243A9BA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.CrossCutting", "Shared.CrossCutting\Shared.CrossCutting.csproj", "{57F6196D-3B31-42A4-B63D-F336F243A9BA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.Domain", "Server.Domain\Server.Domain.csproj", "{35362E8E-2B61-49BF-B46F-AFC21AF298C0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.Database", "Server.Database\Server.Database.csproj", "{2E295D5E-1FDD-4F2E-B090-7620E49B37F1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0 - Core", "0 - Core", "{510058AB-57D7-4DDF-B1E0-E9E41224CD32}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1 - Infrastructure", "1 - Infrastructure", "{CA3B110E-BB83-42AE-8CF4-550C34F3BC56}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2 - Client", "2 - Client", "{1EAA50A4-06B8-4F90-8BAB-772DA026FE19}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +48,13 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D89400C2-7C29-4210-B58A-6341B5D2597B} = {1EAA50A4-06B8-4F90-8BAB-772DA026FE19}
+		{8B7D0416-0ACA-4A5F-B1CE-C151E74C5206} = {510058AB-57D7-4DDF-B1E0-E9E41224CD32}
+		{57F6196D-3B31-42A4-B63D-F336F243A9BA} = {CA3B110E-BB83-42AE-8CF4-550C34F3BC56}
+		{35362E8E-2B61-49BF-B46F-AFC21AF298C0} = {510058AB-57D7-4DDF-B1E0-E9E41224CD32}
+		{2E295D5E-1FDD-4F2E-B090-7620E49B37F1} = {CA3B110E-BB83-42AE-8CF4-550C34F3BC56}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5915D86F-20E3-40E1-8616-206668C068C1}
