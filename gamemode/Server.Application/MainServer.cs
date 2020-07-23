@@ -47,7 +47,6 @@ namespace Server.Application
         {
             var gfPlayer = playerInfo.GetGFPlayer(player);
             var json = JsonConvert.SerializeObject(PopUpdatedPlayerVarsPayload(gfPlayer));
-            Console.WriteLine("Enviei pacotinho: " + json);
             this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_PLAYER_VARS, json);
 
             json = JsonConvert.SerializeObject(this.MapManager.PopUpdatedStaticMarkersPayload());
@@ -59,8 +58,7 @@ namespace Server.Application
             json = JsonConvert.SerializeObject(this.MapManager.PopUpdatedStaticInteractionTargetsPayload());
             this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_STATIC_INTERACTION_TARGETS, json);
 
-            this.chatManager.SendClientMessage(player, ChatColor.TEAM_VAGOS_COLOR, "Chegou aqui que seu cliente ta suavão");
-            gfPlayer.ConnectionState = PlayerConnectionState.LOGGED;
+            playerActions.SpawnPlayer(gfPlayer, "S_M_Y_MARINE_01", 309.6f, -728.7297f, 29.3136f, 246.6142f);
         }
 
         internal void OnPlayerDropped([FromSource] Player player, string reason)
