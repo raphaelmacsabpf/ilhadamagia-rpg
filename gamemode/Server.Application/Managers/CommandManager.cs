@@ -120,7 +120,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.GO:
                     {
-                        if (sourceGFPlayer.AdminLevel < 1)
+                        if (sourceGFPlayer.Account.AdminLevel < 1)
                         {
                             this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_GRAD2, "Você não é um administrador!");
                             return;
@@ -173,7 +173,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.SET_ADMIN:
                     {
-                        if (false && sourceGFPlayer.AdminLevel < 3001) // TODO: Remove TRUE from condition, before beta release
+                        if (sourceGFPlayer.Account.AdminLevel < 3001)
                         {
                             this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_GRAD2, "Você não está autorizado a usar este comando!");
                             return;
@@ -192,23 +192,22 @@ namespace Server.Application.Managers
                         {
                             level = 0;
                         }
-                        /*else if (level < 0 || level > 3001) // TODO: Retornar essa proteção ao comando
+                        else if (level < 0 || level > 3001)
                         {
                             this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_GRAD2, "USE: /setadmin [playerid] [nivel(0-3001)]");
                             return;
-                        }*/
+                        }
 
                         var targetGFPlayer = this.playerInfo.GetGFPlayer(targetPlayer);
-                        targetGFPlayer.AdminLevel = level;
+                        targetGFPlayer.Account.AdminLevel = level;
                         this.chatManager.SendClientMessage(targetPlayer, ChatColor.COLOR_LIGHTBLUE, $"  Você foi promovido a nivel {level} de admin, pelo admin {sourcePlayer.Name}");
                         this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_LIGHTBLUE, $" Você promoveu {targetPlayer.Name} para nivel {level} de admin.");
-                        targetGFPlayer.Money = level; // TODO: Remover esse money daqui quando criar sistema de contas
                         return;
                     }
 
                 case CommandCode.SET_ARMOUR:
                     {
-                        if (sourceGFPlayer.AdminLevel < 1)
+                        if (sourceGFPlayer.Account.AdminLevel < 1)
                         {
                             this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_GRAD2, "Você não está autorizado a usar este comando!");
                             return;
@@ -243,7 +242,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.GO_TO_COORDS:
                     {
-                        if (sourceGFPlayer.AdminLevel < 1)
+                        if (sourceGFPlayer.Account.AdminLevel < 1)
                         {
                             this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_GRAD2, "Você não está autorizado a usar este comando!");
                             return;
@@ -283,7 +282,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.SET_HOUSE:
                     {
-                        if (sourceGFPlayer.AdminLevel < 3001)
+                        if (sourceGFPlayer.Account.AdminLevel < 3001)
                         {
                             this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_GRAD2, "Você não está autorizado a usar este comando!");
                             return;

@@ -91,7 +91,7 @@ namespace Server.Application
         private PlayerVarsDto PopUpdatedPlayerVarsPayload(GFPlayer gfPlayer)
         {
             PlayerVarsDto playerVars = new PlayerVarsDto();
-            playerVars.TryAdd("Money", gfPlayer.Money.ToString());
+            playerVars.TryAdd("Money", gfPlayer.Account.Money.ToString());
             playerVars.TryAdd("Username", gfPlayer.Account.Username);
             return playerVars;
         }
