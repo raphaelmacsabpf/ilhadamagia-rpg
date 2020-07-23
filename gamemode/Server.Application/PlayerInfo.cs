@@ -1,6 +1,7 @@
 ﻿using CitizenFX.Core;
 using Newtonsoft.Json;
 using Server.Application.Entities;
+using Server.Application.Enums;
 using Server.Application.Managers;
 using Server.Database;
 using Server.Domain.Entities;
@@ -11,13 +12,13 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Server.Application
 {
     public class PlayerInfo
     {
         private ConcurrentDictionary<Player, GFPlayer> playerToGFPlayerDictionary;
-        private ConcurrentDictionary<GFPlayer, Player> gfPlayerToPlayerDictionary;
         private ConcurrentQueue<Tuple<PlayerVarsDto, GFPlayer>> playerVarsToUpdateQueue;
         private Thread updatePlayerVarsThread;
         private readonly NetworkManager networkManager;
@@ -26,7 +27,6 @@ namespace Server.Application
         public PlayerInfo(NetworkManager networkManager, AccountRepository accountRepository)
         {
             this.playerToGFPlayerDictionary = new ConcurrentDictionary<Player, GFPlayer>();
-            this.gfPlayerToPlayerDictionary = new ConcurrentDictionary<GFPlayer, Player>();
             this.playerVarsToUpdateQueue = new ConcurrentQueue<Tuple<PlayerVarsDto, GFPlayer>>();
 
             this.updatePlayerVarsThread = new Thread(UpdatePlayerVarsThreadHandler);
@@ -37,28 +37,38 @@ namespace Server.Application
             this.accountRepository = accountRepository;
         }
 
-        public async void PreparePlayerAccount(Player player)
+        public async Task<GFPlayer> PreparePlayerAccounts(Player player)
         {
+            var gfPlayer = new GFPlayer(player);
+            gfPlayer.ConnectionState = PlayerConnectionState.CONNECTED;
+            playerToGFPlayerDictionary.TryAdd(player, gfPlayer);
+
             var license = player.Identifiers["license"];
             var accounts = (await accountRepository.GetAccountListByLicense(license)).ToList();
             if (accounts.Count > 0)
             {
                 foreach (var account in accounts)
                 {
+                    if (gfPlayer.Account == null)
+                        gfPlayer.Account = account;
                     Console.WriteLine($"Encontrada conta #{account.Id} para username: {account.Username}");
                 }
+                gfPlayer.ConnectionState = PlayerConnectionState.LOADING_ACCOUNT;
             }
             else
             {
+                // HACK: Terminar de criar conta aqui, remover dados estáticos e criar sistema de criação de contas
                 var username = "raphael_santos";
                 var password = "123456";
                 Account newAccount = new Account();
                 newAccount.License = license;
                 newAccount.Username = username;
                 newAccount.Password = password;
+                gfPlayer.Account = newAccount;
                 int globalId = await accountRepository.Create(newAccount);
                 Console.WriteLine($"Registrada a conta #{globalId} para o username: {username}");
             }
+            return gfPlayer;
         }
 
         private void UpdatePlayerVarsThreadHandler()
@@ -69,7 +79,7 @@ namespace Server.Application
                 while (playerVarsToUpdateQueue.TryDequeue(out playerVarsTuple))
                 {
                     var json = JsonConvert.SerializeObject(playerVarsTuple.Item1);
-                    this.networkManager.SendPayloadToPlayer(GetPlayer(playerVarsTuple.Item2), PayloadType.TO_PLAYER_VARS, json);
+                    this.networkManager.SendPayloadToPlayer(playerVarsTuple.Item2.Player, PayloadType.TO_PLAYER_VARS, json);
                     Thread.Sleep(10);
                 }
 
@@ -79,20 +89,17 @@ namespace Server.Application
 
         public GFPlayer GetGFPlayer(Player player)
         {
-            GFPlayer gfPlayer;
             if (playerToGFPlayerDictionary.TryGetValue(player, out _) == false)
             {
-                gfPlayer = new GFPlayer(0, Int32.Parse(player.Handle)); // TODO: Load GFPlayer GlobalId
-                playerToGFPlayerDictionary.TryAdd(player, gfPlayer);
-                gfPlayerToPlayerDictionary.TryAdd(gfPlayer, player);
+                Console.WriteLine("antes de encontrar a conta do handle " + player.Handle);
+                var gfPlayer = PreparePlayerAccounts(player).Result;
+                Console.WriteLine($"encontrou a conta do handle: {player.Handle} com estado: {gfPlayer.ConnectionState}");
+                return gfPlayer;
+
+                // HACK: CREATE FALLBACK
             }
 
             return playerToGFPlayerDictionary[player];
-        }
-
-        public Player GetPlayer(GFPlayer gfPlayer)
-        {
-            return gfPlayerToPlayerDictionary[gfPlayer];
         }
 
         public IEnumerable<GFPlayer> GetGFPlayerList()

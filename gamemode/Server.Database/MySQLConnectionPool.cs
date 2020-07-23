@@ -15,7 +15,8 @@ namespace Server.Database
             this.availableConnections = new List<MySqlConnection>();
             for (int i = 0; i < poolSize; i++)
             {
-                var connection = new MySqlConnection(connectionString);
+                var connectionNameDisplayedInMysql = "ConnectionPool#" + i;
+                var connection = new MySqlConnection($"{connectionString} ApplicationName={connectionNameDisplayedInMysql};");
                 connection.Open();
                 this.availableConnections.Add(connection);
                 Console.WriteLine($"[IM MySqlConnectionPool] Started pool connection #{i}");

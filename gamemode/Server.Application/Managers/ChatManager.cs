@@ -25,7 +25,7 @@ namespace Server.Application.Managers
 
         public void SendClientMessage(GFPlayer gfPlayer, ChatColor chatColor, string message)
         {
-            playerInfo.GetPlayer(gfPlayer).TriggerEvent("GF:Client:SendClientMessage", (int)chatColor, message);
+            gfPlayer.Player.TriggerEvent("GF:Client:SendClientMessage", (int)chatColor, message);
         }
 
         public void SendClientMessage(Player player, ChatColor chatColor, string message)

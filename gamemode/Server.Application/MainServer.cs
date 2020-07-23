@@ -1,6 +1,7 @@
 ﻿using CitizenFX.Core;
 using Newtonsoft.Json;
 using Server.Application.Entities;
+using Server.Application.Enums;
 using Server.Application.Managers;
 using Shared.CrossCutting;
 using Shared.CrossCutting.Dto;
@@ -14,7 +15,6 @@ namespace Server.Application
         private readonly NetworkManager networkManager;
         private readonly PlayerActions playerActions;
         private readonly ChatManager chatManager;
-        private int activePlayers;
 
         public MainServer(PlayerInfo playerInfo, CommandManager commandManager, MapManager mapManager, NetworkManager networkManager, PlayerActions playerActions, ChatManager chatManager)
         {
@@ -27,8 +27,7 @@ namespace Server.Application
             foreach (var player in this.Players)
             {
                 var gfPlayer = this.playerInfo.GetGFPlayer(player);
-                gfPlayer.IsActive = true;
-                activePlayers++;
+                gfPlayer.ConnectionState = PlayerConnectionState.ON_GAMEMODE_LOAD;
                 Console.WriteLine($"[IM MainServer] PlayerLoaded: [{player.Handle}] {player.Name}");
             }
 
@@ -48,7 +47,8 @@ namespace Server.Application
         {
             var gfPlayer = playerInfo.GetGFPlayer(player);
             var json = JsonConvert.SerializeObject(PopUpdatedPlayerVarsPayload(gfPlayer));
-            this.networkManager.SendPayloadToPlayer(playerInfo.GetPlayer(gfPlayer), PayloadType.TO_PLAYER_VARS, json);
+            Console.WriteLine("Enviei pacotinho: " + json);
+            this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_PLAYER_VARS, json);
 
             json = JsonConvert.SerializeObject(this.MapManager.PopUpdatedStaticMarkersPayload());
             this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_STATIC_MARKERS, json);
@@ -60,16 +60,14 @@ namespace Server.Application
             this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_STATIC_INTERACTION_TARGETS, json);
 
             this.chatManager.SendClientMessage(player, ChatColor.TEAM_VAGOS_COLOR, "Chegou aqui que seu cliente ta suavão");
-            this.activePlayers++;
-            gfPlayer.IsActive = true;
+            gfPlayer.ConnectionState = PlayerConnectionState.LOGGED;
         }
 
         internal void OnPlayerDropped([FromSource] Player player, string reason)
         {
             var gfPlayer = this.playerInfo.GetGFPlayer(player);
-            gfPlayer.IsActive = false;
-            activePlayers--;
-            Console.WriteLine($"Player dropped, name: {gfPlayer.Username}, reason: {reason}, activePlayers: {activePlayers}");
+            gfPlayer.ConnectionState = PlayerConnectionState.DROPPED;
+            Console.WriteLine($"Player dropped, name: {gfPlayer.Account.Username}, reason: {reason}");
         }
 
         public async void OnPlayerConnecting([FromSource] Player player, string playerName, dynamic setKickReason, dynamic deferrals)
@@ -86,10 +84,7 @@ namespace Server.Application
 
                 await Delay(20);
             }
-            this.playerInfo.PreparePlayerAccount(player);
-            this.playerInfo.GetGFPlayer(player);
-
-            Console.WriteLine($"[Connected] {playerName}, IP: {player.EndPoint}, Identifiers: {player.Identifiers["license"]}");
+            Console.WriteLine($"[Connected] ID:{player.Handle}, PlayerName: {playerName}, IP: {player.EndPoint}, License: {player.Identifiers["license"]}");
             deferrals.done();
         }
 
@@ -97,7 +92,7 @@ namespace Server.Application
         {
             PlayerVarsDto playerVars = new PlayerVarsDto();
             playerVars.TryAdd("Money", gfPlayer.Money.ToString());
-            playerVars.TryAdd("Username", gfPlayer.Username);
+            playerVars.TryAdd("Username", gfPlayer.Account.Username);
             return playerVars;
         }
     }

@@ -23,8 +23,7 @@ namespace Server.Application
 
         public void SetPlayerPos(GFPlayer gfPlayer, Vector3 targetPosition)
         {
-            var player = playerInfo.GetPlayer(gfPlayer);
-            player.TriggerEvent("GF:Client:SetPlayerPos", targetPosition);
+            gfPlayer.Player.TriggerEvent("GF:Client:SetPlayerPos", targetPosition);
         }
 
         public void SetPlayerArmour(Player player, int value)
@@ -44,7 +43,7 @@ namespace Server.Application
 
         public void OpenMenu(GFPlayer gfPlayer, MenuType menuType)
         {
-            playerInfo.GetPlayer(gfPlayer).TriggerEvent("GF:Client:OpenMenu", (int)menuType);
+            gfPlayer.Player.TriggerEvent("GF:Client:OpenMenu", (int)menuType);
         }
     }
 }
