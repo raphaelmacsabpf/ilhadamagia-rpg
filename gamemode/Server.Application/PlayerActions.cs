@@ -45,5 +45,10 @@ namespace Server.Application
         {
             gfPlayer.Player.TriggerEvent("GF:Client:OpenMenu", (int)menuType);
         }
+
+        public void SpawnPlayer(GFPlayer gfPlayer, string skinName, float x, float y, float z, float heading)
+        {
+            gfPlayer.Player.TriggerEvent("GF:Client:SpawnPlayer", skinName, x, y, z, heading);
+        }
     }
 }

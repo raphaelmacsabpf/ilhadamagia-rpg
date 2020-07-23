@@ -21,7 +21,6 @@ namespace Client.Application
 
             // Default Events
             EventHandlers["baseevents:onPlayerDied"] += new Action<int, dynamic>(mainClient.OnDie);
-            EventHandlers["playerSpawned"] += new Action<dynamic>(mainClient.OnPlayerSpawn);
             EventHandlers["onClientMapStart"] += new Action(mainClient.OnPlayerMapStart);
             EventHandlers["onClientResourceStart"] += new Action<string>(mainClient.OnClientResourceStart);
 

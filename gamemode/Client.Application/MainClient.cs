@@ -17,12 +17,10 @@ namespace Client.Application
         private readonly PlayerActions playerActions;
         private readonly TargetsManager targetsManager;
         private readonly MenuManager menuManager;
+        private bool clientInitializationStarted;
 
         public MainClient(PlayerInfo playerInfo, MarkersManager markersManager, Render render, PlayerActions playerActions, TargetsManager targetsManager, MenuManager menuManager)
         {
-            API.RemoveMultiplayerWalletCash();
-            API.RemoveMultiplayerHudCash();
-
             this.playerInfo = playerInfo;
             this.markersManager = markersManager;
             this.render = render;
@@ -48,7 +46,22 @@ namespace Client.Application
         {
             if (API.GetCurrentResourceName() != resourceName) return;
 
-            //await Delay(20000);
+            if (clientInitializationStarted == false)
+            {
+                clientInitializationStarted = true;
+                InitializeClient();
+            }
+        }
+
+        private async void InitializeClient()
+        {
+            API.DoScreenFadeOut(1000);
+            while (API.IsScreenFadingOut())
+            {
+                await Delay(100);
+            }
+            API.ShutdownLoadingScreen();
+            await Delay(1000);
             TriggerServerEvent("GF:Server:OnClientReady");
         }
 
@@ -106,32 +119,21 @@ namespace Client.Application
                 TriggerServerEvent("GF:Server:OnChatMessage", textInput);
         }
 
-        // Default Events
-        public void OnPlayerSpawn(object obj)
-        {
-            API.CancelEvent();
-
-            // TODO: Improve!!! Client has to send spawn event to server.
-            // Default SPAWN
-            playerActions.SpawnPlayer("S_M_Y_MARINE_01", 309.6f, -728.7297f, 29.3136f, 246.6142f);
-        }
-
         public async void OnDie(int killerType, dynamic deathCoords)
         {
             API.CancelEvent();
-            await Spawn.SpawnPlayer("S_M_Y_MARINE_01", 309.6f, -728.7297f, 29.3136f, 246.6142f);
+            await Spawn.SpawnPlayer("S_M_Y_MARINE_01", 309.6f, -728.7297f, 29.3136f, 246.6142f); // TODO: Remove and call event when player dies, fix some bugs also.
         }
 
         public async void OnPlayerMapStart()
         {
+            Debug.WriteLine("CLIENT EVENT: OnPlayerMapStart");
             API.CancelEvent();
-
-            API.RequestModel((uint)PedHash.Marine01SMY);
-            while (API.HasModelLoaded((uint)PedHash.Marine01SMY) == false)
+            if (clientInitializationStarted == false)
             {
-                await Delay(300);
+                clientInitializationStarted = true;
+                InitializeClient();
             }
-            await Spawn.SpawnPlayer("S_M_Y_MARINE_01", 309.6f, -728.7297f, 29.3136f, 246.6142f);
         }
 
         // Commands

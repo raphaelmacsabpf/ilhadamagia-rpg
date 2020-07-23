@@ -1,4 +1,5 @@
 ﻿using CitizenFX.Core;
+using System;
 using System.Threading.Tasks;
 using static CitizenFX.Core.Native.API;
 
@@ -61,7 +62,15 @@ namespace Client.Application
             }
 
             FreezePlayer(PlayerId(), true);
-            await Game.Player.ChangeModel(GetHashKey(skin));
+            var skinHashKey = GetHashKey(skin);
+            var pedModel = Convert.ToUInt32(skinHashKey);
+            RequestModel(pedModel);
+            while (HasModelLoaded(pedModel) == false)
+            {
+                await Delay(300);
+            }
+            await Game.Player.ChangeModel(skinHashKey);
+
             SetPedDefaultComponentVariation(GetPlayerPed(-1));
             RequestCollisionAtCoord(x, y, z);
 
@@ -87,9 +96,6 @@ namespace Client.Application
             }
 
             FreezePlayer(PlayerId(), false);
-
-            //TriggerEvent("playerSpawned", PlayerId());
-
             _spawnLock = false;
         }
     }
