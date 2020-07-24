@@ -37,7 +37,7 @@ namespace Client.Application
             EventHandlers["GF:Client:SetPedArmour"] += new Action<int>(mainClient.GFSetPedArmour);
             EventHandlers["GF:Client:GiveWeaponToPed"] += new Action<uint, int, bool, bool>(mainClient.GFGiveWeaponToPed);
             EventHandlers["Chat:GF:Client:OnClientText"] += new Action<string>(mainClient.OnClienText);
-            EventHandlers["GF:Client:SendPayload"] += new Action<int, string>(mainClient.OnPayloadReceive);
+            EventHandlers["GF:Client:SendPayload"] += new Action<int, string, int>(mainClient.OnPayloadReceive);
             EventHandlers["GF:Client:SetPlayerMoney"] += new Action<int>(mainClient.GFSetPlayerMoney);
             EventHandlers["GF:Client:DeleteVehicle"] += new Action<int>(mainClient.GFDeleteVehicle);
             EventHandlers["GF:Client:OpenMenu"] += new Action<int>(menuManager.OpenMenu);

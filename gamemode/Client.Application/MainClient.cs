@@ -1,11 +1,13 @@
 ﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using CitizenFX.Core.UI;
+using LZ4;
 using Newtonsoft.Json;
 using Shared.CrossCutting;
 using Shared.CrossCutting.Dto;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Client.Application
 {
@@ -27,6 +29,21 @@ namespace Client.Application
             this.playerActions = playerActions;
             this.targetsManager = targetsManager;
             this.menuManager = menuManager;
+        }
+
+        public string Compress(string text)
+        {
+            var compressed = Convert.ToBase64String(LZ4Codec.Wrap(Encoding.UTF8.GetBytes(text)));
+            return compressed;
+        }
+
+        public string Decompress(string compressed, int maxLength)
+        {
+            var uncompressedBytes = LZ4Codec.Unwrap(Convert.FromBase64String(compressed));
+            var decoder = Encoding.UTF8.GetDecoder();
+            var chars = new char[maxLength];
+            decoder.Convert(uncompressedBytes, 0, uncompressedBytes.Length, chars, 0, chars.Length, true, out _, out int charsUsed, out _);
+            return new string(chars, 0, charsUsed);
         }
 
         public void GFDeleteVehicle(int vehicleHandle)
@@ -65,10 +82,11 @@ namespace Client.Application
             TriggerServerEvent("GF:Server:OnClientReady");
         }
 
-        public void OnPayloadReceive(int payloadTypeInt, string payload)
+        public void OnPayloadReceive(int payloadTypeInt, string compressedPayload, int uncompressedLength)
         {
+            var payload = Decompress(compressedPayload, uncompressedLength);
             var subStringLenght = payload.Length < 80 ? payload.Length : payload.Length;
-            Debug.WriteLine($"Payload[{payload.Length}]: { payload.Substring(0, subStringLenght)}..."); // TODO: Remove before release
+            Debug.WriteLine($"Payload[{compressedPayload.Length}:{payload.Length}]: { payload.Substring(0, subStringLenght)}..."); // TODO: Remove before release
             PayloadType payloadType = (PayloadType)payloadTypeInt;
             switch (payloadType)
             {

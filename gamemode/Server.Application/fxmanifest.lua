@@ -8,7 +8,9 @@ client_scripts {
 }
 
 files {
-	'client/MenuAPI.dll'
+	'client/MenuAPI.dll',
+	'client/LZ4.dll',
+	'client/LZ4pn.dll'
 }
 -- move ..\build\client\Newtonsoft.Json.net.dll ..\build\
 

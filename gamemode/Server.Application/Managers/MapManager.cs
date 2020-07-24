@@ -77,7 +77,7 @@ namespace Server.Application.Managers
         {
             this.houses.Add(new GFHouse(1, 430.9583f, -1725.626f, 29.59998f, 432.3956f, -1736.519f, 28.58899f, 48.18897f));
             this.houses.Add(new GFHouse(2, -141.8901f, -1693.345f, 36.15454f, -141.1253f, -1702.009f, 30.10547f, 138.8976f));
-
+            
             foreach (var house in this.houses)
             {
                 this.AddInterationMarkerWithNotification(house.EntranceX, house.EntranceY, house.EntranceZ, MarkerColor.COLOR_BLUE, $"Casa de {house.Owner}, aperte ~o~E~s~ para entrar", (gfPlayer, player) => HouseEnter(gfPlayer, house));
