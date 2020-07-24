@@ -17,9 +17,9 @@ namespace Server.Application.Managers
 
         public void SendClientMessageToAll(ChatColor chatColor, string message)
         {
-            foreach (GFPlayer player in playerInfo.GetGFPlayerList())
+            foreach (GFPlayer gfPlayer in playerInfo.GetGFPlayerList())
             {
-                SendClientMessage(player, chatColor, message);
+                SendClientMessage(gfPlayer, chatColor, message);
             }
         }
 
@@ -28,27 +28,23 @@ namespace Server.Application.Managers
             gfPlayer.Player.TriggerEvent("GF:Client:SendClientMessage", (int)chatColor, message);
         }
 
-        public void SendClientMessage(Player player, ChatColor chatColor, string message)
+        public void PlayerChat(GFPlayer gfPlayer, string message)
         {
-            player.TriggerEvent("GF:Client:SendClientMessage", (int)chatColor, message);
+            ProxDetectorChat(20.0f, gfPlayer, message);
         }
 
-        public void PlayerChat(Player player, string message)
+        public void PlayerScream(GFPlayer gfPlayer, string message)
         {
-            ProxDetectorChat(20.0f, player, message);
+            var outputMessage = $"[ID: {gfPlayer.Player.Handle}] {gfPlayer.Account.Username} GRITA: {message.ToUpper()}!!!";
+            ProxDetectorChat(30.0f, gfPlayer, outputMessage);
         }
 
-        public void PlayerScream(Player player, string message)
+        public void ProxDetectorColors(float radi, GFPlayer gfPlayer, string message, ChatColor color1, ChatColor color2, ChatColor color3, ChatColor color4, ChatColor color5)
         {
-            var outputMessage = $"[ID: {player.Handle}] {player.Name} GRITA: {message.ToUpper()}!!!";
-            ProxDetectorChat(30.0f, player, outputMessage);
-        }
-
-        public void ProxDetectorColors(float radi, Player player, string message, ChatColor color1, ChatColor color2, ChatColor color3, ChatColor color4, ChatColor color5)
-        {
-            foreach (Player i in this.Players)
+            var player = gfPlayer.Player;
+            foreach (GFPlayer i in this.playerInfo.GetGFPlayerList())
             {
-                var position = i.Character.Position;
+                var position = i.Player.Character.Position;
                 var tempposx = player.Character.Position.X - position.X;
                 var tempposy = player.Character.Position.Y - position.Y;
                 var tempposz = player.Character.Position.Z - position.Z;
@@ -79,20 +75,21 @@ namespace Server.Application.Managers
         internal void OnChatMessage([FromSource] Player player, string message)
         {
             var wholeMessageCharsIsUppercase = (message.CompareTo(message.ToUpper()) == 0);
+            var gfPlayer = playerInfo.GetGFPlayer(player);
             if (wholeMessageCharsIsUppercase)
             {
-                PlayerScream(player, message);
+                PlayerScream(gfPlayer, message);
             }
             else
             {
-                var messageToChat = $"[ID: {player.Handle}] {player.Name} diz: {message}";
-                PlayerChat(player, messageToChat);
+                var messageToChat = $"[ID: {player.Handle}] {gfPlayer.Account.Username} diz: {message}";
+                PlayerChat(gfPlayer, messageToChat);
             }
         }
 
-        private void ProxDetectorChat(float radi, Player player, string message)
+        private void ProxDetectorChat(float radi, GFPlayer gfPlayer, string message)
         {
-            ProxDetectorColors(radi, player, message, ChatColor.COLOR_FADE1, ChatColor.COLOR_FADE2, ChatColor.COLOR_FADE3, ChatColor.COLOR_FADE4, ChatColor.COLOR_FADE5);
+            ProxDetectorColors(radi, gfPlayer, message, ChatColor.COLOR_FADE1, ChatColor.COLOR_FADE2, ChatColor.COLOR_FADE3, ChatColor.COLOR_FADE4, ChatColor.COLOR_FADE5);
         }
     }
 }

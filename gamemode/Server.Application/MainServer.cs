@@ -28,7 +28,7 @@ namespace Server.Application
             {
                 var gfPlayer = this.playerInfo.GetGFPlayer(player);
                 gfPlayer.ConnectionState = PlayerConnectionState.ON_GAMEMODE_LOAD;
-                Console.WriteLine($"[IM MainServer] PlayerLoaded: [{player.Handle}] {player.Name}");
+                Console.WriteLine($"[IM MainServer] PlayerLoaded: [{player.Handle}] {gfPlayer.Account.Username}");
             }
 
             Console.WriteLine("[IM MainServer] Started MainServer");
