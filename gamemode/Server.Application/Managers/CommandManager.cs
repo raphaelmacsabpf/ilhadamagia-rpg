@@ -310,6 +310,27 @@ namespace Server.Application.Managers
                         this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_LIGHTBLUE, $" Você setou a casa de {targetPlayer.Name} para ID {houseId}.");
                         return;
                     }
+                case CommandCode.GO_TO_HOUSE:
+                    {
+                        if (sourceGFPlayer.Account.AdminLevel < 4)
+                        {
+                            this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_GRAD2, "Você não está autorizado a usar este comando!");
+                            return;
+                        }
+
+                        var houseIdStr = args[1];
+                        int houseId;
+
+                        if (Int32.TryParse(houseIdStr, out houseId) == false || this.mapManager.IsValidHouseId(houseId) == false)
+                        {
+                            this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_GRAD1, $"   {houseIdStr} não é um ID válido para uma casa.");
+                            return;
+                        }
+
+                        var gfHouse = mapManager.GetGFHouseFromId(houseId);
+                        this.playerActions.TeleportPlayerToPosition(sourceGFPlayer, new Vector3(gfHouse.Entity.EntranceX, gfHouse.Entity.EntranceY, gfHouse.Entity.EntranceZ), 500);
+                        return;
+                    }
                 default:
                     {
                         this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_LIGHTRED, "Comando não reconhecido, use /ajuda para ver alguns comandos!");

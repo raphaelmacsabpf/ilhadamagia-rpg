@@ -34,6 +34,7 @@ namespace Client.Application
                 case "/coords": return CommandCode.GO_TO_COORDS;
                 case "/prop": return CommandCode.PROP_MENU;
                 case "/setcasa": return CommandCode.SET_HOUSE;
+                case "/ircasa": return CommandCode.GO_TO_HOUSE;
                 default: return CommandCode.INVALID_COMMAND;
             }
         }
