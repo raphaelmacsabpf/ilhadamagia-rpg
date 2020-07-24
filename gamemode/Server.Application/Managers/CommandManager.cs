@@ -269,7 +269,7 @@ namespace Server.Application.Managers
                             return;
                         }
 
-                        var distanceFromPlayerToHerHouse = sourcePlayer.Character.Position.DistanceToSquared(new Vector3(playerHouse.EntranceX, playerHouse.EntranceY, playerHouse.EntranceZ));
+                        var distanceFromPlayerToHerHouse = sourcePlayer.Character.Position.DistanceToSquared(new Vector3(playerHouse.Entity.EntranceX, playerHouse.Entity.EntranceY, playerHouse.Entity.EntranceZ));
                         Console.WriteLine($"Distance is: {distanceFromPlayerToHerHouse}"); // TODO: Remover este LOG quando entender os problemas de sincronia
                         if (distanceFromPlayerToHerHouse > Math.Pow(1.5f, 2))
                         {

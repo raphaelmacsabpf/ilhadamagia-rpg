@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\Account.cs" />
+    <Compile Include="Entities\House.cs" />
     <Compile Include="Enums\InteriorType.cs" />
     <Compile Include="Enums\PropertySellState.cs" />
     <Compile Include="Enums\PropertyType.cs" />

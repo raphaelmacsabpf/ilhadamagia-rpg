@@ -2,7 +2,7 @@
 {
     public enum PropertySellState
     {
-        FOR_SALE = 1,
+        FOR_SALE,
         SOLD
     }
 }

@@ -56,7 +56,6 @@
   <ItemGroup>
     <Compile Include="Entities\GFHouse.cs" />
     <Compile Include="Entities\GFPlayer.cs" />
-    <Compile Include="Entities\GFProperty.cs" />
     <Compile Include="Enums\PlayerConnectionState.cs" />
     <Compile Include="Managers\ChatManager.cs" />
     <Compile Include="AppBootstrap.cs" />

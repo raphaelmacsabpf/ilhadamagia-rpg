@@ -1,6 +1,7 @@
 ﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using Server.Application.Entities;
+using Server.Database;
 using Server.Domain.Enums;
 using Shared.CrossCutting;
 using Shared.CrossCutting.Dto;
@@ -22,12 +23,14 @@ namespace Server.Application.Managers
         private readonly PlayerInfo playerInfo;
         private readonly ChatManager chatManager;
         private readonly PlayerActions playerActions;
+        private readonly HouseRepository houseRepository;
 
-        public MapManager(PlayerInfo playerInfo, ChatManager chatManager, PlayerActions playerActions) // TODO: Verify constructor to prevent to start from fivem
+        public MapManager(PlayerInfo playerInfo, ChatManager chatManager, PlayerActions playerActions, HouseRepository houseRepository)
         {
             this.playerInfo = playerInfo;
             this.chatManager = chatManager;
             this.playerActions = playerActions;
+            this.houseRepository = houseRepository;
 
             this.staticMarkers = new List<MarkerDto>();
             this.staticProximityTargets = new List<ProximityTargetDto>();
@@ -75,19 +78,24 @@ namespace Server.Application.Managers
 
         public void BuildHouses()
         {
-            this.houses.Add(new GFHouse(1, 430.9583f, -1725.626f, 29.59998f, 432.3956f, -1736.519f, 28.58899f, 48.18897f));
-            this.houses.Add(new GFHouse(2, -141.8901f, -1693.345f, 36.15454f, -141.1253f, -1702.009f, 30.10547f, 138.8976f));
+            var houseEntities = houseRepository.GetAll();
+            foreach(var houseEntity in houseEntities)
+            {
+                var gfHouse = new GFHouse();
+                gfHouse.Entity = houseEntity;
+                this.houses.Add(gfHouse);
+            }
             
             foreach (var house in this.houses)
             {
-                this.AddInterationMarkerWithNotification(house.EntranceX, house.EntranceY, house.EntranceZ, MarkerColor.COLOR_BLUE, $"Casa de {house.Owner}, aperte ~o~E~s~ para entrar", (gfPlayer, player) => HouseEnter(gfPlayer, house));
+                this.AddInterationMarkerWithNotification(house.Entity.EntranceX, house.Entity.EntranceY, house.Entity.EntranceZ, MarkerColor.COLOR_BLUE, $"Casa de {house.Entity.Owner}, aperte ~o~E~s~ para entrar", (gfPlayer, player) => HouseEnter(gfPlayer, house));
             }
         }
 
         public void HouseEnter(GFPlayer gfPlayer, GFHouse house)
         {
             gfPlayer.CurrentHouse = house;
-            this.playerActions.TeleportPlayerToPosition(gfPlayer, interiorPositions[house.Interior], 1000);
+            this.playerActions.TeleportPlayerToPosition(gfPlayer, interiorPositions[house.Entity.Interior], 1000);
         }
 
         private void HouseExit(GFPlayer gfPlayer)
@@ -95,7 +103,7 @@ namespace Server.Application.Managers
             var house = gfPlayer.CurrentHouse;
             if (house != null)
             {
-                this.playerActions.TeleportPlayerToPosition(gfPlayer, new Vector3(house.EntranceX, house.EntranceY, house.EntranceZ), 3000);
+                this.playerActions.TeleportPlayerToPosition(gfPlayer, new Vector3(house.Entity.EntranceX, house.Entity.EntranceY, house.Entity.EntranceZ), 3000);
                 gfPlayer.CurrentHouse = null;
             }
         }
@@ -167,7 +175,7 @@ namespace Server.Application.Managers
         {
             return this.houses.Exists((house) =>
             {
-                return house.GlobalId == houseId;
+                return house.Entity.Id == houseId;
             });
         }
 
@@ -175,7 +183,7 @@ namespace Server.Application.Managers
         {
             return this.houses.FirstOrDefault((house) =>
             {
-                return house.GlobalId == id;
+                return house.Entity.Id == id;
             });
         }
     }

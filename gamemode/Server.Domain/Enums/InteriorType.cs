@@ -2,7 +2,7 @@
 {
     public enum InteriorType
     {
-        LOW_END_APARTMENT = 1,
+        LOW_END_APARTMENT,
         MEDIUM_END_APARTMENT,
     }
 }

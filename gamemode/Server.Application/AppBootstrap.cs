@@ -26,6 +26,7 @@ namespace Server.Application
             var builder = new ContainerBuilder();
             builder.RegisterInstance(new MySqlConnectionPool(20)).As<MySqlConnectionPool>();
             builder.RegisterType<AccountRepository>().As<AccountRepository>().SingleInstance();
+            builder.RegisterType<HouseRepository>().As<HouseRepository>().SingleInstance();
             builder.RegisterType<MenuManager>().As<MenuManager>().SingleInstance();
             builder.RegisterType<ChatManager>().As<ChatManager>().SingleInstance();
             builder.RegisterType<MapManager>().As<MapManager>().SingleInstance();

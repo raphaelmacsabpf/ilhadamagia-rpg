@@ -2,7 +2,7 @@
 {
     public enum PropertyType
     {
-        House = 1,
+        House,
         Apartment,
         Office,
         Room,
