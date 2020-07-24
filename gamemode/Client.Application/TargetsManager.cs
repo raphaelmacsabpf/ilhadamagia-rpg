@@ -122,13 +122,15 @@ namespace Client.Application
 
         public async void OnTargetAction(string actionName, string payload)
         {
-            //GFSendClientMessage((int)ChatColor.COLOR_ADD, $"actionName: {actionName}, payload:{payload}");
             switch (actionName)
             {
                 case "INFO_TO_PLAYER":
                     string message = payload;
                     this.playerActions.PushNotification(message, 2000);
-                    API.PlaySound(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false, 0, true);
+                    if(API.IsScreenFadedIn() == false && API.IsScreenFadedOut() == false)
+                    {
+                        API.PlaySound(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false, 0, true);
+                    }
                     break;
 
                 case "SERVER_CALLBACK":

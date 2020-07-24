@@ -179,6 +179,11 @@ namespace Client.Application
             this.playerActions.SetPlayerPos(targetPosition);
         }
 
+        public void GFTeleportPlayerToPosition(Vector3 targetPosition, int transitionDurationInMs)
+        {
+            this.playerActions.TeleportPlayerToPosition(targetPosition, transitionDurationInMs);
+        }
+
         public void GFGiveWeaponToPed(uint weaponHash, int ammoCount, bool isHidden, bool equipNow)
         {
             this.playerActions.GivePlayerWeapon((WeaponHash)weaponHash, ammoCount, isHidden, equipNow);

@@ -262,7 +262,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.PROP_MENU:
                     {
-                        var playerHouse = this.mapManager.GetGFHouseFromId(sourceGFPlayer.HouseId);
+                        var playerHouse = this.mapManager.GetGFHouseFromId(sourceGFPlayer.SelectedHouseId);
                         if (playerHouse == null)
                         {
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD1, "Você não possui uma casa válida");
@@ -306,7 +306,7 @@ namespace Server.Application.Managers
                             return;
                         }
 
-                        targetGFPlayer.HouseId = houseId;
+                        targetGFPlayer.SelectedHouseId = houseId;
                         this.chatManager.SendClientMessage(sourcePlayer, ChatColor.COLOR_LIGHTBLUE, $" Você setou a casa de {targetPlayer.Name} para ID {houseId}.");
                         return;
                     }

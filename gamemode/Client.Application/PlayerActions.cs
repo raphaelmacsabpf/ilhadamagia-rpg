@@ -43,6 +43,20 @@ namespace Client.Application
             Game.PlayerPed.Position = targetPosition;
         }
 
+        public async void TeleportPlayerToPosition(Vector3 targetPosition, int transitionDurationInMs = 500)
+        {
+            API.SetPlayerControl(API.PlayerId(), false, 0);
+            API.DoScreenFadeOut(1000);
+            while (API.IsScreenFadingOut())
+            {
+                await Delay(16);
+            }
+            Game.PlayerPed.Position = targetPosition;
+            await Delay(transitionDurationInMs);
+            API.DoScreenFadeIn(1000);
+            API.SetPlayerControl(API.PlayerId(), true, 0);
+        }
+
         internal void GivePlayerWeapon(WeaponHash weaponHash, int ammoCount, bool isHidden, bool equipNow)
         {
             API.GiveWeaponToPed(Game.PlayerPed.Handle, (uint)weaponHash, ammoCount, isHidden, equipNow);

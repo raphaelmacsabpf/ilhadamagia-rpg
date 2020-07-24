@@ -26,6 +26,11 @@ namespace Server.Application
             gfPlayer.Player.TriggerEvent("GF:Client:SetPlayerPos", targetPosition);
         }
 
+        public void TeleportPlayerToPosition(GFPlayer gfPlayer, Vector3 targetPosition, int transitionDurationInMs)
+        {
+            gfPlayer.Player.TriggerEvent("GF:Client:TeleportPlayerToPosition", targetPosition, transitionDurationInMs);
+        }
+
         public void SetPlayerArmour(Player player, int value)
         {
             player.TriggerEvent("GF:Client:SetPedArmour", value);

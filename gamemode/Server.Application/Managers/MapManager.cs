@@ -87,7 +87,7 @@ namespace Server.Application.Managers
         public void HouseEnter(GFPlayer gfPlayer, GFHouse house)
         {
             gfPlayer.CurrentHouse = house;
-            this.playerActions.SetPlayerPos(gfPlayer, interiorPositions[house.Interior]);
+            this.playerActions.TeleportPlayerToPosition(gfPlayer, interiorPositions[house.Interior], 1000);
         }
 
         private void HouseExit(GFPlayer gfPlayer)
@@ -95,7 +95,7 @@ namespace Server.Application.Managers
             var house = gfPlayer.CurrentHouse;
             if (house != null)
             {
-                this.playerActions.SetPlayerPos(gfPlayer, new Vector3(house.EntranceX, house.EntranceY, house.EntranceZ));
+                this.playerActions.TeleportPlayerToPosition(gfPlayer, new Vector3(house.EntranceX, house.EntranceY, house.EntranceZ), 3000);
                 gfPlayer.CurrentHouse = null;
             }
         }

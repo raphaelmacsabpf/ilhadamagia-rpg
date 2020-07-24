@@ -1,6 +1,7 @@
 ﻿using CitizenFX.Core;
 using Server.Application.Enums;
 using Server.Domain.Entities;
+using System.Collections.Generic;
 
 namespace Server.Application.Entities
 {
@@ -14,8 +15,10 @@ namespace Server.Application.Entities
         public PlayerConnectionState ConnectionState { get; set; }
         public Account Account { get; set; }
         public Player Player { get; private set; }
-        public int AdminLevel { get; set; }
-        public int HouseId { get; set; }
+        public int SelectedHouseId { get; set; }
+        public List<int> HouseIds { get; set; }
         public GFHouse CurrentHouse { get; set; }
     }
+
+
 }
