@@ -116,7 +116,7 @@ namespace Server.Application.Managers
                 case CommandCode.KILL:
                     {
                         // sourcePlayer.TriggerEvent("GF:Client:DeleteVehicle", this.mapManager.lastHandle); // TODO: Não esquecer deste exemplo aqui e continuar ele.
-                        this.playerActions.KillPlayer(sourceGFPlayer.Player); // TODO: Algum dia, proteger esse comando para só admin pegar (desenvolver contas antes)
+                        this.playerActions.KillPlayer(sourceGFPlayer); // TODO: Algum dia, proteger esse comando para só admin pegar (desenvolver contas antes)
                         return;
                     }
                 case CommandCode.GO:
@@ -233,11 +233,11 @@ namespace Server.Application.Managers
                             return;
                         }
 
-                        this.playerActions.SetPlayerArmour(targetGfPlayer.Player, value);
+                        this.playerActions.SetPlayerArmour(targetGfPlayer, value);
                         this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $"Você deu {value} de colete para {targetGfPlayer.Account.Username}");
                         this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $"O Admin {targetGfPlayer.Account.Username} te deu {value} de colete");
 
-                        this.playerActions.GiveWeaponToPlayer(sourceGFPlayer.Player, WeaponHash.HeavySniperMk2, 200, false, true); // TODO: Remover isso quando sistema de armas estiver pronto
+                        this.playerActions.GiveWeaponToPlayer(sourceGFPlayer, WeaponHash.HeavySniperMk2, 200, false, true); // TODO: Remover isso quando sistema de armas estiver pronto
                         return;
                     }
                 case CommandCode.GO_TO_COORDS:
@@ -339,7 +339,7 @@ namespace Server.Application.Managers
             }
         }
 
-        private GFPlayer GetPlayerByIdOrName(string playerStr) // TODO: Usar o username aqui
+        private GFPlayer GetPlayerByIdOrName(string playerStr)
         {
             int parsedId;
             bool parseSucceed = Int32.TryParse(playerStr, out parsedId);
@@ -356,10 +356,11 @@ namespace Server.Application.Managers
             }
             else
             {
+                var loweredPlayerStr = playerStr.ToLower();
                 foreach (var gfPlayer in gfPlayerList)
                 {
                     var loweredUsername = gfPlayer.Account.Username.ToLower();
-                    if (loweredUsername.StartsWith(playerStr) || loweredUsername == playerStr)
+                    if (loweredUsername.StartsWith(loweredPlayerStr) || loweredUsername == loweredPlayerStr)
                     {
                         return gfPlayer;
                     }

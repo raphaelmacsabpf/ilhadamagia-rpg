@@ -16,9 +16,9 @@ namespace Server.Application
             this.playerInfo = playerInfo;
         }
 
-        public void KillPlayer(Player player)
+        public void KillPlayer(GFPlayer gfPlayer)
         {
-            player.TriggerEvent("GF:Client:Kill");
+            gfPlayer.Player.TriggerEvent("GF:Client:Kill");
         }
 
         public void SetPlayerPos(GFPlayer gfPlayer, Vector3 targetPosition)
@@ -31,19 +31,19 @@ namespace Server.Application
             gfPlayer.Player.TriggerEvent("GF:Client:TeleportPlayerToPosition", targetPosition, transitionDurationInMs);
         }
 
-        public void SetPlayerArmour(Player player, int value)
+        public void SetPlayerArmour(GFPlayer gfPlayer, int value)
         {
-            player.TriggerEvent("GF:Client:SetPedArmour", value);
+            gfPlayer.Player.TriggerEvent("GF:Client:SetPedArmour", value);
         }
 
-        public void GiveWeaponToPlayer(Player player, WeaponHash weaponHash, int ammoCount, bool isHidden, bool equipNow)
+        public void GiveWeaponToPlayer(GFPlayer gfPlayer, WeaponHash weaponHash, int ammoCount, bool isHidden, bool equipNow)
         {
-            player.TriggerEvent("GF:Client:GiveWeaponToPed", (uint)weaponHash, ammoCount, isHidden, equipNow);
+            gfPlayer.Player.TriggerEvent("GF:Client:GiveWeaponToPed", (uint)weaponHash, ammoCount, isHidden, equipNow);
         }
 
-        public void SetPlayerMoney(Player player, int money)
+        public void SetPlayerMoney(GFPlayer gfPlayer, int money)
         {
-            player.TriggerEvent("GF:Client:SetPlayerMoney", money);
+            gfPlayer.Player.TriggerEvent("GF:Client:SetPlayerMoney", money);
         }
 
         public void OpenMenu(GFPlayer gfPlayer, MenuType menuType)

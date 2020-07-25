@@ -139,7 +139,7 @@ namespace Client.Application
                 int b = colorRgba[2];
                 int a = colorRgba[3];
 
-                API.DrawMarker(markerdto.type, markerdto.posX, markerdto.posY, markerdto.posZ, markerdto.dirX, markerdto.dirY, markerdto.dirZ, markerdto.rotX, markerdto.rotY, markerdto.rotZ, markerdto.scaleX, markerdto.scaleY, markerdto.scaleZ, r, g, b, a, markerdto.bobUpAndDown, markerdto.faceCamera, markerdto.p19, markerdto.rotate, markerdto.textureDict, markerdto.textureName, markerdto.drawOnEnts);
+                API.DrawMarker(markerdto.Type, markerdto.PosX, markerdto.PosY, markerdto.PosZ, markerdto.DirX, markerdto.DirY, markerdto.DirZ, markerdto.RotX, markerdto.RotY, markerdto.RotZ, markerdto.ScaleX, markerdto.ScaleY, markerdto.ScaleZ, r, g, b, a, markerdto.BobUpAndDown, markerdto.FaceCamera, markerdto.P19, markerdto.Rotate, markerdto.TextureDict, markerdto.TextureName, markerdto.DrawOnEnts);
             }
         }
     }
