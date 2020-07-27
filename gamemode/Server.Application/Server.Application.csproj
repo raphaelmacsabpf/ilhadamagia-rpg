@@ -95,7 +95,7 @@
     <PostBuildEvent>cd ..\..\scripts\
 REM icecon.exe -c "stop TutorialScript" 127.0.0.1:30120 PQPMELANCIAAZEDA
 move ..\.build\server\fxmanifest.lua ..\.build\
-xcopy /S /Y ..\Server.Application\html\ ..\.build\html\
+xcopy /S /Y ..\Client.Application\nui\ ..\.build\client\nui\
 del /S ..\.build\server\*.pdb
 del /s ..\.build\server\*.xml
 xcopy /S /Y ..\.build G:\dev\fivem\server\server-data\resources\TutorialScript

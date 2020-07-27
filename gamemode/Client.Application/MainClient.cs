@@ -72,6 +72,7 @@ namespace Client.Application
 
         private async void InitializeClient()
         {
+            API.SetNuiFocus(false, false);
             API.DoScreenFadeOut(1000);
             while (API.IsScreenFadingOut())
             {
@@ -155,9 +156,16 @@ namespace Client.Application
         }
 
         // Commands
-        public void OnInfo() // TODO: REMOVE THIS COMMAND
+        public async void OnInfo() // TODO: REMOVE THIS COMMAND
         {
+            API.SendNuiMessage("{\"type\":\"CHARACTERS_SHOW\",\"enable\":true}");          
             Screen.ShowNotification($"~b~ServerInfo~s~: Your are currently on the Tutorial Server By 4444, {Game.Player.Name}!");
+        }
+
+        public async void OnNuiEndpointCall(IDictionary<string, object> data, CallbackDelegate callbackResponse)
+        {
+            // TODO: Iterate over data to create endpoint calls
+            callbackResponse("200");
         }
 
         public async void onVeh() // TODO: Add complete /veh command

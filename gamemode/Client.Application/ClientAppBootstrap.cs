@@ -1,10 +1,16 @@
 ﻿using CitizenFX.Core;
+using CitizenFX.Core.Native;
 using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Threading.Tasks;
 
 namespace Client.Application
 {
     public class ClientAppBootstrap : BaseScript
     {
+        private bool firstTick = false;
+        private MainClient mainClientHandler;
         public ClientAppBootstrap()
         {
             var menuManager = new MenuManager(true);
@@ -18,6 +24,7 @@ namespace Client.Application
 
             this.Tick += render.RenderTickHandler;
             this.Tick += targetsManager.TargetsTickHandler;
+            this.Tick += OnTick;
 
             // Default Events
             EventHandlers["baseevents:onPlayerDied"] += new Action<int, dynamic>(mainClient.OnDie);
@@ -41,6 +48,17 @@ namespace Client.Application
             EventHandlers["GF:Client:SetPlayerMoney"] += new Action<int>(mainClient.GFSetPlayerMoney);
             EventHandlers["GF:Client:DeleteVehicle"] += new Action<int>(mainClient.GFDeleteVehicle);
             EventHandlers["GF:Client:OpenMenu"] += new Action<int>(menuManager.OpenMenu);
+            mainClientHandler = mainClient;
+        }
+
+        private async Task OnTick()
+        {
+            if (!firstTick)
+            {
+                firstTick = true;
+                API.RegisterNuiCallbackType("NUI_ENDPOINT");
+                EventHandlers["__cfx_nui:NUI_ENDPOINT"] += new Action<IDictionary<string, object>, CallbackDelegate>(mainClientHandler.OnNuiEndpointCall);
+            }
         }
     }
 }
