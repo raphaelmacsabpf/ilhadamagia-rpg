@@ -1,4 +1,5 @@
 ﻿using CitizenFX.Core;
+using GF.CrossCutting;
 using Server.Application.Entities;
 using Server.Domain.Enums;
 using Shared.CrossCutting;
@@ -54,6 +55,16 @@ namespace Server.Application
         public void SpawnPlayer(GFPlayer gfPlayer, string skinName, float x, float y, float z, float heading)
         {
             gfPlayer.Player.TriggerEvent("GF:Client:SpawnPlayer", skinName, x, y, z, heading);
+        }
+
+        public void ShowNUIView(GFPlayer gfPlayer, NUIViewType nuiViewType, bool setFocus)
+        {
+            gfPlayer.Player.TriggerEvent("GF:Client:ShowNUIView", (int)nuiViewType, setFocus);
+        }
+
+        public void CloseNUIView(GFPlayer gfPlayer, NUIViewType nuiViewType, bool cancelFocus)
+        {
+            gfPlayer.Player.TriggerEvent("GF:Client:CloseNUIView", (int)nuiViewType, cancelFocus);
         }
     }
 }

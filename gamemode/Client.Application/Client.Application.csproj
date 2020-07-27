@@ -80,10 +80,32 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="nui\.babelrc" />
+    <None Include="nui\.editorconfig" />
+    <None Include="nui\.prettierignore" />
+    <None Include="nui\.prettierrc" />
+    <None Include="nui\package-lock.json" />
+    <None Include="nui\package.json" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="nui\" />
+    <Content Include="nui\.eslintrc.js" />
+    <Content Include="nui\src\app.js" />
+    <Content Include="nui\src\containers\AccountList\index.js" />
+    <Content Include="nui\src\containers\AccountList\styles.css" />
+    <Content Include="nui\src\containers\App\index.js" />
+    <Content Include="nui\src\containers\App\styles.css" />
+    <Content Include="nui\src\index.html" />
+    <Content Include="nui\src\util\Nui.js" />
+    <Content Include="nui\webpack\webpack.common.js" />
+    <Content Include="nui\webpack\webpack.dev.js" />
+    <Content Include="nui\webpack\webpack.prod.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>cd nui/
+npm install
+npm run build</PostBuildEvent>
+  </PropertyGroup>
 </Project>

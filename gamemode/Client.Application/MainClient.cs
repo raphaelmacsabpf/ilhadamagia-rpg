@@ -1,6 +1,7 @@
 ﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using CitizenFX.Core.UI;
+using GF.CrossCutting;
 using LZ4;
 using Newtonsoft.Json;
 using Shared.CrossCutting;
@@ -73,6 +74,7 @@ namespace Client.Application
         private async void InitializeClient()
         {
             API.SetNuiFocus(false, false);
+
             API.DoScreenFadeOut(1000);
             while (API.IsScreenFadingOut())
             {
@@ -81,6 +83,35 @@ namespace Client.Application
             API.ShutdownLoadingScreen();
             await Delay(1000);
             TriggerServerEvent("GF:Server:OnClientReady");
+        }
+
+        public void ShowNUIView(int nuiViewTypeInt, bool setFocus)
+        {
+            var nuiViewType = (NUIViewType)nuiViewTypeInt;
+
+            var nuiMessage = new
+            {
+                type = "OPEN_VIEW",
+                viewName = nuiViewType.ToString()
+            };
+            var jsonEvent = JsonConvert.SerializeObject(nuiMessage);
+            API.SendNuiMessage(jsonEvent);
+            API.SetNuiFocus(setFocus, setFocus);
+        }
+
+        public void CloseNUIView(int nuiViewTypeInt, bool cancelFocus)
+        {
+            var nuiViewType = (NUIViewType)nuiViewTypeInt;
+
+            var nuiMessage = new
+            {
+                type = "CLOSE_VIEW",
+                viewName = nuiViewType.ToString()
+            };
+            var jsonEvent = JsonConvert.SerializeObject(nuiMessage);
+            API.SendNuiMessage(jsonEvent);
+            var focus = cancelFocus == false;
+            API.SetNuiFocus(focus, focus);
         }
 
         public void OnPayloadReceive(int payloadTypeInt, string compressedPayload, int uncompressedLength)
@@ -164,7 +195,12 @@ namespace Client.Application
 
         public async void OnNuiEndpointCall(IDictionary<string, object> data, CallbackDelegate callbackResponse)
         {
-            // TODO: Iterate over data to create endpoint calls
+            var  responseType = data["type"].ToString();
+            if(responseType == "RESPONSE_ACCOUNT_SELECTED")
+            {
+                var account = data["account"].ToString();
+                TriggerServerEvent("GF:Server:ResponseAccountSelect", account);
+            }
             callbackResponse("200");
         }
 

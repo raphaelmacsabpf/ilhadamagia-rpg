@@ -55,6 +55,7 @@
     <Compile Include="MarkerColorValue.cs" />
     <Compile Include="MenuAction.cs" />
     <Compile Include="MenuType.cs" />
+    <Compile Include="NUIViewType.cs" />
     <Compile Include="PayloadType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

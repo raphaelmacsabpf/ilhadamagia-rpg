@@ -1,4 +1,5 @@
 ﻿using CitizenFX.Core;
+using GF.CrossCutting;
 using Newtonsoft.Json;
 using Server.Application.Entities;
 using Server.Application.Enums;
@@ -58,7 +59,7 @@ namespace Server.Application
             json = JsonConvert.SerializeObject(this.MapManager.PopUpdatedStaticInteractionTargetsPayload());
             this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_STATIC_INTERACTION_TARGETS, json);
 
-            playerActions.SpawnPlayer(gfPlayer, "S_M_Y_MARINE_01", 309.6f, -728.7297f, 29.3136f, 246.6142f);
+            this.playerActions.ShowNUIView(gfPlayer, NUIViewType.SELECT_ACCOUNT, true);
         }
 
         internal void OnPlayerDropped([FromSource] Player player, string reason)
@@ -84,6 +85,13 @@ namespace Server.Application
             }
             Console.WriteLine($"[Connected] ID:{player.Handle}, PlayerName: {playerName}, IP: {player.EndPoint}, License: {player.Identifiers["license"]}");
             deferrals.done();
+        }
+
+        internal void OnPlayerSelectAccount([FromSource] Player player, string accountName)
+        {
+            var gfPlayer = playerInfo.GetGFPlayer(player);
+            playerActions.CloseNUIView(gfPlayer, NUIViewType.SELECT_ACCOUNT, true);
+            playerActions.SpawnPlayer(gfPlayer, "S_M_Y_MARINE_01", 309.6f, -728.7297f, 29.3136f, 246.6142f);
         }
 
         private PlayerVarsDto PopUpdatedPlayerVarsPayload(GFPlayer gfPlayer)
