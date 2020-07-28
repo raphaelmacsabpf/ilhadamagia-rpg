@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandValidator.cs" />
     <Compile Include="Entities\GFHouse.cs" />
     <Compile Include="Entities\GFPlayer.cs" />
     <Compile Include="Enums\PlayerConnectionState.cs" />

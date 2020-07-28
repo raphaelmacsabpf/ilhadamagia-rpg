@@ -45,6 +45,7 @@ namespace Server.Application.Managers
             commandPacket.CommandCode = (CommandCode)commandCode;
             commandPacket.HasArgs = hasArgs;
             commandPacket.Text = text;
+            var sourceCommandValidator = new CommandValidator(sourceGFPlayer);
 
             string[] args = new string[0];
             if (commandPacket.HasArgs)
@@ -120,7 +121,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.GO:
                     {
-                        if (sourceGFPlayer.Account.AdminLevel < 1)
+                        if (sourceCommandValidator.AdminLevel(1).IsInvalid())
                         {
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "Você não é um administrador!");
                             return;
@@ -143,6 +144,12 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.BRING:
                     {
+                        if (sourceCommandValidator.AdminLevel(1).IsInvalid())
+                        {
+                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "Você não é um administrador!");
+                            return;
+                        }
+
                         var targetPlayerStr = args[1];
                         GFPlayer targetGfPlayer = GetPlayerByIdOrName(targetPlayerStr);
                         if (targetGfPlayer == null)
@@ -173,7 +180,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.SET_ADMIN:
                     {
-                        if (sourceGFPlayer.Account.AdminLevel < 3001)
+                        if (sourceCommandValidator.AdminLevel(3001).IsInvalid())
                         {
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "Você não está autorizado a usar este comando!");
                             return;
@@ -206,7 +213,7 @@ namespace Server.Application.Managers
 
                 case CommandCode.SET_ARMOUR:
                     {
-                        if (sourceGFPlayer.Account.AdminLevel < 1)
+                        if (sourceCommandValidator.AdminLevel(1).IsInvalid())
                         {
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "Você não está autorizado a usar este comando!");
                             return;
@@ -241,7 +248,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.GO_TO_COORDS:
                     {
-                        if (sourceGFPlayer.Account.AdminLevel < 1)
+                        if (sourceCommandValidator.AdminLevel(1).IsInvalid())
                         {
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "Você não está autorizado a usar este comando!");
                             return;
@@ -281,7 +288,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.SET_HOUSE:
                     {
-                        if (sourceGFPlayer.Account.AdminLevel < 3001)
+                        if (sourceCommandValidator.AdminLevel(3001).IsInvalid())
                         {
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "Você não está autorizado a usar este comando!");
                             return;
@@ -310,7 +317,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.GO_TO_HOUSE:
                     {
-                        if (sourceGFPlayer.Account.AdminLevel < 4)
+                        if (sourceCommandValidator.AdminLevel(4).IsInvalid())
                         {
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "Você não está autorizado a usar este comando!");
                             return;
