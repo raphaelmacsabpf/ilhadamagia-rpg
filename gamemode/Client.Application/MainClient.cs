@@ -21,6 +21,8 @@ namespace Client.Application
         private readonly TargetsManager targetsManager;
         private readonly MenuManager menuManager;
         private bool clientInitializationStarted;
+        private string lastPayloadCompressed;
+        private int lastPayloadUncompressedLength;
 
         public MainClient(PlayerInfo playerInfo, MarkersManager markersManager, Render render, PlayerActions playerActions, TargetsManager targetsManager, MenuManager menuManager)
         {
@@ -87,6 +89,8 @@ namespace Client.Application
 
         public void OpenNUIView(int nuiViewTypeInt, bool setFocus, string compressedJsonPayload, int uncompressedLength)
         {
+            this.lastPayloadCompressed = compressedJsonPayload;
+            this.lastPayloadUncompressedLength = uncompressedLength;
             var nuiViewType = (NUIViewType)nuiViewTypeInt;
             var payload = Decompress(compressedJsonPayload, uncompressedLength);
             var nuiMessage = new
@@ -163,6 +167,10 @@ namespace Client.Application
             API.CancelEvent();
             if (textInput[0] == '/')
             {
+                if(textInput == "/login") // HACK: Remove this command soon as possible
+                {
+                    OpenNUIView((int)NUIViewType.SELECT_ACCOUNT, true, lastPayloadCompressed, lastPayloadUncompressedLength);
+                }
                 var commandPacket = CommandParser.Parse(textInput);
                 TriggerServerEvent("GF:Server:OnClientCommand", (int)commandPacket.CommandCode, commandPacket.HasArgs, commandPacket.Text);
             }
