@@ -93,13 +93,13 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>cd ..\..\scripts\
-icecon.exe -c "stop ilhadamagiarpg" 127.0.0.1:30120 PQPMELANCIAAZEDA
+REM icecon.exe -c "stop ilhadamagiarpg" 127.0.0.1:30120 PQPMELANCIAAZEDA
 move ..\.build\server\fxmanifest.lua ..\.build\
 mkdir ..\.build\client\nui\html
 xcopy /S /Y ..\Client.Application\nui\html ..\.build\client\nui\html
 del /S ..\.build\server\*.pdb
 del /s ..\.build\server\*.xml
 xcopy /S /Y ..\.build G:\dev\fivem\server\server-data\resources\ilhadamagiarpg
-icecon.exe -c "ensure ilhadamagiarpg" 127.0.0.1:30120 PQPMELANCIAAZEDA</PostBuildEvent>
+REM icecon.exe -c "ensure ilhadamagiarpg" 127.0.0.1:30120 PQPMELANCIAAZEDA</PostBuildEvent>
   </PropertyGroup>
 </Project>

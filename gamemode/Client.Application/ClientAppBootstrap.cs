@@ -48,7 +48,7 @@ namespace Client.Application
             EventHandlers["GF:Client:SetPlayerMoney"] += new Action<int>(mainClient.GFSetPlayerMoney);
             EventHandlers["GF:Client:DeleteVehicle"] += new Action<int>(mainClient.GFDeleteVehicle);
             EventHandlers["GF:Client:OpenMenu"] += new Action<int>(menuManager.OpenMenu);
-            EventHandlers["GF:Client:ShowNUIView"] += new Action<int, bool>(mainClient.ShowNUIView);
+            EventHandlers["GF:Client:OpenNUIView"] += new Action<int, bool, string, int>(mainClient.OpenNUIView);
             EventHandlers["GF:Client:CloseNUIView"] += new Action<int, bool>(mainClient.CloseNUIView); // TODO: Mudar de close para Hide (faz mais sentido)
             mainClientHandler = mainClient;
         }

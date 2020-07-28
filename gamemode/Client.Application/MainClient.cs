@@ -85,14 +85,15 @@ namespace Client.Application
             TriggerServerEvent("GF:Server:OnClientReady");
         }
 
-        public void ShowNUIView(int nuiViewTypeInt, bool setFocus)
+        public void OpenNUIView(int nuiViewTypeInt, bool setFocus, string compressedJsonPayload, int uncompressedLength)
         {
             var nuiViewType = (NUIViewType)nuiViewTypeInt;
-
+            var payload = Decompress(compressedJsonPayload, uncompressedLength);
             var nuiMessage = new
             {
                 type = "OPEN_VIEW",
-                viewName = nuiViewType.ToString()
+                viewName = nuiViewType.ToString(),
+                payload = payload
             };
             var jsonEvent = JsonConvert.SerializeObject(nuiMessage);
             API.SendNuiMessage(jsonEvent);

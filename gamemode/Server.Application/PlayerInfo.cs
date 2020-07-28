@@ -37,20 +37,28 @@ namespace Server.Application
             this.accountRepository = accountRepository;
         }
 
+        public void UnloadGFPlayer(GFPlayer gfPlayer)
+        {
+            playerToGFPlayerDictionary.TryRemove(gfPlayer.Player, out _); // TODO: Melhorar implementação de dicionário de playerinfo
+        }
+
         public async Task<GFPlayer> PreparePlayerAccounts(Player player)
         {
             var gfPlayer = new GFPlayer(player);
             gfPlayer.ConnectionState = PlayerConnectionState.CONNECTED;
-            playerToGFPlayerDictionary.TryAdd(player, gfPlayer);
+            if(playerToGFPlayerDictionary.TryAdd(player, gfPlayer) == false)
+            {
+                throw new Exception("eRRRO AQUI MEU FI, VAI LA E CORRIGE PFVOR");
+            }
 
             var license = player.Identifiers["license"];
             var accounts = (await accountRepository.GetAccountListByLicense(license)).ToList();
             if (accounts.Count > 0)
             {
+                gfPlayer.Account = new Account(); // TODO: Improve temporary account
                 foreach (var account in accounts)
                 {
-                    if (gfPlayer.Account == null)
-                        gfPlayer.Account = account;
+                    gfPlayer.LicenseAccounts.Add(account);
                     Console.WriteLine($"Encontrada conta #{account.Id} para username: {account.Username}");
                 }
                 gfPlayer.ConnectionState = PlayerConnectionState.LOADING_ACCOUNT;

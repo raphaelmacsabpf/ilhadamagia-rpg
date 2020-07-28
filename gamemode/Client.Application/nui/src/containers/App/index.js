@@ -7,8 +7,9 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      viewSelectAccountVisible: false
+      viewSelectAccountVisible: false,
     }
+    this.accountListComponent = undefined;
   }
   componentWillMount() {
     window.addEventListener('message', this.handleEvent);
@@ -22,16 +23,18 @@ class App extends Component {
     // Handle event.data
     console.log(JSON.stringify(event.data));
     if(event.data.type == "OPEN_VIEW") {
-      this.openView(event.data.viewName);
+      const payload = JSON.parse(event.data.payload);
+      this.openView(event.data.viewName, payload);
     }
     else if(event.data.type == "CLOSE_VIEW") {
       this.closeView(event.data.viewName);
     }
   };
-  openView(viewName) {
-    console.log(`Oppening view ${viewName}`); // TODO: Remover esse log
+  openView(viewName, payload) {
+    console.log(`Oppening view ${viewName} with payload: ${JSON.stringify(payload)}`); // TODO: Remover esse log
     if(viewName == 'SELECT_ACCOUNT') {
       this.setState({ viewSelectAccountVisible: true});
+      this.accountListComponent.updateAccounts(payload);
     }
   }
 
@@ -46,7 +49,13 @@ class App extends Component {
     return (
       <div>
         <h1>Ilha da Magia RPG</h1>
-        { this.state.viewSelectAccountVisible && (<AccountList/>)} 
+        { this.state.viewSelectAccountVisible &&
+          (
+            <AccountList ref={component => {
+              this.accountListComponent = component;
+            }}/>
+          )
+        } 
         
       </div>
     )

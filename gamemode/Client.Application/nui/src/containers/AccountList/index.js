@@ -6,8 +6,15 @@ class AccountList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            accounts: ['raphael_santos', 'Raphael_Santos']
+            accounts: []
         };
+    }
+
+    updateAccounts(newAccountList) {
+      let mappedAccountList = newAccountList.map((element) => {
+        return element.Username;
+      });
+      this.setState({accounts: mappedAccountList});
     }
 
     handleAccountSelect(account) {

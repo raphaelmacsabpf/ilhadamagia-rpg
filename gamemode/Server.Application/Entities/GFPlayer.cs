@@ -10,6 +10,7 @@ namespace Server.Application.Entities
         public GFPlayer(Player player)
         {
             this.Player = player;
+            this.LicenseAccounts = new List<Account>();
         }
 
         public PlayerConnectionState ConnectionState { get; set; }
@@ -18,5 +19,6 @@ namespace Server.Application.Entities
         public int SelectedHouseId { get; set; }
         public List<int> HouseIds { get; set; }
         public GFHouse CurrentHouse { get; set; }
+        public List<Account> LicenseAccounts { get; set; }
     }
 }

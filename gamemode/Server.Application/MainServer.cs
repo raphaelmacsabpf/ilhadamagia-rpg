@@ -7,6 +7,7 @@ using Server.Application.Managers;
 using Shared.CrossCutting;
 using Shared.CrossCutting.Dto;
 using System;
+using System.Linq;
 
 namespace Server.Application
 {
@@ -29,7 +30,7 @@ namespace Server.Application
             {
                 var gfPlayer = this.playerInfo.GetGFPlayer(player);
                 gfPlayer.ConnectionState = PlayerConnectionState.ON_GAMEMODE_LOAD;
-                Console.WriteLine($"[IM MainServer] PlayerLoaded: [{player.Handle}] {gfPlayer.Account.Username}");
+                //Console.WriteLine($"[IM MainServer] PlayerLoaded: [{player.Handle}] {gfPlayer.Account.Username}"); // TODO: Resolver este log
             }
 
             Console.WriteLine("[IM MainServer] Started MainServer");
@@ -47,10 +48,10 @@ namespace Server.Application
         public async void OnClientReady([FromSource] Player player)
         {
             var gfPlayer = playerInfo.GetGFPlayer(player);
-            var json = JsonConvert.SerializeObject(PopUpdatedPlayerVarsPayload(gfPlayer));
-            this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_PLAYER_VARS, json);
+            /*var json = JsonConvert.SerializeObject(PopUpdatedPlayerVarsPayload(gfPlayer));
+            this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_PLAYER_VARS, json);*/ // TODO: Voltar a enviar json payload
 
-            json = JsonConvert.SerializeObject(this.MapManager.PopUpdatedStaticMarkersPayload());
+            var json = JsonConvert.SerializeObject(this.MapManager.PopUpdatedStaticMarkersPayload());
             this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_STATIC_MARKERS, json);
 
             json = JsonConvert.SerializeObject(this.MapManager.PopUpdatedStaticProximityTargetsPayload());
@@ -59,12 +60,23 @@ namespace Server.Application
             json = JsonConvert.SerializeObject(this.MapManager.PopUpdatedStaticInteractionTargetsPayload());
             this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_STATIC_INTERACTION_TARGETS, json);
 
-            this.playerActions.ShowNUIView(gfPlayer, NUIViewType.SELECT_ACCOUNT, true);
+            var accountsDto = gfPlayer.LicenseAccounts.Select((element) =>
+            {
+                return new
+                {
+                    Username = element.Username,
+                    Level = element.Level
+                };
+            });
+            json = JsonConvert.SerializeObject(accountsDto);
+            var compressedJson = networkManager.Compress(json);
+            this.playerActions.OpenNUIView(gfPlayer, NUIViewType.SELECT_ACCOUNT, true, compressedJson, json.Length);
         }
 
         internal void OnPlayerDropped([FromSource] Player player, string reason)
         {
             var gfPlayer = this.playerInfo.GetGFPlayer(player);
+            this.playerInfo.UnloadGFPlayer(gfPlayer); // fTODO: Melhorar remoção do GFPlayer
             gfPlayer.ConnectionState = PlayerConnectionState.DROPPED;
             Console.WriteLine($"Player dropped, name: {gfPlayer.Account.Username}, reason: {reason}");
         }
@@ -90,8 +102,22 @@ namespace Server.Application
         internal void OnPlayerSelectAccount([FromSource] Player player, string accountName)
         {
             var gfPlayer = playerInfo.GetGFPlayer(player);
-            playerActions.CloseNUIView(gfPlayer, NUIViewType.SELECT_ACCOUNT, true);
-            playerActions.SpawnPlayer(gfPlayer, "S_M_Y_MARINE_01", 309.6f, -728.7297f, 29.3136f, 246.6142f);
+            var account = gfPlayer.LicenseAccounts.FirstOrDefault((element) =>
+            {
+                return element.Username == accountName;
+            });
+
+            if(account != null)
+            {
+                Console.WriteLine("User selected valid account: " + account.Username); // TODO: Remover este log
+                gfPlayer.Account = account;
+                playerActions.CloseNUIView(gfPlayer, NUIViewType.SELECT_ACCOUNT, true);
+                playerActions.SpawnPlayer(gfPlayer, "S_M_Y_MARINE_01", 309.6f, -728.7297f, 29.3136f, 246.6142f);
+            }
+            else
+            {
+                Console.WriteLine("[ERROR] USER SELECTED INVALID ACCOUNT: " + accountName); // TODO: Remover este log e o else
+            }
         }
 
         private PlayerVarsDto PopUpdatedPlayerVarsPayload(GFPlayer gfPlayer)

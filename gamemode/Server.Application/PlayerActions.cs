@@ -57,9 +57,9 @@ namespace Server.Application
             gfPlayer.Player.TriggerEvent("GF:Client:SpawnPlayer", skinName, x, y, z, heading);
         }
 
-        public void ShowNUIView(GFPlayer gfPlayer, NUIViewType nuiViewType, bool setFocus)
+        public void OpenNUIView(GFPlayer gfPlayer, NUIViewType nuiViewType, bool setFocus, string compressedJsonPayload, int uncompressedLength)
         {
-            gfPlayer.Player.TriggerEvent("GF:Client:ShowNUIView", (int)nuiViewType, setFocus);
+            gfPlayer.Player.TriggerEvent("GF:Client:OpenNUIView", (int)nuiViewType, setFocus, compressedJsonPayload, uncompressedLength);
         }
 
         public void CloseNUIView(GFPlayer gfPlayer, NUIViewType nuiViewType, bool cancelFocus)
