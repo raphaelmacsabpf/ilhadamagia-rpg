@@ -2,7 +2,6 @@
 using CitizenFX.Core.Native;
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Threading.Tasks;
 
 namespace Client.Application
@@ -11,6 +10,7 @@ namespace Client.Application
     {
         private bool firstTick = false;
         private MainClient mainClientHandler;
+
         public ClientAppBootstrap()
         {
             var menuManager = new MenuManager(true);

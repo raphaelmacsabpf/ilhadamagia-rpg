@@ -6,7 +6,6 @@ namespace Server.Application.Entities
     {
         public GFHouse()
         {
- 
         }
 
         public House Entity { get; set; }

@@ -127,7 +127,7 @@ namespace Client.Application
                 case "INFO_TO_PLAYER":
                     string message = payload;
                     this.playerActions.PushNotification(message, 2000);
-                    if(API.IsScreenFadedIn() == false && API.IsScreenFadedOut() == false)
+                    if (API.IsScreenFadedIn() == false && API.IsScreenFadedOut() == false)
                     {
                         API.PlaySound(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false, 0, true);
                     }

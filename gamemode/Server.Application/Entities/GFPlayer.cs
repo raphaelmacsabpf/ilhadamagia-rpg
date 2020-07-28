@@ -19,6 +19,4 @@ namespace Server.Application.Entities
         public List<int> HouseIds { get; set; }
         public GFHouse CurrentHouse { get; set; }
     }
-
-
 }

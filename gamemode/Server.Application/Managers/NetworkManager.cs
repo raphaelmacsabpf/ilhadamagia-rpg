@@ -1,8 +1,8 @@
 ﻿using CitizenFX.Core;
+using LZ4;
 using Shared.CrossCutting;
 using System;
 using System.Text;
-using LZ4;
 
 namespace Server.Application.Managers
 {

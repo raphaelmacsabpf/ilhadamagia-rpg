@@ -79,13 +79,13 @@ namespace Server.Application.Managers
         public void BuildHouses()
         {
             var houseEntities = houseRepository.GetAll();
-            foreach(var houseEntity in houseEntities)
+            foreach (var houseEntity in houseEntities)
             {
                 var gfHouse = new GFHouse();
                 gfHouse.Entity = houseEntity;
                 this.houses.Add(gfHouse);
             }
-            
+
             foreach (var house in this.houses)
             {
                 this.AddInterationMarkerWithNotification(house.Entity.EntranceX, house.Entity.EntranceY, house.Entity.EntranceZ, MarkerColor.COLOR_BLUE, $"Casa de {house.Entity.Owner}, aperte ~o~E~s~ para entrar", (gfPlayer, player) => HouseEnter(gfPlayer, house));
