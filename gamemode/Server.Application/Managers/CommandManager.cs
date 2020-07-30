@@ -45,13 +45,14 @@ namespace Server.Application.Managers
             commandPacket.CommandCode = (CommandCode)commandCode;
             commandPacket.HasArgs = hasArgs;
             commandPacket.Text = text;
-            var sourceCommandValidator = new CommandValidator(sourceGFPlayer);
 
             string[] args = new string[0];
             if (commandPacket.HasArgs)
             {
                 args = commandPacket.Text.Split(' ');
             }
+            var commandValidator = new CommandValidator(this.playerInfo, this.chatManager, sourceGFPlayer, args);
+
             switch (commandPacket.CommandCode)
             {
                 case CommandCode.INFO:
@@ -121,48 +122,26 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.GO:
                     {
-                        if (sourceCommandValidator.AdminLevel(1).IsInvalid())
+                        if (commandValidator.AdminLevel(1).TargetPlayer().IsValid())
                         {
-                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "Você não é um administrador!");
-                            return;
+                            GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                            var targetPosition = targetGfPlayer.Player.Character.Position + new Vector3(0f, 2f, -1f); // I don't know why this -1f???? WTF???
+                            this.playerActions.SetPlayerPos(sourceGFPlayer, targetPosition);
+                            this.chatManager.ProxDetectorColors(10.0f, targetGfPlayer, $"*Admin {sourceGFPlayer.Account.Username} veio até {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE);
+                            this.chatManager.ProxDetectorColors(10.0f, sourceGFPlayer, $"*Admin {sourceGFPlayer.Account.Username} foi até {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE);
                         }
-
-                        var targetPlayerStr = args[1];
-                        GFPlayer targetGfPlayer = GetPlayerByIdOrName(targetPlayerStr);
-                        if (targetGfPlayer == null)
-                        {
-                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD1, $"   {targetPlayerStr} não é um player ativo.");
-                            return;
-                        }
-
-                        var targetPosition = targetGfPlayer.Player.Character.Position + new Vector3(0f, 2f, -1f); // I don't know why this -1f???? WTF???
-
-                        this.playerActions.SetPlayerPos(sourceGFPlayer, targetPosition);
-                        this.chatManager.ProxDetectorColors(10.0f, targetGfPlayer, $"*Admin {sourceGFPlayer.Account.Username} veio até {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE);
-                        this.chatManager.ProxDetectorColors(10.0f, sourceGFPlayer, $"*Admin {sourceGFPlayer.Account.Username} foi até {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE);
                         return;
                     }
                 case CommandCode.BRING:
                     {
-                        if (sourceCommandValidator.AdminLevel(1).IsInvalid())
+                        if (commandValidator.AdminLevel(1).TargetPlayer().IsValid())
                         {
-                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "Você não é um administrador!");
-                            return;
+                            GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                            var sourcePosition = sourceGFPlayer.Player.Character.Position + new Vector3(0f, 2f, -1f); // I don't know why this -1f???? WTF???
+                            this.playerActions.SetPlayerPos(targetGfPlayer, sourcePosition);
+                            this.chatManager.ProxDetectorColors(10.0f, sourceGFPlayer, $"*Admin {sourceGFPlayer.Account.Username} trouxe {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE);
+                            this.chatManager.ProxDetectorColors(10.0f, targetGfPlayer, $"*Admin {sourceGFPlayer.Account.Username} levou {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE);
                         }
-
-                        var targetPlayerStr = args[1];
-                        GFPlayer targetGfPlayer = GetPlayerByIdOrName(targetPlayerStr);
-                        if (targetGfPlayer == null)
-                        {
-                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD1, $"   {targetPlayerStr} não é um player ativo.");
-                            return;
-                        }
-
-                        var sourcePosition = sourceGFPlayer.Player.Character.Position + new Vector3(0f, 2f, -1f); // I don't know why this -1f???? WTF???
-
-                        this.playerActions.SetPlayerPos(targetGfPlayer, sourcePosition);
-                        this.chatManager.ProxDetectorColors(10.0f, sourceGFPlayer, $"*Admin {sourceGFPlayer.Account.Username} trouxe {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE);
-                        this.chatManager.ProxDetectorColors(10.0f, targetGfPlayer, $"*Admin {sourceGFPlayer.Account.Username} levou {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE);
                         return;
                     }
                 case CommandCode.SCREAM:
@@ -180,90 +159,62 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.SET_ADMIN:
                     {
-                        if (sourceCommandValidator.AdminLevel(3001).IsInvalid())
+                        if (commandValidator.AdminLevel(3001).TargetPlayer().IsValid())
                         {
-                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "Você não está autorizado a usar este comando!");
-                            return;
+                            GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                            int level;
+                            if (Int32.TryParse(args[2], out level) == false)
+                            {
+                                level = 0;
+                            }
+                            else if (level < 0 || level > 3001)
+                            {
+                                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "USE: /setadmin [playerid] [nivel(0-3001)]");
+                                return;
+                            }
+                            targetGfPlayer.Account.AdminLevel = level;
+                            this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $"  Você foi promovido a nivel {level} de admin, pelo admin {sourceGFPlayer.Account.Username}");
+                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você promoveu {targetGfPlayer.Account.Username} para nivel {level} de admin.");
                         }
-
-                        var targetPlayerStr = args[1];
-                        var targetGfPlayer = GetPlayerByIdOrName(args[1]);
-                        if (targetGfPlayer == null)
-                        {
-                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD1, $"   {targetPlayerStr} não é um player ativo.");
-                            return;
-                        }
-
-                        int level;
-                        if (Int32.TryParse(args[2], out level) == false)
-                        {
-                            level = 0;
-                        }
-                        else if (level < 0 || level > 3001)
-                        {
-                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "USE: /setadmin [playerid] [nivel(0-3001)]");
-                            return;
-                        }
-
-                        targetGfPlayer.Account.AdminLevel = level;
-                        this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $"  Você foi promovido a nivel {level} de admin, pelo admin {sourceGFPlayer.Account.Username}");
-                        this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você promoveu {targetGfPlayer.Account.Username} para nivel {level} de admin.");
                         return;
                     }
 
                 case CommandCode.SET_ARMOUR:
                     {
-                        if (sourceCommandValidator.AdminLevel(1).IsInvalid())
+                        if (commandValidator.AdminLevel(1).TargetPlayer().IsValid())
                         {
-                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "Você não está autorizado a usar este comando!");
-                            return;
+                            GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                            int value;
+                            if (args[2] == null || Int32.TryParse(args[2], out value) == false)
+                            {
+                                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "USE: /setcolete [playerid] [valor(0-100)]");
+                                return;
+                            }
+                            else if (value < 0 || value > 100)
+                            {
+                                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "USE: /setcolete [playerid] [valor(0-100)]");
+                                return;
+                            }
+                            this.playerActions.SetPlayerArmour(targetGfPlayer, value);
+                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $"Você deu {value} de colete para {targetGfPlayer.Account.Username}");
+                            this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $"O Admin {targetGfPlayer.Account.Username} te deu {value} de colete");
+                            this.playerActions.GiveWeaponToPlayer(sourceGFPlayer, WeaponHash.HeavySniperMk2, 200, false, true); // TODO: Remover isso quando sistema de armas estiver pronto
                         }
-
-                        var targetPlayerStr = args[1];
-                        var targetGfPlayer = GetPlayerByIdOrName(args[1]);
-                        if (targetGfPlayer == null)
-                        {
-                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD1, $"   {targetPlayerStr} não é um player ativo.");
-                            return;
-                        }
-
-                        int value;
-                        if (args[2] == null || Int32.TryParse(args[2], out value) == false)
-                        {
-                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "USE: /setcolete [playerid] [valor(0-100)]");
-                            return;
-                        }
-                        else if (value < 0 || value > 100)
-                        {
-                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "USE: /setcolete [playerid] [valor(0-100)]");
-                            return;
-                        }
-
-                        this.playerActions.SetPlayerArmour(targetGfPlayer, value);
-                        this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $"Você deu {value} de colete para {targetGfPlayer.Account.Username}");
-                        this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $"O Admin {targetGfPlayer.Account.Username} te deu {value} de colete");
-
-                        this.playerActions.GiveWeaponToPlayer(sourceGFPlayer, WeaponHash.HeavySniperMk2, 200, false, true); // TODO: Remover isso quando sistema de armas estiver pronto
                         return;
                     }
                 case CommandCode.GO_TO_COORDS:
                     {
-                        if (sourceCommandValidator.AdminLevel(1).IsInvalid())
+                        if (commandValidator.AdminLevel(1).IsValid())
                         {
-                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "Você não está autorizado a usar este comando!");
-                            return;
+                            var vectorStr = commandPacket.Text.Split(new string[] { " " }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
+                            var vectorPositions = vectorStr.Split(',');
+                            var targetVector = new Vector3(
+                                float.Parse(vectorPositions[0]),
+                                float.Parse(vectorPositions[1]),
+                                float.Parse(vectorPositions[2])
+                            );
+                            this.playerActions.SetPlayerPos(sourceGFPlayer, targetVector);
                         }
-
-                        var vectorStr = commandPacket.Text.Split(new string[] { " " }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
-                        var vectorPositions = vectorStr.Split(',');
-                        var targetVector = new Vector3(
-                            float.Parse(vectorPositions[0]),
-                            float.Parse(vectorPositions[1]),
-                            float.Parse(vectorPositions[2])
-                        );
-
-                        this.playerActions.SetPlayerPos(sourceGFPlayer, targetVector);
-
                         return;
                     }
                 case CommandCode.PROP_MENU:
@@ -288,52 +239,35 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.SET_HOUSE:
                     {
-                        if (sourceCommandValidator.AdminLevel(3001).IsInvalid())
+                        if (commandValidator.AdminLevel(3001).IsValid())
                         {
-                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "Você não está autorizado a usar este comando!");
-                            return;
+                            GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                            var houseIdStr = args[2];
+                            int houseId;
+                            if (Int32.TryParse(houseIdStr, out houseId) == false || this.mapManager.IsValidHouseId(houseId) == false)
+                            {
+                                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD1, $"   {houseIdStr} não é um ID válido para uma casa.");
+                                return;
+                            }
+                            targetGfPlayer.SelectedHouseId = houseId;
+                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você setou a casa de {targetGfPlayer.Account.Username} para ID {houseId}.");
                         }
-
-                        var targetPlayerStr = args[1];
-                        var targetGfPlayer = GetPlayerByIdOrName(args[1]);
-                        if (targetGfPlayer == null)
-                        {
-                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD1, $"   {targetPlayerStr} não é um player ativo.");
-                            return;
-                        }
-
-                        var houseIdStr = args[2];
-                        int houseId;
-
-                        if (Int32.TryParse(houseIdStr, out houseId) == false || this.mapManager.IsValidHouseId(houseId) == false)
-                        {
-                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD1, $"   {houseIdStr} não é um ID válido para uma casa.");
-                            return;
-                        }
-
-                        targetGfPlayer.SelectedHouseId = houseId;
-                        this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você setou a casa de {targetGfPlayer.Account.Username} para ID {houseId}.");
                         return;
                     }
                 case CommandCode.GO_TO_HOUSE:
                     {
-                        if (sourceCommandValidator.AdminLevel(4).IsInvalid())
+                        if (commandValidator.AdminLevel(4).IsValid())
                         {
-                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "Você não está autorizado a usar este comando!");
-                            return;
+                            var houseIdStr = args[1];
+                            int houseId;
+                            if (Int32.TryParse(houseIdStr, out houseId) == false || this.mapManager.IsValidHouseId(houseId) == false)
+                            {
+                                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD1, $"   {houseIdStr} não é um ID válido para uma casa.");
+                                return;
+                            }
+                            var gfHouse = mapManager.GetGFHouseFromId(houseId);
+                            this.playerActions.TeleportPlayerToPosition(sourceGFPlayer, new Vector3(gfHouse.Entity.EntranceX, gfHouse.Entity.EntranceY, gfHouse.Entity.EntranceZ), 500);
                         }
-
-                        var houseIdStr = args[1];
-                        int houseId;
-
-                        if (Int32.TryParse(houseIdStr, out houseId) == false || this.mapManager.IsValidHouseId(houseId) == false)
-                        {
-                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD1, $"   {houseIdStr} não é um ID válido para uma casa.");
-                            return;
-                        }
-
-                        var gfHouse = mapManager.GetGFHouseFromId(houseId);
-                        this.playerActions.TeleportPlayerToPosition(sourceGFPlayer, new Vector3(gfHouse.Entity.EntranceX, gfHouse.Entity.EntranceY, gfHouse.Entity.EntranceZ), 500);
                         return;
                     }
                 default:
@@ -343,37 +277,6 @@ namespace Server.Application.Managers
                         return;
                     }
             }
-        }
-
-        private GFPlayer GetPlayerByIdOrName(string playerStr)
-        {
-            int parsedId;
-            bool parseSucceed = Int32.TryParse(playerStr, out parsedId);
-            var gfPlayerList = this.playerInfo.GetGFPlayerList();
-            if (parseSucceed)
-            {
-                foreach (var gfPlayer in gfPlayerList)
-                {
-                    if (Int32.Parse(gfPlayer.Player.Handle) == parsedId)
-                    {
-                        return gfPlayer;
-                    }
-                }
-            }
-            else
-            {
-                var loweredPlayerStr = playerStr.ToLower();
-                foreach (var gfPlayer in gfPlayerList)
-                {
-                    var loweredUsername = gfPlayer.Account.Username.ToLower();
-                    if (loweredUsername.StartsWith(loweredPlayerStr) || loweredUsername == loweredPlayerStr)
-                    {
-                        return gfPlayer;
-                    }
-                }
-            }
-
-            return null;
         }
     }
 }

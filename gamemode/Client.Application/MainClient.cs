@@ -167,7 +167,7 @@ namespace Client.Application
             API.CancelEvent();
             if (textInput[0] == '/')
             {
-                if(textInput == "/login") // HACK: Remove this command soon as possible
+                if (textInput == "/login") // HACK: Remove this command soon as possible
                 {
                     OpenNUIView((int)NUIViewType.SELECT_ACCOUNT, true, lastPayloadCompressed, lastPayloadUncompressedLength);
                 }
