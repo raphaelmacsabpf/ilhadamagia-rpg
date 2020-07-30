@@ -122,7 +122,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.GO:
                     {
-                        if (commandValidator.AdminLevel(1).TargetPlayer().IsValid())
+                        if (commandValidator.WithAdminLevel(1).WithTargetPlayer().IsValid())
                         {
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                             var targetPosition = targetGfPlayer.Player.Character.Position + new Vector3(0f, 2f, -1f); // I don't know why this -1f???? WTF???
@@ -134,7 +134,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.BRING:
                     {
-                        if (commandValidator.AdminLevel(1).TargetPlayer().IsValid())
+                        if (commandValidator.WithAdminLevel(1).WithTargetPlayer().IsValid())
                         {
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                             var sourcePosition = sourceGFPlayer.Player.Character.Position + new Vector3(0f, 2f, -1f); // I don't know why this -1f???? WTF???
@@ -159,19 +159,11 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.SET_ADMIN:
                     {
-                        if (commandValidator.AdminLevel(3001).TargetPlayer().IsValid())
+                        if (commandValidator.WithAdminLevel(3001).WithTargetPlayer().WithValueBetween(0, 3001, "level").IsValid())
                         {
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
-                            int level;
-                            if (Int32.TryParse(args[2], out level) == false)
-                            {
-                                level = 0;
-                            }
-                            else if (level < 0 || level > 3001)
-                            {
-                                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "USE: /setadmin [playerid] [nivel(0-3001)]");
-                                return;
-                            }
+                            int level = commandValidator.GetVariableInt("level");
+                            
                             targetGfPlayer.Account.AdminLevel = level;
                             this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $"  Você foi promovido a nivel {level} de admin, pelo admin {sourceGFPlayer.Account.Username}");
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você promoveu {targetGfPlayer.Account.Username} para nivel {level} de admin.");
@@ -181,7 +173,7 @@ namespace Server.Application.Managers
 
                 case CommandCode.SET_ARMOUR:
                     {
-                        if (commandValidator.AdminLevel(1).TargetPlayer().IsValid())
+                        if (commandValidator.WithAdminLevel(1).WithTargetPlayer().IsValid()) // HACK: Usar o WithValueBetween aqui na validação
                         {
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                             int value;
@@ -204,7 +196,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.GO_TO_COORDS:
                     {
-                        if (commandValidator.AdminLevel(1).IsValid())
+                        if (commandValidator.WithAdminLevel(1).IsValid())
                         {
                             var vectorStr = commandPacket.Text.Split(new string[] { " " }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
                             var vectorPositions = vectorStr.Split(',');
@@ -239,7 +231,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.SET_HOUSE:
                     {
-                        if (commandValidator.AdminLevel(3001).IsValid())
+                        if (commandValidator.WithAdminLevel(3001).IsValid())
                         {
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                             var houseIdStr = args[2];
@@ -256,7 +248,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.GO_TO_HOUSE:
                     {
-                        if (commandValidator.AdminLevel(4).IsValid())
+                        if (commandValidator.WithAdminLevel(4).IsValid())
                         {
                             var houseIdStr = args[1];
                             int houseId;

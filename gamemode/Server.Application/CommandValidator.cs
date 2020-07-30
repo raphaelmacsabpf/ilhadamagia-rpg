@@ -15,6 +15,7 @@ namespace Server.Application
         private readonly string[] commandArgs;
         private int nextArgPosition;
         private List<string> errorMessages;
+        private Dictionary<string, int> commandVariablesInt;
 
         public CommandValidator(PlayerInfo playerInfo, ChatManager chatManager, GFPlayer gfPlayer, string[] commandArgs)
         {
@@ -24,18 +25,10 @@ namespace Server.Application
             this.commandArgs = commandArgs;
             this.nextArgPosition = 1; // Default first argument to validate
             this.errorMessages = new List<string>();
+            this.commandVariablesInt = new Dictionary<string, int>();
         }
 
-        public GFPlayer GetTargetGFPlayer()
-        {
-            if (this.targetGFPlayer == null)
-            {
-                throw new InvalidOperationException("GetTargetGFPlayer() called without TargetPlayer validation");
-            }
-            return this.targetGFPlayer;
-        }
-
-        public CommandValidator AdminLevel(int minAdminLevel)
+        public CommandValidator WithAdminLevel(int minAdminLevel)
         {
             if (this.sourceGFPlayer.Account.AdminLevel < minAdminLevel)
             {
@@ -44,7 +37,7 @@ namespace Server.Application
             return this;
         }
 
-        public CommandValidator TargetPlayer()
+        public CommandValidator WithTargetPlayer()
         {
             string nextArgumentValue = GetNextArgumentValue();
             if (nextArgumentValue != null)
@@ -63,6 +56,30 @@ namespace Server.Application
             return this;
         }
 
+        public CommandValidator WithValueBetween(int min, int max, string variableName)
+        {
+            string nextArgumentValue = GetNextArgumentValue();
+            if (nextArgumentValue != null)
+            {
+                int nextArgumentValueInt;
+                bool parseStatus = Int32.TryParse(nextArgumentValue, out nextArgumentValueInt);
+                if (parseStatus == false || nextArgumentValueInt < min || nextArgumentValueInt > max)
+                {
+                    this.errorMessages.Add($"{nextArgumentValue} não é um valor válido por não estar entre {min} e {max}");
+                }
+                else if(parseStatus == true)
+                {
+                    commandVariablesInt.Add(variableName, nextArgumentValueInt);
+                } 
+            }
+            else
+            {
+                this.errorMessages.Add("Informe um valor válido");
+            }
+
+            return this;
+        }
+
         public bool IsValid()
         {
             foreach (var errorMessage in this.errorMessages)
@@ -70,8 +87,25 @@ namespace Server.Application
                 this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, errorMessage);
             }
             this.nextArgPosition = 1;
-            this.targetGFPlayer = null;
             return this.errorMessages.Count == 0;
+        }
+
+        public GFPlayer GetTargetGFPlayer()
+        {
+            if (this.targetGFPlayer == null)
+            {
+                throw new InvalidOperationException("GetTargetGFPlayer() called without TargetPlayer validation");
+            }
+            return this.targetGFPlayer;
+        }
+
+        public int GetVariableInt(string variableName)
+        {
+            int variableValue;
+            if(commandVariablesInt.TryGetValue(variableName, out variableValue) == false) {
+                throw new InvalidOperationException($"GetVariableInt() failed to locate variable value for: {variableName}");
+            }
+            return variableValue;
         }
 
         private string GetNextArgumentValue()
