@@ -64,6 +64,7 @@
     <Compile Include="HouseRepository.cs" />
     <Compile Include="MySQLConnectionPool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VehicleRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -95,7 +95,7 @@ namespace Server.Application
                 return element.Username == accountName;
             });
 
-            if(account != null)
+            if (account != null)
             {
                 Console.WriteLine("User selected valid account: " + account.Username); // TODO: Remover este log
                 gfPlayer.Account = account;
