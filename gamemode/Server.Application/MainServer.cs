@@ -48,18 +48,6 @@ namespace Server.Application
         public async void OnClientReady([FromSource] Player player)
         {
             var gfPlayer = playerInfo.GetGFPlayer(player);
-            /*var json = JsonConvert.SerializeObject(PopUpdatedPlayerVarsPayload(gfPlayer));
-            this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_PLAYER_VARS, json);*/ // TODO: Voltar a enviar json payload
-
-            var json = JsonConvert.SerializeObject(this.MapManager.PopUpdatedStaticMarkersPayload());
-            this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_STATIC_MARKERS, json);
-
-            json = JsonConvert.SerializeObject(this.MapManager.PopUpdatedStaticProximityTargetsPayload());
-            this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_STATIC_PROXIMITY_TARGETS, json);
-
-            json = JsonConvert.SerializeObject(this.MapManager.PopUpdatedStaticInteractionTargetsPayload());
-            this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_STATIC_INTERACTION_TARGETS, json);
-
             var accountsDto = gfPlayer.LicenseAccounts.Select((element) =>
             {
                 return new
@@ -68,7 +56,7 @@ namespace Server.Application
                     Level = element.Level
                 };
             });
-            json = JsonConvert.SerializeObject(accountsDto);
+            var json = JsonConvert.SerializeObject(accountsDto);
             var compressedJson = networkManager.Compress(json);
             this.playerActions.OpenNUIView(gfPlayer, NUIViewType.SELECT_ACCOUNT, true, compressedJson, json.Length);
         }
@@ -112,7 +100,17 @@ namespace Server.Application
                 Console.WriteLine("User selected valid account: " + account.Username); // TODO: Remover este log
                 gfPlayer.Account = account;
                 playerActions.CloseNUIView(gfPlayer, NUIViewType.SELECT_ACCOUNT, true);
-                playerActions.SpawnPlayer(gfPlayer, "S_M_Y_MARINE_01", 309.6f, -728.7297f, 29.3136f, 246.6142f);
+
+                var json = JsonConvert.SerializeObject(PopUpdatedPlayerVarsPayload(gfPlayer));
+                this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_PLAYER_VARS, json);
+                json = JsonConvert.SerializeObject(this.MapManager.PopUpdatedStaticMarkersPayload());
+                this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_STATIC_MARKERS, json);
+                json = JsonConvert.SerializeObject(this.MapManager.PopUpdatedStaticProximityTargetsPayload());
+                this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_STATIC_PROXIMITY_TARGETS, json);
+                json = JsonConvert.SerializeObject(this.MapManager.PopUpdatedStaticInteractionTargetsPayload());
+                this.networkManager.SendPayloadToPlayer(player, PayloadType.TO_STATIC_INTERACTION_TARGETS, json);
+
+                playerActions.SpawnPlayer(gfPlayer, "S_M_Y_MARINE_01", 309.6f, -728.7297f, 29.3136f, 246.6142f); // HACK: Mandar player spawnar elegantemente
             }
             else
             {

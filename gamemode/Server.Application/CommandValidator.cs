@@ -34,6 +34,7 @@ namespace Server.Application
             {
                 commandArgs[i] = commandArgs[i].Trim();
             }
+
             this.nextArgPosition = 1; // Default first argument to validate
             this.errorMessages = new List<string>();
             this.commandVariables = new Dictionary<string, object>();
