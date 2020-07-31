@@ -39,8 +39,6 @@ namespace Server.Application
             this.commandVariables = new Dictionary<string, object>();
         }
 
-        public string CommandSyntax { get; set; }
-
         public CommandValidator WithAdminLevel(int minAdminLevel)
         {
             if (this.sourceGFPlayer.Account.AdminLevel < minAdminLevel)
@@ -136,11 +134,15 @@ namespace Server.Application
             return this;
         }
 
-        public bool IsValid()
+        public bool IsValid(string commandSyntax)
         {
-            foreach (var errorMessage in this.errorMessages)
+            foreach (string errorMessage in this.errorMessages)
             {
-                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, errorMessage);
+                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, $"*ARG: {errorMessage}");
+            }
+            if (this.errorMessages.Count > 0 && commandSyntax != null)
+            {
+                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_WHITE, commandSyntax);
             }
             this.nextArgPosition = 1;
             return this.errorMessages.Count == 0;

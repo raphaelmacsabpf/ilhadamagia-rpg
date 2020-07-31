@@ -52,7 +52,7 @@ namespace Server.Application.Managers
             Console.WriteLine("[IM MapManager] Started MapManager");
         }
 
-        public int GetHouseCount
+        public int HouseCount
         {
             get
             {

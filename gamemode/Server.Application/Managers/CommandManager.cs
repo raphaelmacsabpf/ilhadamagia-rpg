@@ -116,7 +116,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.GO:
                     {
-                        if (commandValidator.WithAdminLevel(1).WithTargetPlayer().IsValid())
+                        if (commandValidator.WithAdminLevel(1).WithTargetPlayer().IsValid("USE: /ir [playerid]"))
                         {
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                             var targetPosition = targetGfPlayer.Player.Character.Position + new Vector3(0f, 2f, -1f); // I don't know why this -1f???? WTF???
@@ -128,7 +128,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.BRING:
                     {
-                        if (commandValidator.WithAdminLevel(1).WithTargetPlayer().IsValid())
+                        if (commandValidator.WithAdminLevel(1).WithTargetPlayer().IsValid("USE: /trazer [playerid]"))
                         {
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                             var sourcePosition = sourceGFPlayer.Player.Character.Position + new Vector3(0f, 2f, -1f); // I don't know why this -1f???? WTF???
@@ -140,7 +140,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.SCREAM:
                     {
-                        if (commandValidator.WithVarText("scream-text").IsValid())
+                        if (commandValidator.WithVarText("scream-text").IsValid("USE: /Gritar [mensagem]"))
                         {
                             var messageToScream = commandValidator.GetVar<string>("scream-text");
                             this.chatManager.PlayerScream(sourceGFPlayer, messageToScream);
@@ -150,7 +150,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.SAVE:
                     {
-                        if (commandValidator.WithAdminLevel(1).WithVarString("label").IsValid())
+                        if (commandValidator.WithAdminLevel(1).WithVarString("label").IsValid("USE: /save [rótulo]"))
                         {
                             var position = sourceGFPlayer.Player.Character.Position;
                             var heading = sourceGFPlayer.Player.Character.Heading;
@@ -161,7 +161,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.SET_ADMIN:
                     {
-                        if (commandValidator.WithAdminLevel(3001).WithTargetPlayer().WithVarBetween<int>(0, 3001, "level").IsValid())
+                        if (commandValidator.WithAdminLevel(3001).WithTargetPlayer().WithVarBetween<int>(0, 3001, "level").IsValid("USE: /setadmin [playerid] [nivel(0-3001)]"))
                         {
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                             int level = commandValidator.GetVar<int>("level");
@@ -175,7 +175,7 @@ namespace Server.Application.Managers
 
                 case CommandCode.SET_ARMOUR:
                     {
-                        if (commandValidator.WithAdminLevel(1).WithTargetPlayer().WithVarBetween<int>(0, 100, "armour").IsValid()) // HACK: Usar o WithValueBetween aqui na validação
+                        if (commandValidator.WithAdminLevel(1).WithTargetPlayer().WithVarBetween<int>(0, 100, "armour").IsValid("USE: /setcolete [playerid] [colete(0-100)]"))
                         {
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                             int value = commandValidator.GetVar<int>("armour");
@@ -189,7 +189,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.GO_TO_COORDS: // TODO: Criar parse de float na classe CommandValidator e utilizar aqui para os três parâmetros
                     {
-                        if (commandValidator.WithAdminLevel(1).IsValid())
+                        if (commandValidator.WithAdminLevel(1).IsValid("USE: /coords [x, y, z]")) // TODO: Terminar proteção do comando /coords
                         {
                             var vectorStr = commandPacket.Text.Split(new string[] { " " }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
                             var vectorPositions = vectorStr.Split(',');
@@ -224,7 +224,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.SET_HOUSE:
                     {
-                        if (commandValidator.WithAdminLevel(3001).WithTargetPlayer().WithVarBetween<int>(1, mapManager.GetHouseCount, "house-id").IsValid())
+                        if (commandValidator.WithAdminLevel(3001).WithTargetPlayer().WithVarBetween<int>(1, mapManager.HouseCount, "house-id").IsValid($"USE: /setcasa [playerid] [id(1-{mapManager.HouseCount})]"))
                         {
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                             int houseId = commandValidator.GetVar<int>("house-id");
@@ -235,7 +235,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.GO_TO_HOUSE:
                     {
-                        if (commandValidator.WithAdminLevel(4).WithVarBetween<int>(1, mapManager.GetHouseCount, "house-id").IsValid())
+                        if (commandValidator.WithAdminLevel(4).WithVarBetween<int>(1, mapManager.HouseCount, "house-id").IsValid($"USE: /ircasa [id(1-{mapManager.HouseCount})]"))
                         {
                             int houseId = commandValidator.GetVar<int>("house-id");
                             var gfHouse = mapManager.GetGFHouseFromId(houseId);
