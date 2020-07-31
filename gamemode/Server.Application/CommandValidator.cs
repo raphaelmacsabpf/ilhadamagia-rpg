@@ -11,22 +11,35 @@ namespace Server.Application
         private readonly PlayerInfo playerInfo;
         private readonly ChatManager chatManager;
         private GFPlayer sourceGFPlayer;
+        private readonly CommandPacket commandPacket;
         private GFPlayer targetGFPlayer;
         private readonly string[] commandArgs;
         private int nextArgPosition;
         private List<string> errorMessages;
-        private Dictionary<string, int> commandVariablesInt;
+        private Dictionary<string, object> commandVariables;
 
-        public CommandValidator(PlayerInfo playerInfo, ChatManager chatManager, GFPlayer gfPlayer, string[] commandArgs)
+        public CommandValidator(PlayerInfo playerInfo, ChatManager chatManager, GFPlayer gfPlayer, CommandPacket commandPacket)
         {
             this.playerInfo = playerInfo;
             this.chatManager = chatManager;
             this.sourceGFPlayer = gfPlayer;
-            this.commandArgs = commandArgs;
+            this.commandPacket = commandPacket;
+            this.commandArgs = new string[0];
+
+            if (commandPacket.HasArgs) // TODO: Empacotar em método privado
+            {
+                this.commandArgs = commandPacket.Text.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            }
+            for (int i = 0; i < commandArgs.Length; i++)
+            {
+                commandArgs[i] = commandArgs[i].Trim();
+            }
             this.nextArgPosition = 1; // Default first argument to validate
             this.errorMessages = new List<string>();
-            this.commandVariablesInt = new Dictionary<string, int>();
+            this.commandVariables = new Dictionary<string, object>();
         }
+
+        public string CommandSyntax { get; set; }
 
         public CommandValidator WithAdminLevel(int minAdminLevel)
         {
@@ -56,21 +69,64 @@ namespace Server.Application
             return this;
         }
 
-        public CommandValidator WithValueBetween(int min, int max, string variableName)
+        public CommandValidator WithVarBetween<TVarType>(TVarType min, TVarType max, string varName)
         {
             string nextArgumentValue = GetNextArgumentValue();
             if (nextArgumentValue != null)
             {
-                int nextArgumentValueInt;
-                bool parseStatus = Int32.TryParse(nextArgumentValue, out nextArgumentValueInt);
-                if (parseStatus == false || nextArgumentValueInt < min || nextArgumentValueInt > max)
+                var type = typeof(TVarType);
+                if (type == typeof(Int32))
                 {
-                    this.errorMessages.Add($"{nextArgumentValue} não é um valor válido por não estar entre {min} e {max}");
+                    int nextArgumentValueInt;
+                    int minInt = (int)Convert.ChangeType(min, TypeCode.Int32);
+                    int maxInt = (int)Convert.ChangeType(max, TypeCode.Int32);
+                    bool parseInt = Int32.TryParse(nextArgumentValue, out nextArgumentValueInt);
+                    if (parseInt == false || nextArgumentValueInt < minInt || nextArgumentValueInt > maxInt)
+                    {
+                        this.errorMessages.Add($"{nextArgumentValue} não é um valor válido por não estar entre {min} e {max}");
+                    }
+                    else if (parseInt == true)
+                    {
+                        commandVariables.Add(varName, nextArgumentValueInt);
+                    }
                 }
-                else if(parseStatus == true)
+            }
+            else
+            {
+                this.errorMessages.Add("Informe um valor válido");
+            }
+
+            return this;
+        }
+
+        public CommandValidator WithVarText(string varName)
+        {
+            try
+            {
+                var textValue = commandPacket.Text.Split(new string[] { " " }, this.nextArgPosition + 1, StringSplitOptions.RemoveEmptyEntries)[this.nextArgPosition];
+                if (textValue == null)
                 {
-                    commandVariablesInt.Add(variableName, nextArgumentValueInt);
-                } 
+                    this.errorMessages.Add("Você precisa informar um texto ao final deste comando");
+                }
+                else
+                {
+                    this.commandVariables.Add(varName, textValue);
+                }
+            }
+            catch (Exception)
+            {
+                this.errorMessages.Add("Você precisa informar um texto ao final deste comando.");
+            }
+
+            return this;
+        }
+
+        public CommandValidator WithVarString(string varName)
+        {
+            string nextArgumentValue = GetNextArgumentValue();
+            if (nextArgumentValue != null)
+            {
+                commandVariables.Add(varName, nextArgumentValue);
             }
             else
             {
@@ -99,13 +155,14 @@ namespace Server.Application
             return this.targetGFPlayer;
         }
 
-        public int GetVariableInt(string variableName)
+        public TVarType GetVar<TVarType>(string variableName)
         {
-            int variableValue;
-            if(commandVariablesInt.TryGetValue(variableName, out variableValue) == false) {
-                throw new InvalidOperationException($"GetVariableInt() failed to locate variable value for: {variableName}");
+            object variableValue;
+            if (commandVariables.TryGetValue(variableName, out variableValue) == false)
+            {
+                throw new InvalidOperationException($"GetVar<{typeof(TVarType).Name}>() failed to locate variable value for: {variableName}");
             }
-            return variableValue;
+            return (TVarType)variableValue;
         }
 
         private string GetNextArgumentValue()

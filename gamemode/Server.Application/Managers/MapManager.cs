@@ -52,6 +52,14 @@ namespace Server.Application.Managers
             Console.WriteLine("[IM MapManager] Started MapManager");
         }
 
+        public int GetHouseCount
+        {
+            get
+            {
+                return this.houses.Count;
+            }
+        }
+
         public void BuildMarkers()
         {
             this.AddInterationMarkerWithNotification(307.8857f, -727.8989f, 29.3136f - 0.5f, MarkerColor.COLOR_ORANGE, "Bem vindo ao ~b~Ilha da Magia RPG~s~, aperte ~o~E~s~ para interagir.", (gfPlayer, player) =>

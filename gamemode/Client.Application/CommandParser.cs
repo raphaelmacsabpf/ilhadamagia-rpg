@@ -1,4 +1,5 @@
 ﻿using Shared.CrossCutting;
+using System;
 
 namespace Client.Application
 {
@@ -8,7 +9,7 @@ namespace Client.Application
         {
             var commandPacket = new CommandPacket();
 
-            string[] args = text.Split(' ');
+            string[] args = text.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             var command = args[0].ToLower();
 
             commandPacket.Text = text;

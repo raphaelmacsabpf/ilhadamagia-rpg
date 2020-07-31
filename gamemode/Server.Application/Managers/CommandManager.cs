@@ -45,13 +45,7 @@ namespace Server.Application.Managers
             commandPacket.CommandCode = (CommandCode)commandCode;
             commandPacket.HasArgs = hasArgs;
             commandPacket.Text = text;
-
-            string[] args = new string[0];
-            if (commandPacket.HasArgs)
-            {
-                args = commandPacket.Text.Split(' ');
-            }
-            var commandValidator = new CommandValidator(this.playerInfo, this.chatManager, sourceGFPlayer, args);
+            var commandValidator = new CommandValidator(this.playerInfo, this.chatManager, sourceGFPlayer, commandPacket);
 
             switch (commandPacket.CommandCode)
             {
@@ -146,24 +140,32 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.SCREAM:
                     {
-                        var messageToScream = commandPacket.Text.Split(new string[] { " " }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
-                        this.chatManager.PlayerScream(sourceGFPlayer, messageToScream);
+                        if (commandValidator.WithVarText("scream-text").IsValid())
+                        {
+                            var messageToScream = commandValidator.GetVar<string>("scream-text");
+                            this.chatManager.PlayerScream(sourceGFPlayer, messageToScream);
+                        }
+
                         return;
                     }
                 case CommandCode.SAVE:
                     {
-                        var position = sourceGFPlayer.Player.Character.Position;
-                        var heading = sourceGFPlayer.Player.Character.Heading;
-                        Console.WriteLine($"Saved {args[1]} X,Y,Z,H::::: SetPlayerPosHeading({position.X}f, {position.Y}f, {position.Z}f, {heading}f);");
+                        if (commandValidator.WithAdminLevel(1).WithVarString("label").IsValid())
+                        {
+                            var position = sourceGFPlayer.Player.Character.Position;
+                            var heading = sourceGFPlayer.Player.Character.Heading;
+                            Console.WriteLine($"Saved {commandValidator.GetVar<string>("label")} X,Y,Z,H::::: SetPlayerPosHeading({position.X}f, {position.Y}f, {position.Z}f, {heading}f);");
+                        }
+
                         return;
                     }
                 case CommandCode.SET_ADMIN:
                     {
-                        if (commandValidator.WithAdminLevel(3001).WithTargetPlayer().WithValueBetween(0, 3001, "level").IsValid())
+                        if (commandValidator.WithAdminLevel(3001).WithTargetPlayer().WithVarBetween<int>(0, 3001, "level").IsValid())
                         {
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
-                            int level = commandValidator.GetVariableInt("level");
-                            
+                            int level = commandValidator.GetVar<int>("level");
+
                             targetGfPlayer.Account.AdminLevel = level;
                             this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $"  Você foi promovido a nivel {level} de admin, pelo admin {sourceGFPlayer.Account.Username}");
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você promoveu {targetGfPlayer.Account.Username} para nivel {level} de admin.");
@@ -173,20 +175,11 @@ namespace Server.Application.Managers
 
                 case CommandCode.SET_ARMOUR:
                     {
-                        if (commandValidator.WithAdminLevel(1).WithTargetPlayer().IsValid()) // HACK: Usar o WithValueBetween aqui na validação
+                        if (commandValidator.WithAdminLevel(1).WithTargetPlayer().WithVarBetween<int>(0, 100, "armour").IsValid()) // HACK: Usar o WithValueBetween aqui na validação
                         {
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
-                            int value;
-                            if (args[2] == null || Int32.TryParse(args[2], out value) == false)
-                            {
-                                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "USE: /setcolete [playerid] [valor(0-100)]");
-                                return;
-                            }
-                            else if (value < 0 || value > 100)
-                            {
-                                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, "USE: /setcolete [playerid] [valor(0-100)]");
-                                return;
-                            }
+                            int value = commandValidator.GetVar<int>("armour");
+
                             this.playerActions.SetPlayerArmour(targetGfPlayer, value);
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $"Você deu {value} de colete para {targetGfPlayer.Account.Username}");
                             this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $"O Admin {targetGfPlayer.Account.Username} te deu {value} de colete");
@@ -194,7 +187,7 @@ namespace Server.Application.Managers
                         }
                         return;
                     }
-                case CommandCode.GO_TO_COORDS:
+                case CommandCode.GO_TO_COORDS: // TODO: Criar parse de float na classe CommandValidator e utilizar aqui para os três parâmetros
                     {
                         if (commandValidator.WithAdminLevel(1).IsValid())
                         {
@@ -231,16 +224,10 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.SET_HOUSE:
                     {
-                        if (commandValidator.WithAdminLevel(3001).IsValid())
+                        if (commandValidator.WithAdminLevel(3001).WithTargetPlayer().WithVarBetween<int>(1, mapManager.GetHouseCount, "house-id").IsValid())
                         {
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
-                            var houseIdStr = args[2];
-                            int houseId;
-                            if (Int32.TryParse(houseIdStr, out houseId) == false || this.mapManager.IsValidHouseId(houseId) == false)
-                            {
-                                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD1, $"   {houseIdStr} não é um ID válido para uma casa.");
-                                return;
-                            }
+                            int houseId = commandValidator.GetVar<int>("house-id");
                             targetGfPlayer.SelectedHouseId = houseId;
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você setou a casa de {targetGfPlayer.Account.Username} para ID {houseId}.");
                         }
@@ -248,15 +235,9 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.GO_TO_HOUSE:
                     {
-                        if (commandValidator.WithAdminLevel(4).IsValid())
+                        if (commandValidator.WithAdminLevel(4).WithVarBetween<int>(1, mapManager.GetHouseCount, "house-id").IsValid())
                         {
-                            var houseIdStr = args[1];
-                            int houseId;
-                            if (Int32.TryParse(houseIdStr, out houseId) == false || this.mapManager.IsValidHouseId(houseId) == false)
-                            {
-                                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD1, $"   {houseIdStr} não é um ID válido para uma casa.");
-                                return;
-                            }
+                            int houseId = commandValidator.GetVar<int>("house-id");
                             var gfHouse = mapManager.GetGFHouseFromId(houseId);
                             this.playerActions.TeleportPlayerToPosition(sourceGFPlayer, new Vector3(gfHouse.Entity.EntranceX, gfHouse.Entity.EntranceY, gfHouse.Entity.EntranceZ), 500);
                         }
