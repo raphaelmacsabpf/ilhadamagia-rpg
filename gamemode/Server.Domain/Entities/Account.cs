@@ -9,6 +9,7 @@ namespace Server.Domain.Entities
         }
 
         public int Id { get; set; }
+        public string Guid { get; set; }
         public string License { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }

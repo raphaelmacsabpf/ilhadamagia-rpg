@@ -1,6 +1,8 @@
 ﻿using CitizenFX.Core;
 using GF.CrossCutting;
+using Newtonsoft.Json;
 using Server.Application.Entities;
+using Server.Application.Managers;
 using Server.Domain.Enums;
 using Shared.CrossCutting;
 using System;
@@ -10,11 +12,13 @@ namespace Server.Application
     public class PlayerActions : BaseScript
     {
         private readonly PlayerInfo playerInfo;
+        private readonly NetworkManager networkManager;
 
-        public PlayerActions(PlayerInfo playerInfo)
+        public PlayerActions(PlayerInfo playerInfo, NetworkManager networkManager)
         {
             Console.WriteLine("[IM PlayerActions] Started PlayerActions");
             this.playerInfo = playerInfo;
+            this.networkManager = networkManager;
         }
 
         public void KillPlayer(GFPlayer gfPlayer)
@@ -47,9 +51,12 @@ namespace Server.Application
             gfPlayer.Player.TriggerEvent("GF:Client:SetPlayerMoney", money);
         }
 
-        public void OpenMenu(GFPlayer gfPlayer, MenuType menuType)
+        public void OpenMenu(GFPlayer gfPlayer, MenuType menuType, object payload)
         {
-            gfPlayer.Player.TriggerEvent("GF:Client:OpenMenu", (int)menuType);
+            var json = JsonConvert.SerializeObject(payload);
+            var compressedJson = networkManager.Compress(json);
+            var uncompressedLenght = json.Length;
+            gfPlayer.Player.TriggerEvent("GF:Client:OpenMenu", (int)menuType, compressedJson, uncompressedLenght);
         }
 
         public void SpawnPlayer(GFPlayer gfPlayer, string skinName, float x, float y, float z, float heading)
@@ -60,6 +67,11 @@ namespace Server.Application
         public void OpenNUIView(GFPlayer gfPlayer, NUIViewType nuiViewType, bool setFocus, string compressedJsonPayload, int uncompressedLength)
         {
             gfPlayer.Player.TriggerEvent("GF:Client:OpenNUIView", (int)nuiViewType, setFocus, compressedJsonPayload, uncompressedLength);
+        }
+
+        public void CreateVehicle(GFPlayer gfPlayer, Vector3 position, float heading, Domain.Entities.Vehicle vehicle)
+        {
+            gfPlayer.Player.TriggerEvent("GF:Client:CreateVehicle", vehicle.Hash, vehicle.PrimaryColor, vehicle.SecondaryColor, vehicle.Fuel, position.X, position.Y, position.Z, heading);
         }
 
         public void CloseNUIView(GFPlayer gfPlayer, NUIViewType nuiViewType, bool cancelFocus)

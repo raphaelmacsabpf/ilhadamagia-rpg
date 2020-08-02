@@ -27,6 +27,7 @@ namespace Server.Application
             builder.RegisterInstance(new MySqlConnectionPool(20)).As<MySqlConnectionPool>();
             builder.RegisterType<AccountRepository>().As<AccountRepository>().SingleInstance();
             builder.RegisterType<HouseRepository>().As<HouseRepository>().SingleInstance();
+            builder.RegisterType<VehicleRepository>().As<VehicleRepository>().SingleInstance();
             builder.RegisterType<MenuManager>().As<MenuManager>().SingleInstance();
             builder.RegisterType<ChatManager>().As<ChatManager>().SingleInstance();
             builder.RegisterType<MapManager>().As<MapManager>().SingleInstance();
@@ -56,7 +57,7 @@ namespace Server.Application
                 EventHandlers["GF:Server:OnChatMessage"] += new Action<Player, string>(chatManager.OnChatMessage);
                 EventHandlers["GF:Server:OnClientCommand"] += new Action<Player, int, bool, string>(mainServer.CommandManager.OnClientCommand);
                 EventHandlers["GF:Server:OnPlayerTargetActionServerCallback"] += new Action<Player, string>(mainServer.MapManager.OnPlayerTargetActionServerCallback);
-                EventHandlers["GF:Server:OnMenuAction"] += new Action<Player, int>(menuManager.OnPlayerMenuAction);
+                EventHandlers["GF:Server:OnMenuAction"] += new Action<Player, int, string>(menuManager.OnPlayerMenuAction);
                 EventHandlers["GF:Server:ResponseAccountSelect"] += new Action<Player, string>(mainServer.OnPlayerSelectAccount);
             }
 

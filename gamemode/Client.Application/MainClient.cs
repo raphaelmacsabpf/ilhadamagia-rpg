@@ -2,13 +2,11 @@
 using CitizenFX.Core.Native;
 using CitizenFX.Core.UI;
 using GF.CrossCutting;
-using LZ4;
 using Newtonsoft.Json;
 using Shared.CrossCutting;
 using Shared.CrossCutting.Dto;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Client.Application
 {
@@ -19,41 +17,33 @@ namespace Client.Application
         private readonly Render render;
         private readonly PlayerActions playerActions;
         private readonly TargetsManager targetsManager;
-        private readonly MenuManager menuManager;
+        private readonly ClientNetworkManager clientNetworkManager;
         private bool clientInitializationStarted;
         private string lastPayloadCompressed;
         private int lastPayloadUncompressedLength;
 
-        public MainClient(PlayerInfo playerInfo, MarkersManager markersManager, Render render, PlayerActions playerActions, TargetsManager targetsManager, MenuManager menuManager)
+        public MainClient(PlayerInfo playerInfo, MarkersManager markersManager, Render render, PlayerActions playerActions, TargetsManager targetsManager, ClientNetworkManager clientNetworkManager)
         {
             this.playerInfo = playerInfo;
             this.markersManager = markersManager;
             this.render = render;
             this.playerActions = playerActions;
             this.targetsManager = targetsManager;
-            this.menuManager = menuManager;
+            this.clientNetworkManager = clientNetworkManager;
         }
 
-        public string Compress(string text)
+        public async void CreateVehicle(uint modelHash, int primaryColor, int secondaryColor, int fuel, float x, float y, float z, float heading)
         {
-            var compressed = Convert.ToBase64String(LZ4Codec.Wrap(Encoding.UTF8.GetBytes(text)));
-            return compressed;
+            var model = new Model((VehicleHash)modelHash);
+            var vehicle = await World.CreateVehicle(model, new Vector3(x, y, z), heading);
+            API.SetVehicleColours(vehicle.Handle, primaryColor, secondaryColor);
+            API.SetVehicleFuelLevel(vehicle.Handle, fuel);
         }
 
-        public string Decompress(string compressed, int maxLength)
+        public void DeleteVehicle(int vehicleHandle)
         {
-            var uncompressedBytes = LZ4Codec.Unwrap(Convert.FromBase64String(compressed));
-            var decoder = Encoding.UTF8.GetDecoder();
-            var chars = new char[maxLength];
-            decoder.Convert(uncompressedBytes, 0, uncompressedBytes.Length, chars, 0, chars.Length, true, out _, out int charsUsed, out _);
-            return new string(chars, 0, charsUsed);
-        }
-
-        public void GFDeleteVehicle(int vehicleHandle)
-        {
-            Debug.WriteLine("--------------- HANDLE DO VEH É: " + vehicleHandle);
-            int hndl = vehicleHandle;
-            API.DeleteVehicle(ref hndl);
+            int vehicleHandleRef = vehicleHandle;
+            API.DeleteVehicle(ref vehicleHandleRef);
         }
 
         public void GFSetPlayerMoney(int money)
@@ -92,7 +82,7 @@ namespace Client.Application
             this.lastPayloadCompressed = compressedJsonPayload;
             this.lastPayloadUncompressedLength = uncompressedLength;
             var nuiViewType = (NUIViewType)nuiViewTypeInt;
-            var payload = Decompress(compressedJsonPayload, uncompressedLength);
+            var payload = clientNetworkManager.Decompress(compressedJsonPayload, uncompressedLength);
             var nuiMessage = new
             {
                 type = "OPEN_VIEW",
@@ -121,7 +111,7 @@ namespace Client.Application
 
         public void OnPayloadReceive(int payloadTypeInt, string compressedPayload, int uncompressedLength)
         {
-            var payload = Decompress(compressedPayload, uncompressedLength);
+            var payload = clientNetworkManager.Decompress(compressedPayload, uncompressedLength);
             var subStringLenght = payload.Length < 80 ? payload.Length : payload.Length;
             Debug.WriteLine($"Payload[{compressedPayload.Length}:{payload.Length}]: { payload.Substring(0, subStringLenght)}..."); // TODO: Remove before release
             PayloadType payloadType = (PayloadType)payloadTypeInt;

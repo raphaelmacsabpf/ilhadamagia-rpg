@@ -39,9 +39,9 @@ namespace Client.Application
             ProcessInputs();
             RenderMarkers();
             RenderPlayerMoney();
-            for (int i = 0; i < 1000000; i++) // HACK: Teste de estabilidade do tick (Remover antes de lançar)
+            /*for (int i = 0; i < 800000; i++) // HACK: Teste de estabilidade do tick (Remover antes de lançar)
             {
-            }
+            }*/
         }
 
         private async void ProcessInputs()

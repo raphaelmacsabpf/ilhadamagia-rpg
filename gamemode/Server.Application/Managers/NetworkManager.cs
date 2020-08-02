@@ -23,5 +23,11 @@ namespace Server.Application.Managers
             var compressed = Convert.ToBase64String(LZ4Codec.Wrap(Encoding.UTF8.GetBytes(text)));
             return compressed;
         }
+
+        public string Decompress(string compressed)
+        {
+            var uncompressed = Encoding.UTF8.GetString(LZ4Codec.Unwrap(Convert.FromBase64String(compressed)));
+            return uncompressed;
+        }
     }
 }

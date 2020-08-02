@@ -13,14 +13,15 @@ namespace Client.Application
 
         public ClientAppBootstrap()
         {
-            var menuManager = new MenuManager(true);
             var playerInfo = new PlayerInfo();
             var markersManager = new MarkersManager();
             var drawTextAPI = new DrawTextAPI(true);
             var playerActions = new PlayerActions(true);
             var targetsManager = new TargetsManager(playerActions);
             var render = new Render(drawTextAPI, markersManager, targetsManager);
-            var mainClient = new MainClient(playerInfo, markersManager, render, playerActions, targetsManager, menuManager);
+            var clientNetworkManager = new ClientNetworkManager();
+            var menuManager = new MenuManager(clientNetworkManager);
+            var mainClient = new MainClient(playerInfo, markersManager, render, playerActions, targetsManager, clientNetworkManager);
 
             this.Tick += render.RenderTickHandler;
             this.Tick += targetsManager.TargetsTickHandler;
@@ -46,8 +47,9 @@ namespace Client.Application
             EventHandlers["Chat:GF:Client:OnClientText"] += new Action<string>(mainClient.OnClienText);
             EventHandlers["GF:Client:SendPayload"] += new Action<int, string, int>(mainClient.OnPayloadReceive);
             EventHandlers["GF:Client:SetPlayerMoney"] += new Action<int>(mainClient.GFSetPlayerMoney);
-            EventHandlers["GF:Client:DeleteVehicle"] += new Action<int>(mainClient.GFDeleteVehicle);
-            EventHandlers["GF:Client:OpenMenu"] += new Action<int>(menuManager.OpenMenu);
+            EventHandlers["GF:Client:CreateVehicle"] += new Action<uint, int, int, int, float, float, float, float>(mainClient.CreateVehicle);
+            EventHandlers["GF:Client:DeleteVehicle"] += new Action<int>(mainClient.DeleteVehicle);
+            EventHandlers["GF:Client:OpenMenu"] += new Action<int, string, int>(menuManager.OpenMenu);
             EventHandlers["GF:Client:OpenNUIView"] += new Action<int, bool, string, int>(mainClient.OpenNUIView);
             EventHandlers["GF:Client:CloseNUIView"] += new Action<int, bool>(mainClient.CloseNUIView); // TODO: Mudar de close para Hide (faz mais sentido)
             mainClientHandler = mainClient;

@@ -1,6 +1,6 @@
-﻿namespace Server.Domain.Enums
+﻿namespace Shared.CrossCuting.Domain.Enums
 {
-    public enum VehicleHash : uint
+    public enum DomainVehicleHash : uint
     {
         Chimera = 6774487,
         CarbonRS = 11251904,

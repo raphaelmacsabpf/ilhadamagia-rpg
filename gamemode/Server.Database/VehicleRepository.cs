@@ -19,9 +19,9 @@ namespace Server.Database
             return this.mySqlConnection.Query<Vehicle>("SELECT * FROM imtb_vehicle;");
         }
 
-        public IEnumerable<Vehicle> GetAllOfAnOwner(string ownerUsername)
+        public IEnumerable<Vehicle> GetAccountVehicles(Account owner)
         {
-            return this.mySqlConnection.Query<Vehicle>(@"SELECT * FROM imtb_vehicle WHERE Owner=@Owner;", new { Owner = ownerUsername });
+            return this.mySqlConnection.Query<Vehicle>(@"SELECT * FROM imtb_vehicle WHERE Owner=@Owner;", new { Owner = owner.Username });
         }
     }
 }

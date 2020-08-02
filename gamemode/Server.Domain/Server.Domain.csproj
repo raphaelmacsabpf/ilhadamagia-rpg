@@ -47,7 +47,6 @@
     <Compile Include="Enums\InteriorType.cs" />
     <Compile Include="Enums\PropertySellState.cs" />
     <Compile Include="Enums\PropertyType.cs" />
-    <Compile Include="Enums\VehicleHash.cs" />
     <Compile Include="Enums\WeaponHash.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

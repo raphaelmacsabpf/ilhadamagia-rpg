@@ -1,8 +1,10 @@
 ﻿using CitizenFX.Core;
+using GF.CrossCutting.Dto;
 using Server.Application.Entities;
 using Server.Domain.Enums;
 using Shared.CrossCutting;
 using System;
+using System.Linq;
 
 namespace Server.Application.Managers
 {
@@ -10,15 +12,13 @@ namespace Server.Application.Managers
     {
         private readonly ChatManager chatManager;
         private readonly PlayerInfo playerInfo;
-        private readonly NetworkManager networkManager;
         private readonly PlayerActions playerActions;
         private readonly MapManager mapManager;
 
-        public CommandManager(ChatManager chatManager, PlayerInfo playerInfo, NetworkManager networkManager, PlayerActions playerActions, MapManager mapManager)
+        public CommandManager(ChatManager chatManager, PlayerInfo playerInfo, PlayerActions playerActions, MapManager mapManager)
         {
             this.chatManager = chatManager;
             this.playerInfo = playerInfo;
-            this.networkManager = networkManager;
             this.playerActions = playerActions;
             this.mapManager = mapManager;
             Console.WriteLine("[IM CommandManager] Started CommandManager");
@@ -218,8 +218,21 @@ namespace Server.Application.Managers
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD1, "Você está muito longe da sua casa");
                             return;
                         }
+                        var vehicleList = mapManager.VehicleRepository.GetAccountVehicles(sourceGFPlayer.Account);
+                        var vehiclesAsDto = vehicleList.Select((vehicleEntity) =>
+                        {
+                            return new VehicleDto()
+                            {
+                                Guid = vehicleEntity.Guid,
+                                Hash = vehicleEntity.Hash,
+                                PrimaryColor = vehicleEntity.PrimaryColor,
+                                SecondaryColor = vehicleEntity.SecondaryColor,
+                                Fuel = vehicleEntity.Fuel,
+                                EngineHealth = vehicleEntity.EngineHealth
+                            };
+                        });
 
-                        this.playerActions.OpenMenu(sourceGFPlayer, MenuType.House);
+                        this.playerActions.OpenMenu(sourceGFPlayer, MenuType.House, vehiclesAsDto);
                         return;
                     }
                 case CommandCode.SET_HOUSE:

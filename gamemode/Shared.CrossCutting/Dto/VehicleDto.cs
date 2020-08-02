@@ -1,10 +1,8 @@
-﻿namespace Server.Domain.Entities
+﻿namespace GF.CrossCutting.Dto
 {
-    public class Vehicle
+    public class VehicleDto
     {
-        public int Id { get; set; }
         public string Guid { get; set; }
-        public string Owner { get; set; }
         public uint Hash { get; set; }
         public int PrimaryColor { get; set; }
         public int SecondaryColor { get; set; }

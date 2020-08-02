@@ -1,4 +1,5 @@
 ﻿using Server.Domain.Enums;
+using System;
 
 namespace Server.Domain.Entities
 {
@@ -9,6 +10,7 @@ namespace Server.Domain.Entities
         }
 
         public int Id { get; set; }
+        public string Guid { get; set; }
         public string Owner { get; set; }
         public float EntranceX { get; set; }
         public float EntranceY { get; set; }
