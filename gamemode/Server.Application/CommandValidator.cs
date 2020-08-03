@@ -135,7 +135,7 @@ namespace Server.Application
             return this;
         }
 
-        public bool IsValid(string commandSyntax)
+        public bool IsValid(string commandSyntax = null)
         {
             foreach (string errorMessage in this.errorMessages)
             {

@@ -66,7 +66,8 @@ namespace Server.Application
             else
             {
                 // HACK: Terminar de criar conta aqui, remover dados estáticos e criar sistema de criação de contas
-                var username = "raphael_santos";
+                gfPlayer.ConnectionState = PlayerConnectionState.NEW_ACCOUNT;
+                /*var username = "raphael_santos";
                 var password = "123456";
                 Account newAccount = new Account();
                 newAccount.License = license;
@@ -74,7 +75,7 @@ namespace Server.Application
                 newAccount.Password = password;
                 gfPlayer.Account = newAccount;
                 int globalId = await accountRepository.Create(newAccount);
-                Console.WriteLine($"Registrada a conta #{globalId} para o username: {username}");
+                Console.WriteLine($"Registrada a conta #{globalId} para o username: {username}");*/
             }
             return gfPlayer;
         }

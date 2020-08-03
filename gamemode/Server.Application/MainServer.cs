@@ -48,17 +48,25 @@ namespace Server.Application
         public async void OnClientReady([FromSource] Player player)
         {
             var gfPlayer = playerInfo.GetGFPlayer(player);
-            var accountsDto = gfPlayer.LicenseAccounts.Select((element) =>
+            if(gfPlayer.ConnectionState == PlayerConnectionState.LOADING_ACCOUNT)
             {
-                return new
+                var accountsDto = gfPlayer.LicenseAccounts.Select((element) =>
                 {
-                    Username = element.Username,
-                    Level = element.Level
-                };
-            });
-            var json = JsonConvert.SerializeObject(accountsDto);
-            var compressedJson = networkManager.Compress(json);
-            this.playerActions.OpenNUIView(gfPlayer, NUIViewType.SELECT_ACCOUNT, true, compressedJson, json.Length);
+                    return new
+                    {
+                        Username = element.Username,
+                        Level = element.Level
+                    };
+                });
+                var json = JsonConvert.SerializeObject(accountsDto);
+                var compressedJson = networkManager.Compress(json);
+                this.playerActions.OpenNUIView(gfPlayer, NUIViewType.SELECT_ACCOUNT, true, compressedJson, json.Length);
+            }
+            else if (gfPlayer.ConnectionState == PlayerConnectionState.NEW_ACCOUNT)
+            {
+                Console.WriteLine(">>>>>>>>>>>++++++ Account register system wasn't created yet"); // TODO: Tratar corretamente criação de conta
+            }
+            
         }
 
         internal void OnPlayerDropped([FromSource] Player player, string reason)

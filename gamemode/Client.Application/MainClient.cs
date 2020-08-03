@@ -19,8 +19,8 @@ namespace Client.Application
         private readonly TargetsManager targetsManager;
         private readonly ClientNetworkManager clientNetworkManager;
         private bool clientInitializationStarted;
-        private string lastPayloadCompressed;
-        private int lastPayloadUncompressedLength;
+        private string lastPayloadCompressed; // TODO: Remover este campo
+        private int lastPayloadUncompressedLength; // TODO: Remover este campo
 
         public MainClient(PlayerInfo playerInfo, MarkersManager markersManager, Render render, PlayerActions playerActions, TargetsManager targetsManager, ClientNetworkManager clientNetworkManager)
         {

@@ -32,9 +32,10 @@ namespace Client.Application
 
         public async Task RenderTickHandler()
         {
-            API.SetVehicleDensityMultiplierThisFrame(0.01f);
-            API.SetRandomVehicleDensityMultiplierThisFrame(0.01f);
-            API.SetParkedVehicleDensityMultiplierThisFrame(0.0f);
+            // TODO: Decidir um destino para funções de diminuir quantidade de carros NPC
+            //API.SetVehicleDensityMultiplierThisFrame(0.01f);
+            //API.SetRandomVehicleDensityMultiplierThisFrame(0.01f);
+            //API.SetParkedVehicleDensityMultiplierThisFrame(0.0f);
 
             ProcessInputs();
             RenderMarkers();
