@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using MySqlConnector;
 using Server.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -34,6 +35,24 @@ SELECT LAST_INSERT_ID();";
 
             var insertedIdTask = this.mySqlConnection.ExecuteScalarAsync<int>(sqlStatement, account);
             return insertedIdTask;
+        }
+
+        public Task Update(Account account)
+        {
+            account.UpdatedAt = DateTime.Now;
+            var sqlStatement = @"
+UPDATE imtb_account SET
+UpdatedAt = @UpdatedAt,
+AdminLevel = @AdminLevel,
+DonateRank = @DonateRank,
+Level = @Level,
+Respect = @Respect,
+ConnectedTime = @ConnectedTime,
+Money = @Money,
+Bank = @Bank
+WHERE Id = @Id";
+
+            return this.mySqlConnection.ExecuteAsync(sqlStatement, account);
         }
 
         public IEnumerable<Account> GetAll()
