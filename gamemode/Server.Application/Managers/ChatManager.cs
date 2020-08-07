@@ -72,7 +72,7 @@ namespace Server.Application.Managers
             }
         }
 
-        internal void OnChatMessage([FromSource] Player player, string message)
+        internal void OnChatMessage([FromSource] Player player, string message) // TODO: PROTEGER OnChatMessage
         {
             var wholeMessageCharsIsUppercase = (message.CompareTo(message.ToUpper()) == 0);
             var gfPlayer = playerInfo.GetGFPlayer(player);

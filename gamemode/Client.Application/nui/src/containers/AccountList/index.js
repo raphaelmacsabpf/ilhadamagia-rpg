@@ -41,7 +41,7 @@ class AccountList extends Component {
           <button onClick={ (e) => this.handleAccountSelect(e) }>Selecionards</button>
         </div>
       )
-    }    
+    }
 }
 
 export default AccountList;

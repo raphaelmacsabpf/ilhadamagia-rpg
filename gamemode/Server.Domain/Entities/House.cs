@@ -1,5 +1,4 @@
 ﻿using Server.Domain.Enums;
-using System;
 
 namespace Server.Domain.Entities
 {

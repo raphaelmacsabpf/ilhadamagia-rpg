@@ -33,6 +33,7 @@ namespace Server.Application
             builder.RegisterType<MapManager>().As<MapManager>().SingleInstance();
             builder.RegisterType<PlayerActions>().As<PlayerActions>().SingleInstance();
             builder.RegisterType<PlayerInfo>().As<PlayerInfo>().SingleInstance();
+            builder.RegisterType<FSMManager>().As<FSMManager>().SingleInstance();
 
             builder.RegisterType<NetworkManager>().As<NetworkManager>().SingleInstance();
             builder.RegisterType<CommandManager>().As<CommandManager>().SingleInstance();

@@ -44,6 +44,9 @@
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Stateless, Version=4.0.0.0, Culture=neutral, PublicKeyToken=93038f0927583c9a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Stateless.5.1.2\lib\net45\Stateless.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -59,11 +62,13 @@
     <Compile Include="Entities\GFPlayer.cs" />
     <Compile Include="Entities\GFVehicle.cs" />
     <Compile Include="Enums\PlayerConnectionState.cs" />
+    <Compile Include="Enums\PlayerConnectionTrigger.cs" />
     <Compile Include="Managers\ChatManager.cs" />
     <Compile Include="AppBootstrap.cs" />
     <Compile Include="Managers\CommandManager.cs" />
     <Compile Include="DebugResolveModule.cs" />
     <Compile Include="MainServer.cs" />
+    <Compile Include="Managers\FSMManager.cs" />
     <Compile Include="Managers\MapManager.cs" />
     <Compile Include="Managers\NetworkManager.cs" />
     <Compile Include="MenuManager.cs" />

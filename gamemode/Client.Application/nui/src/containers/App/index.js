@@ -55,8 +55,8 @@ class App extends Component {
               this.accountListComponent = component;
             }}/>
           )
-        } 
-        
+        }
+
       </div>
     )
   }

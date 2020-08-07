@@ -1,18 +1,14 @@
 ﻿using CitizenFX.Core;
 using Newtonsoft.Json;
 using Server.Application.Entities;
-using Server.Application.Enums;
 using Server.Application.Managers;
 using Server.Database;
-using Server.Domain.Entities;
 using Shared.CrossCutting;
 using Shared.CrossCutting.Dto;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Server.Application
 {
@@ -37,47 +33,14 @@ namespace Server.Application
             this.accountRepository = accountRepository;
         }
 
+        public void LoadGFPlayer(GFPlayer gfPlayer)
+        {
+            playerToGFPlayerDictionary.TryAdd(gfPlayer.Player, gfPlayer);
+        }
+
         public void UnloadGFPlayer(GFPlayer gfPlayer)
         {
             playerToGFPlayerDictionary.TryRemove(gfPlayer.Player, out _); // TODO: Melhorar implementação de dicionário de playerinfo
-        }
-
-        public async Task<GFPlayer> PreparePlayerAccounts(Player player)
-        {
-            var gfPlayer = new GFPlayer(player);
-            gfPlayer.ConnectionState = PlayerConnectionState.CONNECTED;
-            if(playerToGFPlayerDictionary.TryAdd(player, gfPlayer) == false)
-            {
-                throw new Exception("eRRRO AQUI MEU FI, VAI LA E CORRIGE PFVOR");
-            }
-
-            var license = player.Identifiers["license"];
-            var accounts = (await accountRepository.GetAccountListByLicense(license)).ToList();
-            if (accounts.Count > 0)
-            {
-                gfPlayer.Account = new Account(); // TODO: Improve temporary account
-                foreach (var account in accounts)
-                {
-                    gfPlayer.LicenseAccounts.Add(account);
-                    Console.WriteLine($"Encontrada conta #{account.Id} para username: {account.Username}");
-                }
-                gfPlayer.ConnectionState = PlayerConnectionState.LOADING_ACCOUNT;
-            }
-            else
-            {
-                // HACK: Terminar de criar conta aqui, remover dados estáticos e criar sistema de criação de contas
-                gfPlayer.ConnectionState = PlayerConnectionState.NEW_ACCOUNT;
-                /*var username = "raphael_santos";
-                var password = "123456";
-                Account newAccount = new Account();
-                newAccount.License = license;
-                newAccount.Username = username;
-                newAccount.Password = password;
-                gfPlayer.Account = newAccount;
-                int globalId = await accountRepository.Create(newAccount);
-                Console.WriteLine($"Registrada a conta #{globalId} para o username: {username}");*/
-            }
-            return gfPlayer;
         }
 
         private void UpdatePlayerVarsThreadHandler()
@@ -96,18 +59,16 @@ namespace Server.Application
             }
         }
 
+        public PlayerVarsDto PopUpdatedPlayerVarsPayload(GFPlayer gfPlayer)
+        {
+            PlayerVarsDto playerVars = new PlayerVarsDto();
+            playerVars.TryAdd("Money", gfPlayer.Account.Money.ToString());
+            playerVars.TryAdd("Username", gfPlayer.Account.Username);
+            return playerVars;
+        }
+
         public GFPlayer GetGFPlayer(Player player)
         {
-            if (playerToGFPlayerDictionary.TryGetValue(player, out _) == false)
-            {
-                Console.WriteLine("antes de encontrar a conta do handle " + player.Handle);
-                var gfPlayer = PreparePlayerAccounts(player).Result;
-                Console.WriteLine($"encontrou a conta do handle: {player.Handle} com estado: {gfPlayer.ConnectionState}");
-                return gfPlayer;
-
-                // HACK: CREATE FALLBACK
-            }
-
             return playerToGFPlayerDictionary[player];
         }
 

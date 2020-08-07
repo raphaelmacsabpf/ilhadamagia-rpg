@@ -110,9 +110,9 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.KILL:
                     {
-                        if(commandValidator.WithAdminLevel(1).IsValid())
-                        // sourcePlayer.TriggerEvent("GF:Client:DeleteVehicle", this.mapManager.lastHandle); // TODO: Não esquecer deste exemplo aqui e continuar ele.
-                        this.playerActions.KillPlayer(sourceGFPlayer); // TODO: Algum dia, proteger esse comando para só admin pegar (desenvolver contas antes)
+                        if (commandValidator.WithAdminLevel(1).IsValid())
+                            // sourcePlayer.TriggerEvent("GF:Client:DeleteVehicle", this.mapManager.lastHandle); // TODO: Não esquecer deste exemplo aqui e continuar ele.
+                            this.playerActions.KillPlayer(sourceGFPlayer); // TODO: Algum dia, proteger esse comando para só admin pegar (desenvolver contas antes)
                         return;
                     }
                 case CommandCode.GO:

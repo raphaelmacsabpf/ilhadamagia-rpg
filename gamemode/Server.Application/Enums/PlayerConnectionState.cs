@@ -2,8 +2,8 @@
 {
     public enum PlayerConnectionState
     {
-        CONNECTING,
-        ON_GAMEMODE_LOAD,
+        GAMEMODE_LOAD_DELAY,
+        INITIAL,
         CONNECTED,
         NEW_ACCOUNT,
         LOADING_ACCOUNT,

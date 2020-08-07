@@ -8,7 +8,6 @@ namespace Client
     {
         public ClientNetworkManager()
         {
-
         }
 
         public string Compress(string text)

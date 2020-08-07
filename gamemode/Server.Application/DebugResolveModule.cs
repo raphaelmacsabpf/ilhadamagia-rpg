@@ -41,21 +41,13 @@ namespace Server.Application
 
         private static void VisualizeGraph(ResolveInfo node, int depth = 0)
         {
-            Console.Write("[IM AppBootstrap] ");
+            string depthWhiteSpace = "";
             for (int i = 0; i < depth; i++)
             {
-                Console.Write("   ");
+                depthWhiteSpace += "   ";
             }
 
-            Console.Write(node.ComponentType);
-            Console.Write(" (");
-            Console.Write(node.ResolveTime.TotalMilliseconds.ToString("F1"));
-            Console.Write(" ms. / ");
-            Console.Write(node.CreationTime.TotalMilliseconds.ToString("F1"));
-            Console.Write(" ms.)");
-
-            Console.WriteLine("");
-
+            Console.WriteLine($"[IM AppBootstrap] {depthWhiteSpace}{node.ComponentType} ({node.ResolveTime.TotalMilliseconds.ToString("F1")} ms. / {node.CreationTime.TotalMilliseconds.ToString("F1")} ms.)");
             foreach (var dependency in node.Dependencies)
             {
                 VisualizeGraph(dependency, depth + 1);
