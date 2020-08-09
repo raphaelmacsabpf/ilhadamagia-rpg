@@ -49,7 +49,8 @@ Level = @Level,
 Respect = @Respect,
 ConnectedTime = @ConnectedTime,
 Money = @Money,
-Bank = @Bank
+Bank = @Bank,
+SelectedHouse = @SelectedHouse
 WHERE Id = @Id";
 
             return this.mySqlConnection.ExecuteAsync(sqlStatement, account);

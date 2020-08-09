@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace Server.Application.Managers
 {
-    public class FSMManager
+    public class StateManager
     {
         private readonly ChatManager chatManager;
         private readonly PlayerInfo playerInfo;
@@ -20,7 +20,7 @@ namespace Server.Application.Managers
         private readonly PlayerActions playerActions;
         private readonly AccountRepository accountRepository;
 
-        public FSMManager(ChatManager chatManager, PlayerInfo playerInfo, NetworkManager networkManager, MapManager mapManager, PlayerActions playerActions, AccountRepository accountRepository)
+        public StateManager(ChatManager chatManager, PlayerInfo playerInfo, NetworkManager networkManager, MapManager mapManager, PlayerActions playerActions, AccountRepository accountRepository)
         {
             this.chatManager = chatManager;
             this.playerInfo = playerInfo;
@@ -38,9 +38,34 @@ namespace Server.Application.Managers
             playerInfo.LoadGFPlayer(gfPlayer);
         }
 
+        public void SelectAccountForPlayer(GFPlayer gfPlayer, string accountName)
+        {
+            var account = gfPlayer.LicenseAccounts.FirstOrDefault((element) =>
+            {
+                return element.Username == accountName;
+            });
+            if (account != null)
+            {
+                gfPlayer.Account = account;
+                if (account.SelectedHouse != null)
+                {
+                    var houses = mapManager.GetAllHousesFromOwner(account.Username).ToList();
+                    if (houses != null)
+                    {
+                        gfPlayer.SelectedHouse = houses.FirstOrDefault((gfHouse) =>
+                        {
+                            return gfHouse.Entity != null && gfHouse.Entity.Id == account.SelectedHouse;
+                        });
+                    }
+                }
+                gfPlayer.FSM.Fire(PlayerConnectionTrigger.ACCOUNT_SELECTED);
+            }
+        }
+
         private StateMachine<PlayerConnectionState, PlayerConnectionTrigger> CreatePlayerConnectionFSM(GFPlayer gfPlayer)
         {
             var fsm = new StateMachine<PlayerConnectionState, PlayerConnectionTrigger>(PlayerConnectionState.INITIAL);
+
             fsm.OnTransitioned((transition) =>
             {
                 if (gfPlayer.Account != null)
@@ -52,6 +77,7 @@ namespace Server.Application.Managers
                     Console.WriteLine($"Player connection state change #{gfPlayer.Player.Handle} Name: {gfPlayer.Player.Name}, Transition: {transition.Source} -> {transition.Destination}");
                 }
             });
+
             fsm.OnUnhandledTrigger((state, trigger) =>
             {
                 if (gfPlayer.Account != null)
@@ -127,7 +153,9 @@ namespace Server.Application.Managers
                     var compressedJson = networkManager.Compress(json);
                     this.playerActions.OpenNUIView(gfPlayer, NUIViewType.SELECT_ACCOUNT, true, compressedJson, json.Length);
                 });
+
             fsm.Configure(PlayerConnectionState.LOGGED)
+                .Permit(PlayerConnectionTrigger.SET_TO_SPAWN, PlayerConnectionState.SPAWNED)
                 .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
                 .OnEntry(() =>
                 {
@@ -142,6 +170,13 @@ namespace Server.Application.Managers
                     json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticInteractionTargetsPayload());
                     this.networkManager.SendPayloadToPlayer(gfPlayer.Player, PayloadType.TO_STATIC_INTERACTION_TARGETS, json);
 
+                    gfPlayer.FSM.Fire(PlayerConnectionTrigger.SET_TO_SPAWN);
+                });
+
+            fsm.Configure(PlayerConnectionState.SPAWNED)
+                .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
+                .OnEntry(() =>
+                {
                     playerActions.SpawnPlayer(gfPlayer, "S_M_Y_MARINE_01", 309.6f, -728.7297f, 29.3136f, 246.6142f); // HACK: Mandar player spawnar elegantemente
                 });
             return fsm;

@@ -8,6 +8,7 @@
         NEW_ACCOUNT,
         LOADING_ACCOUNT,
         LOGGED,
-        DROPPED
+        DROPPED,
+        SPAWNED
     }
 }

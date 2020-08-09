@@ -60,6 +60,14 @@ namespace Server.Application.Managers
             }
         }
 
+        public IEnumerable<GFHouse> GetAllHousesFromOwner(string ownerUsername)
+        {
+            return this.houses.Where((house) =>
+            {
+                return house.Entity.Owner == ownerUsername;
+            });
+        }
+
         public VehicleRepository VehicleRepository { get; }
 
         public void GFPlayerCallPropertyVehicle(GFPlayer gfPlayer, string vehicleGuid)
@@ -74,34 +82,6 @@ namespace Server.Application.Managers
                 var gfHouse = GetClosestHouseInRadius(gfPlayer, 3.0f);
                 playerActions.CreateVehicle(gfPlayer, new Vector3(gfHouse.Entity.VehiclePositionX, gfHouse.Entity.VehiclePositionY, gfHouse.Entity.VehiclePositionZ), gfHouse.Entity.VehicleHeading, vehicle);
             }
-        }
-
-        private GFHouse GetClosestHouseInRadius(GFPlayer gfPlayer, float radius)
-        {
-            var playerPosition = gfPlayer.Player.Character.Position;
-            GFHouse closestHouse = null;
-            float closestDistance = float.MaxValue;
-
-            foreach (var gfHouse in this.houses)
-            {
-                var houseEntity = gfHouse.Entity;
-                var distanceToClosest = playerPosition.DistanceToSquared(new Vector3(houseEntity.EntranceX, houseEntity.EntranceY, houseEntity.EntranceZ));
-                if (distanceToClosest < closestDistance)
-                {
-                    closestHouse = gfHouse;
-                    closestDistance = distanceToClosest;
-                }
-            }
-
-            if (closestHouse != null)
-            {
-                if (closestDistance < radius)
-                {
-                    return closestHouse;
-                }
-            }
-
-            return null;
         }
 
         public List<MarkerDto> PopUpdatedStaticMarkersPayload()
@@ -185,19 +165,47 @@ namespace Server.Application.Managers
             }
         }
 
+        private GFHouse GetClosestHouseInRadius(GFPlayer gfPlayer, float radius)
+        {
+            var playerPosition = gfPlayer.Player.Character.Position;
+            GFHouse closestHouse = null;
+            float closestDistance = float.MaxValue;
+
+            foreach (var gfHouse in this.houses)
+            {
+                var houseEntity = gfHouse.Entity;
+                var distanceToClosest = playerPosition.DistanceToSquared(new Vector3(houseEntity.EntranceX, houseEntity.EntranceY, houseEntity.EntranceZ));
+                if (distanceToClosest < closestDistance)
+                {
+                    closestHouse = gfHouse;
+                    closestDistance = distanceToClosest;
+                }
+            }
+
+            if (closestHouse != null)
+            {
+                if (closestDistance < radius)
+                {
+                    return closestHouse;
+                }
+            }
+
+            return null;
+        }
+
         private void HouseEnter(GFPlayer gfPlayer, GFHouse house)
         {
-            gfPlayer.CurrentHouse = house;
+            gfPlayer.CurrentHouseInside = house;
             this.playerActions.TeleportPlayerToPosition(gfPlayer, interiorPositions[house.Entity.Interior], 1000);
         }
 
         private void HouseExit(GFPlayer gfPlayer)
         {
-            var house = gfPlayer.CurrentHouse;
+            var house = gfPlayer.CurrentHouseInside;
             if (house != null)
             {
                 this.playerActions.TeleportPlayerToPosition(gfPlayer, new Vector3(house.Entity.EntranceX, house.Entity.EntranceY, house.Entity.EntranceZ), 3000);
-                gfPlayer.CurrentHouse = null;
+                gfPlayer.CurrentHouseInside = null;
             }
         }
 

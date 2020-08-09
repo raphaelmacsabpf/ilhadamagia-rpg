@@ -2,7 +2,6 @@
 using Server.Application.Enums;
 using Server.Application.Managers;
 using System;
-using System.Linq;
 
 namespace Server.Application
 {
@@ -12,9 +11,9 @@ namespace Server.Application
         private readonly NetworkManager networkManager;
         private readonly PlayerActions playerActions;
         private readonly ChatManager chatManager;
-        private readonly FSMManager fsmManager;
+        private readonly StateManager stateManager;
 
-        public MainServer(PlayerInfo playerInfo, CommandManager commandManager, MapManager mapManager, NetworkManager networkManager, PlayerActions playerActions, ChatManager chatManager, FSMManager fsmManager)
+        public MainServer(PlayerInfo playerInfo, CommandManager commandManager, MapManager mapManager, NetworkManager networkManager, PlayerActions playerActions, ChatManager chatManager, StateManager stateManager)
         {
             this.playerInfo = playerInfo;
             this.CommandManager = commandManager;
@@ -22,10 +21,10 @@ namespace Server.Application
             this.networkManager = networkManager;
             this.playerActions = playerActions;
             this.chatManager = chatManager;
-            this.fsmManager = fsmManager;
+            this.stateManager = stateManager;
             foreach (var player in this.Players)
             {
-                fsmManager.PrepareFSMForPlayer(player);
+                stateManager.PrepareFSMForPlayer(player);
                 var gfPlayer = playerInfo.GetGFPlayer(player);
                 gfPlayer.FSM.Fire(PlayerConnectionTrigger.GAMEMODE_LOAD);
             }
@@ -33,13 +32,13 @@ namespace Server.Application
             Console.WriteLine("[IM MainServer] Started MainServer");
         }
 
-        public CommandManager CommandManager { get; }
+        internal CommandManager CommandManager { get; }
 
-        public MapManager MapManager { get; }
+        internal MapManager MapManager { get; }
 
-        public async void OnClientReady([FromSource] Player player)
+        internal async void OnClientReady([FromSource] Player player)
         {
-            fsmManager.PrepareFSMForPlayer(player);
+            stateManager.PrepareFSMForPlayer(player);
             var gfPlayer = playerInfo.GetGFPlayer(player);
             gfPlayer.FSM.Fire(PlayerConnectionTrigger.CLIENT_READY);
         }
@@ -50,7 +49,7 @@ namespace Server.Application
             gfPlayer.FSM.Fire(PlayerConnectionTrigger.PLAYER_DROPPED);
         }
 
-        public async void OnPlayerConnecting([FromSource] Player player, string playerName, dynamic setKickReason, dynamic deferrals)
+        internal async void OnPlayerConnecting([FromSource] Player player, string playerName, dynamic setKickReason, dynamic deferrals)
         {
             deferrals.defer();
 
@@ -71,16 +70,7 @@ namespace Server.Application
         internal void OnPlayerSelectAccount([FromSource] Player player, string accountName)
         {
             var gfPlayer = playerInfo.GetGFPlayer(player);
-            var account = gfPlayer.LicenseAccounts.FirstOrDefault((element) =>
-            {
-                return element.Username == accountName;
-            });
-
-            if (account != null)
-            {
-                gfPlayer.Account = account;
-                gfPlayer.FSM.Fire(PlayerConnectionTrigger.ACCOUNT_SELECTED);
-            }
+            stateManager.SelectAccountForPlayer(gfPlayer, accountName);
         }
     }
 }

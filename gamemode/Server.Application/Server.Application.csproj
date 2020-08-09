@@ -68,7 +68,7 @@
     <Compile Include="Managers\CommandManager.cs" />
     <Compile Include="DebugResolveModule.cs" />
     <Compile Include="MainServer.cs" />
-    <Compile Include="Managers\FSMManager.cs" />
+    <Compile Include="Managers\StateManager.cs" />
     <Compile Include="Managers\MapManager.cs" />
     <Compile Include="Managers\NetworkManager.cs" />
     <Compile Include="MenuManager.cs" />
