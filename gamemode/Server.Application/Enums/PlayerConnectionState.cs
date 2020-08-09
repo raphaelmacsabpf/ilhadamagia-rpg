@@ -9,6 +9,7 @@
         LOADING_ACCOUNT,
         LOGGED,
         DROPPED,
+        SELECT_SPAWN_POSITION,
         SPAWNED
     }
 }

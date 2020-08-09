@@ -193,10 +193,15 @@ namespace Server.Application.Managers
             return null;
         }
 
+        public Vector3 GetHouseInteriorPosition(GFHouse house)
+        {
+            return interiorPositions[house.Entity.Interior];
+        }
+
         private void HouseEnter(GFPlayer gfPlayer, GFHouse house)
         {
             gfPlayer.CurrentHouseInside = house;
-            this.playerActions.TeleportPlayerToPosition(gfPlayer, interiorPositions[house.Entity.Interior], 1000);
+            this.playerActions.TeleportPlayerToPosition(gfPlayer, GetHouseInteriorPosition(house), 1000);
         }
 
         private void HouseExit(GFPlayer gfPlayer)

@@ -39,6 +39,8 @@ namespace Server.Application.Entities
             }
         }
 
+        public Vector3 SpawnPosition { get; set; }
+
         public GFHouse CurrentHouseInside { get; set; }
         public List<Account> LicenseAccounts { get; set; }
     }

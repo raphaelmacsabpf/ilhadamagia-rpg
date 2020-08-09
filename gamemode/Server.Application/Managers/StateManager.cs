@@ -155,7 +155,7 @@ namespace Server.Application.Managers
                 });
 
             fsm.Configure(PlayerConnectionState.LOGGED)
-                .Permit(PlayerConnectionTrigger.SET_TO_SPAWN, PlayerConnectionState.SPAWNED)
+                .Permit(PlayerConnectionTrigger.SELECTING_SPAWN_POSITION, PlayerConnectionState.SELECT_SPAWN_POSITION)
                 .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
                 .OnEntry(() =>
                 {
@@ -170,14 +170,31 @@ namespace Server.Application.Managers
                     json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticInteractionTargetsPayload());
                     this.networkManager.SendPayloadToPlayer(gfPlayer.Player, PayloadType.TO_STATIC_INTERACTION_TARGETS, json);
 
-                    gfPlayer.FSM.Fire(PlayerConnectionTrigger.SET_TO_SPAWN);
+                    gfPlayer.FSM.Fire(PlayerConnectionTrigger.SELECTING_SPAWN_POSITION);
+                });
+
+            fsm.Configure(PlayerConnectionState.SELECT_SPAWN_POSITION)
+                .Permit(PlayerConnectionTrigger.SET_TO_SPAWN, PlayerConnectionState.SPAWNED)
+                .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
+                .OnEntry(() =>
+                {
+                    if(gfPlayer.SelectedHouse != null)
+                    {
+                        gfPlayer.CurrentHouseInside = gfPlayer.SelectedHouse;
+                        gfPlayer.SpawnPosition = mapManager.GetHouseInteriorPosition(gfPlayer.SelectedHouse);
+                    }
+                    else
+                    {
+                        gfPlayer.SpawnPosition = new Vector3(309.6f, -728.7297f, 29.3136f);
+                    }
+                    fsm.Fire(PlayerConnectionTrigger.SET_TO_SPAWN);
                 });
 
             fsm.Configure(PlayerConnectionState.SPAWNED)
                 .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
                 .OnEntry(() =>
                 {
-                    playerActions.SpawnPlayer(gfPlayer, "S_M_Y_MARINE_01", 309.6f, -728.7297f, 29.3136f, 246.6142f); // HACK: Mandar player spawnar elegantemente
+                    playerActions.SpawnPlayer(gfPlayer, "S_M_Y_MARINE_01", gfPlayer.SpawnPosition.X, gfPlayer.SpawnPosition.Y, gfPlayer.SpawnPosition.Z, 0); // HACK: Pegar skin do banco para spawnar
                 });
             return fsm;
         }

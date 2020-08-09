@@ -8,6 +8,7 @@
         ACCOUNT_FOUND,
         ACCOUNT_NOT_FOUND,
         ACCOUNT_SELECTED,
+        SELECTING_SPAWN_POSITION,
         SET_TO_SPAWN
     }
 }
