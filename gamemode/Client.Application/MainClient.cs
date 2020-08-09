@@ -154,15 +154,22 @@ namespace Client.Application
 
         public void OnClienText(string textInput)
         {
-            API.CancelEvent();
+            bool cancelEvent = true;
             if (textInput[0] == '/')
             {
                 if (textInput == "/login") // HACK: Remove this command soon as possible
                 {
                     OpenNUIView((int)NUIViewType.SELECT_ACCOUNT, true, lastPayloadCompressed, lastPayloadUncompressedLength);
                 }
-                var commandPacket = CommandParser.Parse(textInput);
-                TriggerServerEvent("GF:Server:OnClientCommand", (int)commandPacket.CommandCode, commandPacket.HasArgs, commandPacket.Text);
+                else
+                {
+                    var commandPacket = CommandParser.Parse(textInput);
+                    TriggerServerEvent("GF:Server:OnClientCommand", (int)commandPacket.CommandCode, commandPacket.HasArgs, commandPacket.Text);
+                }
+                if(cancelEvent)
+                {
+                    API.CancelEvent();
+                }
             }
             else
                 TriggerServerEvent("GF:Server:OnChatMessage", textInput);

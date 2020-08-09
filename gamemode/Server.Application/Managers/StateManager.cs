@@ -70,11 +70,11 @@ namespace Server.Application.Managers
             {
                 if (gfPlayer.Account != null)
                 {
-                    Console.WriteLine($"Player connection state change #{gfPlayer.Player.Handle} Name: {gfPlayer.Player.Name}, Username: {gfPlayer.Account.Username}, Transition: {transition.Source} -> {transition.Destination}");
+                    Console.WriteLine($"Player connection state change #{gfPlayer.Player.Handle} Name: {gfPlayer.Player.Name}, Username: {gfPlayer.Account.Username}, Transition: {transition.Source}[{transition.Trigger}] -> {transition.Destination}");
                 }
                 else
                 {
-                    Console.WriteLine($"Player connection state change #{gfPlayer.Player.Handle} Name: {gfPlayer.Player.Name}, Transition: {transition.Source} -> {transition.Destination}");
+                    Console.WriteLine($"Player connection state change #{gfPlayer.Player.Handle} Name: {gfPlayer.Player.Name}, Transition: {transition.Source}[{transition.Trigger}] -> {transition.Destination}");
                 }
             });
 

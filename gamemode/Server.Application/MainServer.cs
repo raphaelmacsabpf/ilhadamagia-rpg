@@ -1,7 +1,9 @@
 ﻿using CitizenFX.Core;
+using CitizenFX.Core.Native;
 using Server.Application.Enums;
 using Server.Application.Managers;
 using System;
+using System.Collections.Generic;
 
 namespace Server.Application
 {
@@ -28,6 +30,17 @@ namespace Server.Application
                 var gfPlayer = playerInfo.GetGFPlayer(player);
                 gfPlayer.FSM.Fire(PlayerConnectionTrigger.GAMEMODE_LOAD);
             }
+
+            API.RegisterCommand("gmx", new Action<int, List<object>, string>((source, args, rawCommand) =>
+            {
+                if (source <= 0)
+                {
+                    foreach (var targetPlayer in playerInfo.GetGFPlayerList())
+                    {
+                        targetPlayer.Player.Drop("GMX");
+                    }
+                }
+            }), true);
 
             Console.WriteLine("[IM MainServer] Started MainServer");
         }
