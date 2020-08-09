@@ -13,12 +13,12 @@ namespace Server.Application.Managers
 {
     public class MapManager : BaseScript
     {
-        private List<MarkerDto> staticMarkers;
-        private List<ProximityTargetDto> staticProximityTargets;
-        private List<InteractionTargetDto> staticInteractionTargets;
-        private Dictionary<string, Action<GFPlayer, Player>> interactionTargetsCallbacks;
-        private List<GFHouse> houses;
-        private Dictionary<InteriorType, Vector3> interiorPositions;
+        private readonly List<MarkerDto> staticMarkers;
+        private readonly List<ProximityTargetDto> staticProximityTargets;
+        private readonly List<InteractionTargetDto> staticInteractionTargets;
+        private readonly Dictionary<string, Action<GFPlayer, Player>> interactionTargetsCallbacks;
+        private readonly List<GFHouse> houses;
+        private readonly Dictionary<InteriorType, Vector3> interiorPositions;
 
         private readonly PlayerInfo playerInfo;
         private readonly ChatManager chatManager;
@@ -52,20 +52,11 @@ namespace Server.Application.Managers
             Console.WriteLine("[IM MapManager] Started MapManager");
         }
 
-        public int HouseCount
-        {
-            get
-            {
-                return this.houses.Count;
-            }
-        }
+        public int HouseCount => this.houses.Count;
 
         public IEnumerable<GFHouse> GetAllHousesFromOwner(string ownerUsername)
         {
-            return this.houses.Where((house) =>
-            {
-                return house.Entity.Owner == ownerUsername;
-            });
+            return this.houses.Where((house) => house.Entity.Owner == ownerUsername);
         }
 
         public VehicleRepository VehicleRepository { get; }
@@ -73,15 +64,10 @@ namespace Server.Application.Managers
         public void GFPlayerCallPropertyVehicle(GFPlayer gfPlayer, string vehicleGuid)
         {
             var playerVehicles = VehicleRepository.GetAccountVehicles(gfPlayer.Account);
-            var vehicle = playerVehicles.FirstOrDefault((_) =>
-            {
-                return _.Guid == vehicleGuid;
-            });
-            if (vehicle != null)
-            {
-                var gfHouse = GetClosestHouseInRadius(gfPlayer, 3.0f);
-                playerActions.CreateVehicle(gfPlayer, new Vector3(gfHouse.Entity.VehiclePositionX, gfHouse.Entity.VehiclePositionY, gfHouse.Entity.VehiclePositionZ), gfHouse.Entity.VehicleHeading, vehicle);
-            }
+            var vehicle = playerVehicles.FirstOrDefault((_) => _.Guid == vehicleGuid);
+            if (vehicle == null) return;
+            var gfHouse = GetClosestHouseInRadius(gfPlayer, 3.0f);
+            playerActions.CreateVehicle(gfPlayer, new Vector3(gfHouse.Entity.VehiclePositionX, gfHouse.Entity.VehiclePositionY, gfHouse.Entity.VehiclePositionZ), gfHouse.Entity.VehicleHeading, vehicle);
         }
 
         public List<MarkerDto> PopUpdatedStaticMarkersPayload()
@@ -119,10 +105,7 @@ namespace Server.Application.Managers
 
         public GFHouse GetGFHouseFromId(int id)
         {
-            return this.houses.FirstOrDefault((house) =>
-            {
-                return house.Entity.Id == id;
-            });
+            return this.houses.FirstOrDefault((house) => house.Entity.Id == id);
         }
 
         private void BuildMarkers()
@@ -154,8 +137,7 @@ namespace Server.Application.Managers
             var houseEntities = houseRepository.GetAll();
             foreach (var houseEntity in houseEntities)
             {
-                var gfHouse = new GFHouse();
-                gfHouse.Entity = houseEntity;
+                var gfHouse = new GFHouse {Entity = houseEntity};
                 this.houses.Add(gfHouse);
             }
 
@@ -169,28 +151,19 @@ namespace Server.Application.Managers
         {
             var playerPosition = gfPlayer.Player.Character.Position;
             GFHouse closestHouse = null;
-            float closestDistance = float.MaxValue;
+            var closestDistance = float.MaxValue;
 
             foreach (var gfHouse in this.houses)
             {
                 var houseEntity = gfHouse.Entity;
                 var distanceToClosest = playerPosition.DistanceToSquared(new Vector3(houseEntity.EntranceX, houseEntity.EntranceY, houseEntity.EntranceZ));
-                if (distanceToClosest < closestDistance)
-                {
-                    closestHouse = gfHouse;
-                    closestDistance = distanceToClosest;
-                }
+                if (!(distanceToClosest < closestDistance)) continue;
+                closestHouse = gfHouse;
+                closestDistance = distanceToClosest;
             }
 
-            if (closestHouse != null)
-            {
-                if (closestDistance < radius)
-                {
-                    return closestHouse;
-                }
-            }
-
-            return null;
+            if (closestHouse == null) return null;
+            return closestDistance < radius ? closestHouse : null;
         }
 
         public Vector3 GetHouseInteriorPosition(GFHouse house)
@@ -233,7 +206,7 @@ namespace Server.Application.Managers
 
         private void AddInteractionToServerCallbackTarget(float x, float y, float z, Action<GFPlayer, Player> serverCallback)
         {
-            Random random = new Random();
+            var random = new Random();
             var callbackId = $"{random.Next()}.{random.Next()}.{random.Next()}.{serverCallback.GetHashCode()}";
             interactionTargetsCallbacks.Add(callbackId, serverCallback);
             this.staticInteractionTargets.Add(new InteractionTargetDto(x, y, z, "SERVER_CALLBACK", callbackId));
@@ -246,10 +219,7 @@ namespace Server.Application.Managers
 
         private bool IsValidHouseId(int houseId)
         {
-            return this.houses.Exists((house) =>
-            {
-                return house.Entity.Id == houseId;
-            });
+            return this.houses.Exists((house) => house.Entity.Id == houseId);
         }
     }
 }

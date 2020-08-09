@@ -40,26 +40,15 @@ namespace Server.Application.Managers
 
         public void SelectAccountForPlayer(GFPlayer gfPlayer, string accountName)
         {
-            var account = gfPlayer.LicenseAccounts.FirstOrDefault((element) =>
+            var account = gfPlayer.LicenseAccounts.FirstOrDefault((element) => element.Username == accountName);
+            if (account == null) return;
+            gfPlayer.Account = account;
+            if (account.SelectedHouse != null)
             {
-                return element.Username == accountName;
-            });
-            if (account != null)
-            {
-                gfPlayer.Account = account;
-                if (account.SelectedHouse != null)
-                {
-                    var houses = mapManager.GetAllHousesFromOwner(account.Username).ToList();
-                    if (houses != null)
-                    {
-                        gfPlayer.SelectedHouse = houses.FirstOrDefault((gfHouse) =>
-                        {
-                            return gfHouse.Entity != null && gfHouse.Entity.Id == account.SelectedHouse;
-                        });
-                    }
-                }
-                gfPlayer.FSM.Fire(PlayerConnectionTrigger.ACCOUNT_SELECTED);
+                var houses = mapManager.GetAllHousesFromOwner(account.Username).ToList();
+                gfPlayer.SelectedHouse = houses.FirstOrDefault((gfHouse) => gfHouse.Entity != null && gfHouse.Entity.Id == account.SelectedHouse );
             }
+            gfPlayer.FSM.Fire(PlayerConnectionTrigger.ACCOUNT_SELECTED);
         }
 
         private StateMachine<PlayerConnectionState, PlayerConnectionTrigger> CreatePlayerConnectionFSM(GFPlayer gfPlayer)
@@ -68,26 +57,16 @@ namespace Server.Application.Managers
 
             fsm.OnTransitioned((transition) =>
             {
-                if (gfPlayer.Account != null)
-                {
-                    Console.WriteLine($"Player connection state change #{gfPlayer.Player.Handle} Name: {gfPlayer.Player.Name}, Username: {gfPlayer.Account.Username}, Transition: {transition.Source}[{transition.Trigger}] -> {transition.Destination}");
-                }
-                else
-                {
-                    Console.WriteLine($"Player connection state change #{gfPlayer.Player.Handle} Name: {gfPlayer.Player.Name}, Transition: {transition.Source}[{transition.Trigger}] -> {transition.Destination}");
-                }
+                Console.WriteLine(gfPlayer.Account != null
+                    ? $"Player connection state change #{gfPlayer.Player.Handle} Name: {gfPlayer.Player.Name}, Username: {gfPlayer.Account.Username}, Transition: {transition.Source}[{transition.Trigger}] -> {transition.Destination}"
+                    : $"Player connection state change #{gfPlayer.Player.Handle} Name: {gfPlayer.Player.Name}, Transition: {transition.Source}[{transition.Trigger}] -> {transition.Destination}");
             });
 
             fsm.OnUnhandledTrigger((state, trigger) =>
             {
-                if (gfPlayer.Account != null)
-                {
-                    Console.WriteLine($"ERROR: State trigger error  #{gfPlayer.Player.Handle} Name: {gfPlayer.Player.Name}, Username: {gfPlayer.Account.Username}, State: {state}, Trigger: {trigger}");
-                }
-                else
-                {
-                    Console.WriteLine($"ERROR: State trigger error  #{gfPlayer.Player.Handle} Name: {gfPlayer.Player.Name}, State: {state}, Trigger: {trigger}");
-                }
+                Console.WriteLine(gfPlayer.Account != null
+                    ? $"ERROR: State trigger error  #{gfPlayer.Player.Handle} Name: {gfPlayer.Player.Name}, Username: {gfPlayer.Account.Username}, State: {state}, Trigger: {trigger}"
+                    : $"ERROR: State trigger error  #{gfPlayer.Player.Handle} Name: {gfPlayer.Player.Name}, State: {state}, Trigger: {trigger}");
             });
 
             fsm.Configure(PlayerConnectionState.INITIAL)
@@ -141,13 +120,10 @@ namespace Server.Application.Managers
                 .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
                 .OnEntry(() =>
                 {
-                    var accountsDto = gfPlayer.LicenseAccounts.Select((element) =>
+                    var accountsDto = gfPlayer.LicenseAccounts.Select((element) => new
                     {
-                        return new
-                        {
-                            Username = element.Username,
-                            Level = element.Level
-                        };
+                        Username = element.Username,
+                        Level = element.Level
                     });
                     var json = JsonConvert.SerializeObject(accountsDto);
                     var compressedJson = networkManager.Compress(json);
