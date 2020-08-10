@@ -54,7 +54,7 @@ namespace Client.Application
 
             _spawnLock = true;
 
-            DoScreenFadeOut(fastSpawn ? 100 : 500);
+            DoScreenFadeOut(fastSpawn ? 1 : 500);
 
             while (IsScreenFadingOut())
             {
@@ -67,7 +67,7 @@ namespace Client.Application
             RequestModel(pedModel);
             while (HasModelLoaded(pedModel) == false)
             {
-                await Delay(fastSpawn ? 100 : 300);
+                await Delay(fastSpawn ? 1 : 300);
             }
             await Game.Player.ChangeModel(skinHashKey);
 
@@ -88,7 +88,7 @@ namespace Client.Application
             }
 
             ShutdownLoadingScreen();
-            DoScreenFadeIn(fastSpawn ? 100 : 500);
+            DoScreenFadeIn(fastSpawn ? 1 : 500);
 
             while (IsScreenFadingIn())
             {
