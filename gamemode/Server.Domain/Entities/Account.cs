@@ -20,6 +20,7 @@ namespace Server.Domain.Entities
         public int ConnectedTime { get; set; }
         public int Money { get; set; }
         public int Bank { get; set; }
+        public string PedModel { get; set; }
         public int? SelectedHouse { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }

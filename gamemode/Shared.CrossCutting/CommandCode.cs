@@ -15,6 +15,7 @@
         GO_TO_COORDS,
         PROP_MENU,
         SET_HOUSE,
-        GO_TO_HOUSE
+        GO_TO_HOUSE,
+        SET_PED
     }
 }

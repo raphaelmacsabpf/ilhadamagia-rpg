@@ -67,9 +67,9 @@ namespace Client.Application
             API.SetPedArmour(Game.PlayerPed.Handle, value);
         }
 
-        internal async void SpawnPlayer(string skinName, float x, float y, float z, float heading)
+        internal async void SpawnPlayer(string skinName, float x, float y, float z, float heading, bool fastSpawn)
         {
-            await Spawn.SpawnPlayer(skinName, x, y, z, heading);
+            await Spawn.SpawnPlayer(skinName, x, y, z, heading, fastSpawn);
         }
     }
 }

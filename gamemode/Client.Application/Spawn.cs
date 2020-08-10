@@ -47,14 +47,14 @@ namespace Client.Application
             }
         }
 
-        public static async Task SpawnPlayer(string skin, float x, float y, float z, float heading)
+        public static async Task SpawnPlayer(string skin, float x, float y, float z, float heading, bool fastSpawn)
         {
             if (_spawnLock)
                 return;
 
             _spawnLock = true;
 
-            DoScreenFadeOut(500);
+            DoScreenFadeOut(fastSpawn ? 100 : 500);
 
             while (IsScreenFadingOut())
             {
@@ -67,7 +67,7 @@ namespace Client.Application
             RequestModel(pedModel);
             while (HasModelLoaded(pedModel) == false)
             {
-                await Delay(300);
+                await Delay(fastSpawn ? 100 : 300);
             }
             await Game.Player.ChangeModel(skinHashKey);
 
@@ -88,7 +88,7 @@ namespace Client.Application
             }
 
             ShutdownLoadingScreen();
-            DoScreenFadeIn(500);
+            DoScreenFadeIn(fastSpawn ? 100 : 500);
 
             while (IsScreenFadingIn())
             {

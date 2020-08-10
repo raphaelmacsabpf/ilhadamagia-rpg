@@ -1,8 +1,8 @@
 ﻿using CitizenFX.Core;
 using Server.Application.Enums;
 using Server.Domain.Entities;
+using Server.Domain.Enums;
 using Stateless;
-using System;
 using System.Collections.Generic;
 
 namespace Server.Application.Entities
@@ -16,29 +16,28 @@ namespace Server.Application.Entities
             this.Player = player;
             this.License = player.Identifiers["license"];
             this.LicenseAccounts = new List<Account>();
+            this.SpawnType = SpawnType.Unset;
         }
 
         public string License { get; }
         public StateMachine<PlayerConnectionState, PlayerConnectionTrigger> FSM { get; set; }
         public Account Account { get; set; }
-        public Player Player { get; private set; }
+        public Player Player { get; }
 
         public GFHouse SelectedHouse
         {
-            get
-            {
-                return selectedHouse;
-            }
+            get => selectedHouse;
             set
             {
                 selectedHouse = value;
-                if (value != null && value.Entity != null && this.Account != null)
+                if (value?.Entity != null && this.Account != null)
                 {
                     this.Account.SelectedHouse = value.Entity.Id;
                 }
             }
         }
 
+        public SpawnType SpawnType { get; set; }
         public Vector3 SpawnPosition { get; set; }
 
         public GFHouse CurrentHouseInside { get; set; }

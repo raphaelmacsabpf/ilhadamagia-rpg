@@ -1,4 +1,5 @@
 ﻿using CitizenFX.Core;
+using GF.CrossCutting;
 using GF.CrossCutting.Dto;
 using Server.Application.Entities;
 using Server.Domain.Enums;
@@ -14,13 +15,15 @@ namespace Server.Application.Managers
         private readonly PlayerInfo playerInfo;
         private readonly PlayerActions playerActions;
         private readonly MapManager mapManager;
+        private readonly StateManager stateManager;
 
-        public CommandManager(ChatManager chatManager, PlayerInfo playerInfo, PlayerActions playerActions, MapManager mapManager)
+        public CommandManager(ChatManager chatManager, PlayerInfo playerInfo, PlayerActions playerActions, MapManager mapManager, StateManager stateManager)
         {
             this.chatManager = chatManager;
             this.playerInfo = playerInfo;
             this.playerActions = playerActions;
             this.mapManager = mapManager;
+            this.stateManager = stateManager;
             Console.WriteLine("[IM CommandManager] Started CommandManager");
         }
 
@@ -254,6 +257,25 @@ namespace Server.Application.Managers
                             int houseId = commandValidator.GetVar<int>("house-id");
                             var gfHouse = mapManager.GetGFHouseFromId(houseId);
                             this.playerActions.TeleportPlayerToPosition(sourceGFPlayer, new Vector3(gfHouse.Entity.EntranceX, gfHouse.Entity.EntranceY, gfHouse.Entity.EntranceZ), 500);
+                        }
+                        return;
+                    }
+                case CommandCode.SET_PED:
+                    {
+                        if (commandValidator.WithAdminLevel(4).WithTargetPlayer()
+                            .WithVarBetween<int>(0, PedModels.GetPedModelMaxId(), "ped-model-id")
+                            .IsValid($"USE: /setskin [playerid] [id(0-{PedModels.GetPedModelMaxId()}]"))
+                        {
+                            GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                            var pedId = commandValidator.GetVar<int>("ped-model-id");
+                            var pedModelHash = PedModels.GetHashStringById(pedId);
+                            if (pedModelHash != null)
+                            {
+                                targetGfPlayer.Account.PedModel = pedModelHash;
+                                stateManager.RespawnPlayerInCurrentPosition(targetGfPlayer);
+                                this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" Sua skin foi alterada pelo admin {sourceGFPlayer.Account.Username}");
+                                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você alterou a skin de {targetGfPlayer.Account.Username}");
+                            }
                         }
                         return;
                     }

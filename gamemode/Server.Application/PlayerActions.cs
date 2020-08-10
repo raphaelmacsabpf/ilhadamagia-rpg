@@ -59,9 +59,9 @@ namespace Server.Application
             gfPlayer.Player.TriggerEvent("GF:Client:OpenMenu", (int)menuType, compressedJson, uncompressedLenght);
         }
 
-        public void SpawnPlayer(GFPlayer gfPlayer, string skinName, float x, float y, float z, float heading)
+        public void SpawnPlayer(GFPlayer gfPlayer, string skinName, float x, float y, float z, float heading, bool fastSpawn)
         {
-            gfPlayer.Player.TriggerEvent("GF:Client:SpawnPlayer", skinName, x, y, z, heading);
+            gfPlayer.Player.TriggerEvent("GF:Client:SpawnPlayer", skinName, x, y, z, heading, fastSpawn);
         }
 
         public void OpenNUIView(GFPlayer gfPlayer, NUIViewType nuiViewType, bool setFocus, string compressedJsonPayload, int uncompressedLength)

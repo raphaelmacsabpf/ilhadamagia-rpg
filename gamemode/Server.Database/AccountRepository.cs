@@ -9,7 +9,7 @@ namespace Server.Database
 {
     public class AccountRepository
     {
-        private MySqlConnection mySqlConnection;
+        private readonly MySqlConnection mySqlConnection;
 
         public AccountRepository(MySqlConnectionPool mySqlConnectionPool)
         {
@@ -18,7 +18,7 @@ namespace Server.Database
 
         public Task<IEnumerable<Account>> GetAccountListByLicense(string license)
         {
-            var sqlStatement = @"
+            const string sqlStatement = @"
 SELECT * FROM imtb_account
 WHERE License=@License;";
             var accountsTask = this.mySqlConnection.QueryAsync<Account>(sqlStatement, new { License = license });
@@ -27,7 +27,7 @@ WHERE License=@License;";
 
         public Task<int> Create(Account account)
         {
-            var sqlStatement = @"
+            const string sqlStatement = @"
 INSERT INTO imtb_account
 (License, Username, Password, CreatedAt)
 VALUES (@License, @Username, @Password, @CreatedAt);
@@ -40,7 +40,7 @@ SELECT LAST_INSERT_ID();";
         public Task Update(Account account)
         {
             account.UpdatedAt = DateTime.Now;
-            var sqlStatement = @"
+            const string sqlStatement = @"
 UPDATE imtb_account SET
 UpdatedAt = @UpdatedAt,
 AdminLevel = @AdminLevel,
@@ -50,7 +50,8 @@ Respect = @Respect,
 ConnectedTime = @ConnectedTime,
 Money = @Money,
 Bank = @Bank,
-SelectedHouse = @SelectedHouse
+SelectedHouse = @SelectedHouse,
+PedModel = @PedModel
 WHERE Id = @Id";
 
             return this.mySqlConnection.ExecuteAsync(sqlStatement, account);

@@ -38,7 +38,7 @@ namespace Client.Application
 
             // GF Events
             EventHandlers["GF:Client:SendClientMessage"] += new Action<int, string>(mainClient.GFSendClientMessage);
-            EventHandlers["GF:Client:SpawnPlayer"] += new Action<string, float, float, float, float>(mainClient.GFSpawnPlayer);
+            EventHandlers["GF:Client:SpawnPlayer"] += new Action<string, float, float, float, float, bool>(mainClient.GFSpawnPlayer);
             EventHandlers["GF:Client:Kill"] += new Action(mainClient.GFKill);
             EventHandlers["GF:Client:SetPlayerPos"] += new Action<Vector3>(mainClient.GFSetPlayerPos);
             EventHandlers["GF:Client:TeleportPlayerToPosition"] += new Action<Vector3, int>(mainClient.GFTeleportPlayerToPosition);

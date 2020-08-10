@@ -166,7 +166,7 @@ namespace Client.Application
                     var commandPacket = CommandParser.Parse(textInput);
                     TriggerServerEvent("GF:Server:OnClientCommand", (int)commandPacket.CommandCode, commandPacket.HasArgs, commandPacket.Text);
                 }
-                if(cancelEvent)
+                if (cancelEvent)
                 {
                     API.CancelEvent();
                 }
@@ -178,7 +178,7 @@ namespace Client.Application
         public async void OnDie(int killerType, dynamic deathCoords)
         {
             API.CancelEvent();
-            await Spawn.SpawnPlayer("S_M_Y_MARINE_01", 309.6f, -728.7297f, 29.3136f, 246.6142f); // TODO: Remove and call event when player dies, fix some bugs also.
+            await Spawn.SpawnPlayer("S_M_Y_MARINE_01", 309.6f, -728.7297f, 29.3136f, 246.6142f, false); // TODO: Remove and call event when player dies, fix some bugs also.
         }
 
         public async void OnPlayerMapStart()
@@ -232,9 +232,9 @@ namespace Client.Application
             this.playerActions.SendMessageToPlayerChat((ChatColor)chatColor, message);
         }
 
-        public async void GFSpawnPlayer(string skinName, float x, float y, float z, float heading)
+        public async void GFSpawnPlayer(string skinName, float x, float y, float z, float heading, bool fastSpawn)
         {
-            this.playerActions.SpawnPlayer(skinName, x, y, z, heading);
+            this.playerActions.SpawnPlayer(skinName, x, y, z, heading, fastSpawn);
         }
 
         public void GFKill()

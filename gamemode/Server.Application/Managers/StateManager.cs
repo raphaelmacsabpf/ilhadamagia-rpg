@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Server.Application.Entities;
 using Server.Application.Enums;
 using Server.Database;
+using Server.Domain.Enums;
 using Shared.CrossCutting;
 using Stateless;
 using System;
@@ -46,9 +47,17 @@ namespace Server.Application.Managers
             if (account.SelectedHouse != null)
             {
                 var houses = mapManager.GetAllHousesFromOwner(account.Username).ToList();
-                gfPlayer.SelectedHouse = houses.FirstOrDefault((gfHouse) => gfHouse.Entity != null && gfHouse.Entity.Id == account.SelectedHouse );
+                gfPlayer.SelectedHouse = houses.FirstOrDefault((gfHouse) => gfHouse.Entity != null && gfHouse.Entity.Id == account.SelectedHouse);
             }
             gfPlayer.FSM.Fire(PlayerConnectionTrigger.ACCOUNT_SELECTED);
+        }
+
+        public void RespawnPlayerInCurrentPosition(GFPlayer gfPlayer)
+        {
+            var position = gfPlayer.Player.Character.Position;
+            gfPlayer.SpawnType = SpawnType.ToCoords;
+            gfPlayer.SpawnPosition = position;
+            gfPlayer.FSM.Fire(PlayerConnectionTrigger.SET_TO_SPAWN);
         }
 
         private StateMachine<PlayerConnectionState, PlayerConnectionTrigger> CreatePlayerConnectionFSM(GFPlayer gfPlayer)
@@ -152,25 +161,31 @@ namespace Server.Application.Managers
             fsm.Configure(PlayerConnectionState.SELECT_SPAWN_POSITION)
                 .Permit(PlayerConnectionTrigger.SET_TO_SPAWN, PlayerConnectionState.SPAWNED)
                 .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
-                .OnEntry(() =>
+                .OnEntry((transition) =>
                 {
-                    if(gfPlayer.SelectedHouse != null)
+                    if (gfPlayer.SpawnType == SpawnType.Unset)
                     {
-                        gfPlayer.CurrentHouseInside = gfPlayer.SelectedHouse;
-                        gfPlayer.SpawnPosition = mapManager.GetHouseInteriorPosition(gfPlayer.SelectedHouse);
+                        if (gfPlayer.SelectedHouse != null)
+                        {
+                            gfPlayer.CurrentHouseInside = gfPlayer.SelectedHouse;
+                            gfPlayer.SpawnPosition = mapManager.GetHouseInteriorPosition(gfPlayer.SelectedHouse);
+                        }
+                        else
+                        {
+                            gfPlayer.SpawnPosition = new Vector3(309.6f, -728.7297f, 29.3136f);
+                        }
                     }
-                    else
-                    {
-                        gfPlayer.SpawnPosition = new Vector3(309.6f, -728.7297f, 29.3136f);
-                    }
+
                     fsm.Fire(PlayerConnectionTrigger.SET_TO_SPAWN);
                 });
 
             fsm.Configure(PlayerConnectionState.SPAWNED)
+                .PermitReentry(PlayerConnectionTrigger.SET_TO_SPAWN)
                 .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
                 .OnEntry(() =>
                 {
-                    playerActions.SpawnPlayer(gfPlayer, "S_M_Y_MARINE_01", gfPlayer.SpawnPosition.X, gfPlayer.SpawnPosition.Y, gfPlayer.SpawnPosition.Z, 0); // HACK: Pegar skin do banco para spawnar
+                    var fastSpawn = gfPlayer.SpawnType == SpawnType.ToCoords;
+                    playerActions.SpawnPlayer(gfPlayer, gfPlayer.Account.PedModel, gfPlayer.SpawnPosition.X, gfPlayer.SpawnPosition.Y, gfPlayer.SpawnPosition.Z, 0, fastSpawn); // HACK: Pegar skin do banco para spawnar
                 });
             return fsm;
         }

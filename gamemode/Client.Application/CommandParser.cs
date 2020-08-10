@@ -36,6 +36,7 @@ namespace Client.Application
                 case "/prop": return CommandCode.PROP_MENU;
                 case "/setcasa": return CommandCode.SET_HOUSE;
                 case "/ircasa": return CommandCode.GO_TO_HOUSE;
+                case "/setskin": return CommandCode.SET_PED;
                 default: return CommandCode.INVALID_COMMAND;
             }
         }
