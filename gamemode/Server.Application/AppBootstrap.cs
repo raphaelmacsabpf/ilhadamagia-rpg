@@ -60,6 +60,7 @@ namespace Server.Application
                 EventHandlers["GF:Server:OnPlayerTargetActionServerCallback"] += new Action<Player, string>(mainServer.MapManager.OnPlayerTargetActionServerCallback);
                 EventHandlers["GF:Server:OnMenuAction"] += new Action<Player, int, string>(menuManager.OnPlayerMenuAction);
                 EventHandlers["GF:Server:ResponseAccountSelect"] += new Action<Player, string>(mainServer.OnPlayerSelectAccount);
+                EventHandlers["GF:Server:TriggerStateEvent"] += new Action<Player, string>(mainServer.OnPlayerTriggerStateEvent);
             }
 
             initializationStopwatch.Stop();

@@ -85,5 +85,21 @@ namespace Server.Application
             var gfPlayer = playerInfo.GetGFPlayer(player);
             stateManager.SelectAccountForPlayer(gfPlayer, accountName);
         }
+
+        public void OnPlayerTriggerStateEvent([FromSource] Player player, string eventTriggered)
+        {
+            var gfPlayer = playerInfo.GetGFPlayer(player);
+            switch (eventTriggered)
+            {
+                case "die":
+                {
+                    if (gfPlayer.FSM.CanFire(PlayerConnectionTrigger.PLAYER_DIED))
+                    {
+                        gfPlayer.FSM.Fire(PlayerConnectionTrigger.PLAYER_DIED);
+                    }
+                    return;
+                }
+            }
+        }
     }
 }

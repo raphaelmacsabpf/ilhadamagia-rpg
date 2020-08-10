@@ -9,6 +9,7 @@
         ACCOUNT_NOT_FOUND,
         ACCOUNT_SELECTED,
         SELECTING_SPAWN_POSITION,
-        SET_TO_SPAWN
+        SET_TO_SPAWN,
+        PLAYER_DIED
     }
 }

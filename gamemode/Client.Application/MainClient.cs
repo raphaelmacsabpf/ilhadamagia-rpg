@@ -178,7 +178,7 @@ namespace Client.Application
         public async void OnDie(int killerType, dynamic deathCoords)
         {
             API.CancelEvent();
-            await Spawn.SpawnPlayer("S_M_Y_MARINE_01", 309.6f, -728.7297f, 29.3136f, 246.6142f, false); // TODO: Remove and call event when player dies, fix some bugs also.
+            TriggerServerEvent("GF:Server:TriggerStateEvent", "die");
         }
 
         public async void OnPlayerMapStart()
