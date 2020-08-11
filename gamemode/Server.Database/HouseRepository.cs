@@ -8,7 +8,7 @@ namespace Server.Database
 {
     public class HouseRepository
     {
-        private MySqlConnection mySqlConnection;
+        private readonly MySqlConnection mySqlConnection;
 
         public HouseRepository(MySqlConnectionPool mySqlConnectionPool)
         {

@@ -24,5 +24,9 @@ namespace Server.Domain.Entities
         public int? SelectedHouse { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public float LastX { get; set; }
+        public float LastY { get; set; }
+        public float LastZ { get; set; }
+        public int? LastHouseInside { get; set; }
     }
 }

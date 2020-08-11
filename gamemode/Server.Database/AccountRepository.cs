@@ -51,7 +51,11 @@ ConnectedTime = @ConnectedTime,
 Money = @Money,
 Bank = @Bank,
 SelectedHouse = @SelectedHouse,
-PedModel = @PedModel
+PedModel = @PedModel,
+LastX = @LastX,
+LastY = @LastY,
+LastZ = @LastZ,
+LastHouseInside = @LastHouseInside
 WHERE Id = @Id";
 
             return this.mySqlConnection.ExecuteAsync(sqlStatement, account);

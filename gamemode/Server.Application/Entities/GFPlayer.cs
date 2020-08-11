@@ -17,6 +17,7 @@ namespace Server.Application.Entities
             this.License = player.Identifiers["license"];
             this.LicenseAccounts = new List<Account>();
             this.SpawnType = SpawnType.Unset;
+            this.IsFirstSpawn = true;
         }
 
         public string License { get; }
@@ -39,6 +40,7 @@ namespace Server.Application.Entities
 
         public SpawnType SpawnType { get; set; }
         public Vector3 SpawnPosition { get; set; }
+        public bool IsFirstSpawn { get; set; }
 
         public GFHouse CurrentHouseInside { get; set; }
         public List<Account> LicenseAccounts { get; set; }

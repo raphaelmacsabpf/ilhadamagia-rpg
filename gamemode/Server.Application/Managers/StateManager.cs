@@ -89,6 +89,14 @@ namespace Server.Application.Managers
                 {
                     if (gfPlayer.Account != null)
                     {
+                        var playerPosition = gfPlayer.Player.Character.Position;
+                        gfPlayer.Account.LastX = playerPosition.X;
+                        gfPlayer.Account.LastY = playerPosition.Y;
+                        gfPlayer.Account.LastZ = playerPosition.Z;
+                        gfPlayer.Account.LastHouseInside = gfPlayer.CurrentHouseInside != null
+                            ? Convert.ToInt32(gfPlayer.CurrentHouseInside.Entity.Id)
+                            : (int?)null;
+
                         accountRepository.Update(gfPlayer.Account);
                         Console.WriteLine($"Player dropped #{gfPlayer.Player.Handle} Name: {gfPlayer.Player.Name}, Username: {gfPlayer.Account.Username}");
                         this.playerInfo.UnloadGFPlayer(gfPlayer);
@@ -166,10 +174,28 @@ namespace Server.Application.Managers
                 {
                     if (gfPlayer.SpawnType == SpawnType.Unset)
                     {
-                        if (gfPlayer.SelectedHouse != null)
+                        if (gfPlayer.IsFirstSpawn)
                         {
-                            gfPlayer.CurrentHouseInside = gfPlayer.SelectedHouse;
-                            gfPlayer.SpawnPosition = mapManager.GetHouseInteriorPosition(gfPlayer.SelectedHouse);
+                            if (DateTime.Now - gfPlayer.Account.UpdatedAt < TimeSpan.FromSeconds(600))
+                            {
+                                gfPlayer.SpawnPosition = new Vector3(gfPlayer.Account.LastX, gfPlayer.Account.LastY, gfPlayer.Account.LastZ);
+                                var accountLastHouseInside = gfPlayer.Account.LastHouseInside;
+                                if (accountLastHouseInside != null)
+                                {
+                                    var lastHouseInt = Convert.ToInt32(accountLastHouseInside);
+                                    gfPlayer.CurrentHouseInside = mapManager.GetGFHouseFromId(lastHouseInt);
+                                }
+                            }
+                            else if (gfPlayer.SelectedHouse != null)
+                            {
+                                gfPlayer.CurrentHouseInside = gfPlayer.SelectedHouse;
+                                gfPlayer.SpawnPosition = mapManager.GetHouseInteriorPosition(gfPlayer.SelectedHouse);
+                            }
+                            else
+                            {
+                                gfPlayer.SpawnPosition = new Vector3(309.6f, -728.7297f, 29.3136f);
+                            }
+                            gfPlayer.IsFirstSpawn = false;
                         }
                         else
                         {
