@@ -9,6 +9,7 @@ using Shared.CrossCutting;
 using Stateless;
 using System;
 using System.Linq;
+using Stateless.Graph;
 
 namespace Server.Application.Managers
 {
@@ -198,6 +199,11 @@ namespace Server.Application.Managers
                     // TODO: Tratar morte do jogador
                     fsm.Fire(PlayerConnectionTrigger.SELECTING_SPAWN_POSITION);
                 });
+
+            // TODO: Versionar arquivo de gráfico de estados
+            var graphText = UmlDotGraph.Format(fsm.GetInfo());
+            Console.WriteLine(graphText);
+
             return fsm;
         }
     }

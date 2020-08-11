@@ -37,7 +37,7 @@ namespace Server.Application
                 {
                     foreach (var targetPlayer in playerInfo.GetGFPlayerList())
                     {
-                        targetPlayer.Player.Drop("GMX");
+                        targetPlayer.FSM.Fire(PlayerConnectionTrigger.PLAYER_DROPPED);
                     }
                 }
             }), true);
