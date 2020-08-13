@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="CommandValidator.cs" />
     <Compile Include="Entities\GFHouse.cs" />
+    <Compile Include="Entities\GFOrg.cs" />
     <Compile Include="Entities\GFPlayer.cs" />
     <Compile Include="Entities\GFVehicle.cs" />
     <Compile Include="Enums\PlayerConnectionState.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="Managers\CommandManager.cs" />
     <Compile Include="DebugResolveModule.cs" />
     <Compile Include="MainServer.cs" />
+    <Compile Include="Managers\GameEntitiesManager.cs" />
     <Compile Include="Managers\StateManager.cs" />
     <Compile Include="Managers\MapManager.cs" />
     <Compile Include="Managers\NetworkManager.cs" />

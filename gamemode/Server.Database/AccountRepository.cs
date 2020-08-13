@@ -55,7 +55,8 @@ PedModel = @PedModel,
 LastX = @LastX,
 LastY = @LastY,
 LastZ = @LastZ,
-LastHouseInside = @LastHouseInside
+LastHouseInside = @LastHouseInside,
+OrgId = @OrgId
 WHERE Id = @Id";
 
             return this.mySqlConnection.ExecuteAsync(sqlStatement, account);

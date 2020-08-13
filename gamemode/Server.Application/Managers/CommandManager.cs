@@ -16,14 +16,16 @@ namespace Server.Application.Managers
         private readonly PlayerActions playerActions;
         private readonly MapManager mapManager;
         private readonly StateManager stateManager;
+        private readonly GameEntitiesManager gameEntitiesManager;
 
-        public CommandManager(ChatManager chatManager, PlayerInfo playerInfo, PlayerActions playerActions, MapManager mapManager, StateManager stateManager)
+        public CommandManager(ChatManager chatManager, PlayerInfo playerInfo, PlayerActions playerActions, MapManager mapManager, StateManager stateManager, GameEntitiesManager gameEntitiesManager)
         {
             this.chatManager = chatManager;
             this.playerInfo = playerInfo;
             this.playerActions = playerActions;
             this.mapManager = mapManager;
             this.stateManager = stateManager;
+            this.gameEntitiesManager = gameEntitiesManager;
             Console.WriteLine("[IM CommandManager] Started CommandManager");
         }
 
@@ -276,6 +278,27 @@ namespace Server.Application.Managers
                                 this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" Sua skin foi alterada pelo admin {sourceGFPlayer.Account.Username}");
                                 this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você alterou a skin de {targetGfPlayer.Account.Username}");
                             }
+                        }
+                        return;
+                    }
+                case CommandCode.SET_ORG:
+                    {
+                        if (commandValidator.WithAdminLevel(4).WithTargetPlayer()
+                            .WithVarBetween<int>(0, PedModels.GetPedModelMaxId(), "org-id")
+                            .IsValid($"USE: /setorg [playerid] [org-id(0-{gameEntitiesManager.GetMaxOrgId()}]"))
+                        {
+                            GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                            var orgId = commandValidator.GetVar<int>("org-id");
+                            var gfOrg = gameEntitiesManager.GetGFOrgById(orgId);
+                            if (gfOrg == null)
+                            {
+                                commandValidator.SendCommandError($"org-id {orgId} inválido", $"USE: /setorg [playerid] [id(0-{gameEntitiesManager.GetMaxOrgId()}]");
+                                return;
+                            }
+                            targetGfPlayer.Account.OrgId = orgId;
+                            stateManager.RespawnPlayerInCurrentPosition(targetGfPlayer);
+                            this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" Sua organização foi alterada para {gfOrg.Entity.Name} pelo admin {sourceGFPlayer.Account.Username}");
+                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você alterou a organização de {targetGfPlayer.Account.Username} para {gfOrg.Entity.Name}");
                         }
                         return;
                     }

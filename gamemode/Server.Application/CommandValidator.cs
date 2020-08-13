@@ -135,6 +135,15 @@ namespace Server.Application
             return this;
         }
 
+        public void SendCommandError(string errorMessage, string commandSyntax = null)
+        {
+            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, $"*ARG: {errorMessage}");
+            if (commandSyntax != null)
+            {
+                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_WHITE, commandSyntax);
+            }
+        }
+
         public bool IsValid(string commandSyntax = null)
         {
             foreach (string errorMessage in this.errorMessages)

@@ -37,6 +37,7 @@ namespace Client.Application
                 case "/setcasa": return CommandCode.SET_HOUSE;
                 case "/ircasa": return CommandCode.GO_TO_HOUSE;
                 case "/setskin": return CommandCode.SET_PED;
+                case "/setorg": return CommandCode.SET_ORG;
                 default: return CommandCode.INVALID_COMMAND;
             }
         }

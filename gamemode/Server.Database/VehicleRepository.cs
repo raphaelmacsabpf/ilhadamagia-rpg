@@ -7,7 +7,7 @@ namespace Server.Database
 {
     public class VehicleRepository
     {
-        private MySqlConnection mySqlConnection;
+        private readonly MySqlConnection mySqlConnection;
 
         public VehicleRepository(MySqlConnectionPool mySqlConnectionPool)
         {

@@ -28,9 +28,11 @@ namespace Server.Application
             builder.RegisterType<AccountRepository>().As<AccountRepository>().SingleInstance();
             builder.RegisterType<HouseRepository>().As<HouseRepository>().SingleInstance();
             builder.RegisterType<VehicleRepository>().As<VehicleRepository>().SingleInstance();
+            builder.RegisterType<OrgRepository>().As<OrgRepository>().SingleInstance();
             builder.RegisterType<MenuManager>().As<MenuManager>().SingleInstance();
             builder.RegisterType<ChatManager>().As<ChatManager>().SingleInstance();
             builder.RegisterType<MapManager>().As<MapManager>().SingleInstance();
+            builder.RegisterType<GameEntitiesManager>().As<GameEntitiesManager>().SingleInstance();
             builder.RegisterType<PlayerActions>().As<PlayerActions>().SingleInstance();
             builder.RegisterType<PlayerInfo>().As<PlayerInfo>().SingleInstance();
             builder.RegisterType<StateManager>().As<StateManager>().SingleInstance();

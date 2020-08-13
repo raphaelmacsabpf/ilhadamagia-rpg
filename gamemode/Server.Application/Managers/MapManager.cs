@@ -137,7 +137,7 @@ namespace Server.Application.Managers
             var houseEntities = houseRepository.GetAll();
             foreach (var houseEntity in houseEntities)
             {
-                var gfHouse = new GFHouse {Entity = houseEntity};
+                var gfHouse = new GFHouse { Entity = houseEntity };
                 this.houses.Add(gfHouse);
             }
 

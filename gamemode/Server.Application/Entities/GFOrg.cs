@@ -2,8 +2,8 @@
 
 namespace Server.Application.Entities
 {
-    public class GFHouse
+    public class GFOrg
     {
-        public House Entity { get; set; }
+        public Org Entity { get; set; }
     }
 }

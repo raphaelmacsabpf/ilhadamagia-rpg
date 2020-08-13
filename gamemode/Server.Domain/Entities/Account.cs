@@ -28,5 +28,6 @@ namespace Server.Domain.Entities
         public float LastY { get; set; }
         public float LastZ { get; set; }
         public int? LastHouseInside { get; set; }
+        public int OrgId { get; set; }
     }
 }

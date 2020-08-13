@@ -16,6 +16,7 @@
         PROP_MENU,
         SET_HOUSE,
         GO_TO_HOUSE,
-        SET_PED
+        SET_PED,
+        SET_ORG
     }
 }

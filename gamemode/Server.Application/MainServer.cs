@@ -14,8 +14,9 @@ namespace Server.Application
         private readonly PlayerActions playerActions;
         private readonly ChatManager chatManager;
         private readonly StateManager stateManager;
+        private readonly GameEntitiesManager gameEntitiesManager;
 
-        public MainServer(PlayerInfo playerInfo, CommandManager commandManager, MapManager mapManager, NetworkManager networkManager, PlayerActions playerActions, ChatManager chatManager, StateManager stateManager)
+        public MainServer(PlayerInfo playerInfo, CommandManager commandManager, MapManager mapManager, NetworkManager networkManager, PlayerActions playerActions, ChatManager chatManager, StateManager stateManager, GameEntitiesManager gameEntitiesManager)
         {
             this.playerInfo = playerInfo;
             this.CommandManager = commandManager;
@@ -24,6 +25,7 @@ namespace Server.Application
             this.playerActions = playerActions;
             this.chatManager = chatManager;
             this.stateManager = stateManager;
+            this.gameEntitiesManager = gameEntitiesManager;
             foreach (var player in this.Players)
             {
                 stateManager.PrepareFSMForPlayer(player);
@@ -92,13 +94,13 @@ namespace Server.Application
             switch (eventTriggered)
             {
                 case "die":
-                {
-                    if (gfPlayer.FSM.CanFire(PlayerConnectionTrigger.PLAYER_DIED))
                     {
-                        gfPlayer.FSM.Fire(PlayerConnectionTrigger.PLAYER_DIED);
+                        if (gfPlayer.FSM.CanFire(PlayerConnectionTrigger.PLAYER_DIED))
+                        {
+                            gfPlayer.FSM.Fire(PlayerConnectionTrigger.PLAYER_DIED);
+                        }
+                        return;
                     }
-                    return;
-                }
             }
         }
     }

@@ -7,9 +7,9 @@ using Server.Database;
 using Server.Domain.Enums;
 using Shared.CrossCutting;
 using Stateless;
+using Stateless.Graph;
 using System;
 using System.Linq;
-using Stateless.Graph;
 
 namespace Server.Application.Managers
 {
@@ -21,8 +21,9 @@ namespace Server.Application.Managers
         private readonly MapManager mapManager;
         private readonly PlayerActions playerActions;
         private readonly AccountRepository accountRepository;
+        private readonly GameEntitiesManager gameEntitiesManager;
 
-        public StateManager(ChatManager chatManager, PlayerInfo playerInfo, NetworkManager networkManager, MapManager mapManager, PlayerActions playerActions, AccountRepository accountRepository)
+        public StateManager(ChatManager chatManager, PlayerInfo playerInfo, NetworkManager networkManager, MapManager mapManager, PlayerActions playerActions, AccountRepository accountRepository, GameEntitiesManager gameEntitiesManager)
         {
             this.chatManager = chatManager;
             this.playerInfo = playerInfo;
@@ -30,6 +31,7 @@ namespace Server.Application.Managers
             this.mapManager = mapManager;
             this.playerActions = playerActions;
             this.accountRepository = accountRepository;
+            this.gameEntitiesManager = gameEntitiesManager;
         }
 
         public void PrepareFSMForPlayer(Player player)
@@ -193,13 +195,13 @@ namespace Server.Application.Managers
                             }
                             else
                             {
-                                gfPlayer.SpawnPosition = new Vector3(309.6f, -728.7297f, 29.3136f);
+                                SetSpawnToOrganization(gfPlayer);
                             }
                             gfPlayer.IsFirstSpawn = false;
                         }
                         else
                         {
-                            gfPlayer.SpawnPosition = new Vector3(309.6f, -728.7297f, 29.3136f);
+                            SetSpawnToOrganization(gfPlayer);
                         }
                     }
 
@@ -231,6 +233,19 @@ namespace Server.Application.Managers
             Console.WriteLine(graphText);
 
             return fsm;
+        }
+
+        private void SetSpawnToOrganization(GFPlayer gfPlayer)
+        {
+            var playerOrg = gameEntitiesManager.GetGFOrgById(gfPlayer.Account.OrgId);
+            if (playerOrg == null)
+            {
+                gfPlayer.SpawnPosition = new Vector3(309.6f, -728.7297f, 29.3136f);
+            }
+            else
+            {
+                gfPlayer.SpawnPosition = new Vector3(playerOrg.Entity.SpawnX, playerOrg.Entity.SpawnY, playerOrg.Entity.SpawnZ);
+            }
         }
     }
 }
