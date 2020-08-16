@@ -38,6 +38,7 @@ namespace Client.Application
                 case "/ircasa": return CommandCode.GO_TO_HOUSE;
                 case "/setskin": return CommandCode.SET_PED;
                 case "/setorg": return CommandCode.SET_ORG;
+                case "/dararma": return CommandCode.GIVE_WEAPON;
                 default: return CommandCode.INVALID_COMMAND;
             }
         }

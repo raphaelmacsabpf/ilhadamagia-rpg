@@ -1,6 +1,6 @@
-﻿namespace Shared.CrossCuting.Domain.Enums
+﻿namespace GF.CrossCutting.Enums
 {
-    public enum DomainVehicleHash : uint
+    public enum GameVehicleHash : uint
     {
         Chimera = 6774487,
         CarbonRS = 11251904,

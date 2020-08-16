@@ -47,7 +47,8 @@
     <Compile Include="ChatColorValue.cs" />
     <Compile Include="CommandCode.cs" />
     <Compile Include="CommandPacket.cs" />
-    <Compile Include="Domain\Enums\DomainVehicleHash.cs" />
+    <Compile Include="Enums\GameWeaponHash.cs" />
+    <Compile Include="Enums\GameVehicleHash.cs" />
     <Compile Include="Dto\InteractionTargetDto.cs" />
     <Compile Include="Dto\MarkerDto.cs" />
     <Compile Include="Dto\PlayerVarDto.cs" />
@@ -59,9 +60,10 @@
     <Compile Include="MenuType.cs" />
     <Compile Include="NUIViewType.cs" />
     <Compile Include="PayloadType.cs" />
-    <Compile Include="PedModels.cs" />
+    <Compile Include="Converters\PedModelsConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VehicleConvert.cs" />
+    <Compile Include="Converters\VehicleConverter.cs" />
+    <Compile Include="Converters\WeaponConverter.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

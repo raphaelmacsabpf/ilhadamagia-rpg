@@ -1,9 +1,8 @@
 ﻿using CitizenFX.Core;
 using Newtonsoft.Json;
-using Server.Application.Managers;
 using Shared.CrossCutting;
 
-namespace Server.Application
+namespace Server.Application.Managers
 {
     public class MenuManager : BaseScript
     {

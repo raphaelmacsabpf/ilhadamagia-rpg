@@ -2,10 +2,10 @@
 using GF.CrossCutting;
 using GF.CrossCutting.Dto;
 using Server.Application.Entities;
-using Server.Domain.Enums;
 using Shared.CrossCutting;
 using System;
 using System.Linq;
+using GF.CrossCutting.Converters;
 
 namespace Server.Application.Managers
 {
@@ -189,7 +189,6 @@ namespace Server.Application.Managers
                             this.playerActions.SetPlayerArmour(targetGfPlayer, value);
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $"Você deu {value} de colete para {targetGfPlayer.Account.Username}");
                             this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $"O Admin {targetGfPlayer.Account.Username} te deu {value} de colete");
-                            this.playerActions.GiveWeaponToPlayer(sourceGFPlayer, WeaponHash.HeavySniperMk2, 200, false, true); // TODO: Remover isso quando sistema de armas estiver pronto
                         }
                         return;
                     }
@@ -265,12 +264,12 @@ namespace Server.Application.Managers
                 case CommandCode.SET_PED:
                     {
                         if (commandValidator.WithAdminLevel(4).WithTargetPlayer()
-                            .WithVarBetween<int>(0, PedModels.GetPedModelMaxId(), "ped-model-id")
-                            .IsValid($"USE: /setskin [playerid] [id(0-{PedModels.GetPedModelMaxId()}]"))
+                            .WithVarBetween<int>(0, PedModelsConverter.GetPedModelMaxId(), "ped-model-id")
+                            .IsValid($"USE: /setskin [playerid] [id(0-{PedModelsConverter.GetPedModelMaxId()}]"))
                         {
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                             var pedId = commandValidator.GetVar<int>("ped-model-id");
-                            var pedModelHash = PedModels.GetHashStringById(pedId);
+                            var pedModelHash = PedModelsConverter.GetHashStringById(pedId);
                             if (pedModelHash != null)
                             {
                                 targetGfPlayer.Account.PedModel = pedModelHash;
@@ -284,7 +283,7 @@ namespace Server.Application.Managers
                 case CommandCode.SET_ORG:
                     {
                         if (commandValidator.WithAdminLevel(4).WithTargetPlayer()
-                            .WithVarBetween<int>(0, PedModels.GetPedModelMaxId(), "org-id")
+                            .WithVarBetween<int>(0, PedModelsConverter.GetPedModelMaxId(), "org-id")
                             .IsValid($"USE: /setorg [playerid] [org-id(0-{gameEntitiesManager.GetMaxOrgId()}]"))
                         {
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
@@ -299,6 +298,26 @@ namespace Server.Application.Managers
                             stateManager.RespawnPlayerInCurrentPosition(targetGfPlayer);
                             this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" Sua organização foi alterada para {gfOrg.Entity.Name} pelo admin {sourceGFPlayer.Account.Username}");
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você alterou a organização de {targetGfPlayer.Account.Username} para {gfOrg.Entity.Name}");
+                        }
+                        return;
+                    }
+                case CommandCode.GIVE_WEAPON:
+                    {
+                        if (commandValidator.WithAdminLevel(4).WithTargetPlayer()
+                            .WithVarBetween<int>(0, WeaponConverter.GetWeaponMaxId(), "weapon-id")
+                            .WithVarBetween<int>(0, 1000, "ammo-count")
+                            .IsValid($"USE: /dararma [playerid] [weapon-id(1-{WeaponConverter.GetWeaponMaxId()}] [ammo-count(0-1000)]"))
+                        {
+                            GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                            var weaponId = commandValidator.GetVar<int>("weapon-id");
+                            var ammoCount = commandValidator.GetVar<int>("ammo-count");
+
+                            var weaponModelHash = WeaponConverter.GetWeaponHashById(weaponId);
+                            var weaponName = WeaponConverter.GetWeaponNameById(weaponId);
+                            
+                            this.playerActions.GiveWeaponToPlayer(sourceGFPlayer, (uint)weaponModelHash, ammoCount, false, true); // TODO: Remover isso quando sistema de armas estiver pronto
+                            this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" O admin {sourceGFPlayer.Account.Username} lhe concedeu uma {weaponName} com {ammoCount} de munição");
+                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você concedeu uma {weaponName} com {ammoCount} de munição para {targetGfPlayer.Account.Username}");
                         }
                         return;
                     }

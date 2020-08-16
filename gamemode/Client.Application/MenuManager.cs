@@ -3,9 +3,10 @@ using GF.CrossCutting;
 using GF.CrossCutting.Dto;
 using MenuAPI;
 using Newtonsoft.Json;
-using Shared.CrossCuting.Domain.Enums;
 using Shared.CrossCutting;
 using System.Collections.Generic;
+using GF.CrossCutting.Converters;
+using GF.CrossCutting.Enums;
 
 namespace Client.Application
 {
@@ -47,8 +48,8 @@ namespace Client.Application
             foreach (var vehicle in vehicleList)
             {
                 index++;
-                var vehicleHash = (DomainVehicleHash)vehicle.Hash;
-                var vehicleName = VehicleConvert.GetVehicleName(vehicleHash);
+                var vehicleHash = (GameVehicleHash)vehicle.Hash;
+                var vehicleName = VehicleConverter.GetVehicleName(vehicleHash);
                 var menuItem = new MenuItem($"#{index} {vehicleName}", $"Combustível: {vehicle.Fuel}%, Conservação: {vehicle.EngineHealth}%");
                 menuItem.ItemData = vehicle.Guid;
                 vehicleListMenu.AddMenuItem(menuItem);

@@ -41,9 +41,9 @@ namespace Server.Application
             gfPlayer.Player.TriggerEvent("GF:Client:SetPedArmour", value);
         }
 
-        public void GiveWeaponToPlayer(GFPlayer gfPlayer, WeaponHash weaponHash, int ammoCount, bool isHidden, bool equipNow)
+        public void GiveWeaponToPlayer(GFPlayer gfPlayer, uint weaponHash, int ammoCount, bool isHidden, bool equipNow)
         {
-            gfPlayer.Player.TriggerEvent("GF:Client:GiveWeaponToPed", (uint)weaponHash, ammoCount, isHidden, equipNow);
+            gfPlayer.Player.TriggerEvent("GF:Client:GiveWeaponToPed", weaponHash, ammoCount, isHidden, equipNow);
         }
 
         public void SetPlayerMoney(GFPlayer gfPlayer, int money)

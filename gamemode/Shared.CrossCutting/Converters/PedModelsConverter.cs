@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace GF.CrossCutting
 {
-    public class PedModels
+    public class PedModelsConverter
     {
-        static PedModels()
+        static PedModelsConverter()
         {
             AllPedsDictionary = new Dictionary<string, string>()
             {

@@ -11,6 +11,7 @@ class App extends Component {
     }
     this.accountListComponent = undefined;
   }
+
   componentWillMount() {
     window.addEventListener('message', this.handleEvent);
   }
