@@ -10,13 +10,14 @@ namespace Server.Application
     {
         private readonly PlayerInfo playerInfo;
         private readonly ChatManager chatManager;
-        private GFPlayer sourceGFPlayer;
+        private readonly GFPlayer sourceGFPlayer;
         private readonly CommandPacket commandPacket;
         private GFPlayer targetGFPlayer;
         private readonly string[] commandArgs;
+        private readonly List<string> variableNames;
         private int nextArgPosition;
-        private List<string> errorMessages;
-        private Dictionary<string, object> commandVariables;
+        private readonly List<string> errorMessages;
+        private readonly Dictionary<string, object> commandVariables;
 
         public CommandValidator(PlayerInfo playerInfo, ChatManager chatManager, GFPlayer gfPlayer, CommandPacket commandPacket)
         {
@@ -25,6 +26,7 @@ namespace Server.Application
             this.sourceGFPlayer = gfPlayer;
             this.commandPacket = commandPacket;
             this.commandArgs = new string[0];
+            this.variableNames = new List<string>();
 
             if (commandPacket.HasArgs) // TODO: Empacotar em método privado
             {
@@ -49,20 +51,20 @@ namespace Server.Application
             return this;
         }
 
-        public CommandValidator WithTargetPlayer()
+        public CommandValidator WithTargetPlayer(string varName)
         {
-            string nextArgumentValue = GetNextArgumentValue();
+            string nextArgumentValue = GetNextArgumentValue(varName);
             if (nextArgumentValue != null)
             {
                 this.targetGFPlayer = GetPlayerByIdOrName(nextArgumentValue);
                 if (this.targetGFPlayer == null)
                 {
-                    this.errorMessages.Add($"{nextArgumentValue} não é um id/username válido");
+                    this.errorMessages.Add($"{nextArgumentValue} não é um {varName} válido");
                 }
             }
             else
             {
-                this.errorMessages.Add("Informe um id/username válido");
+                this.errorMessages.Add($"Informe um {varName} válido");
             }
 
             return this;
@@ -70,7 +72,7 @@ namespace Server.Application
 
         public CommandValidator WithVarBetween<TVarType>(TVarType min, TVarType max, string varName)
         {
-            string nextArgumentValue = GetNextArgumentValue();
+            string nextArgumentValue = GetNextArgumentValue(varName);
             if (nextArgumentValue != null)
             {
                 var type = typeof(TVarType);
@@ -82,7 +84,7 @@ namespace Server.Application
                     bool parseInt = Int32.TryParse(nextArgumentValue, out nextArgumentValueInt);
                     if (parseInt == false || nextArgumentValueInt < minInt || nextArgumentValueInt > maxInt)
                     {
-                        this.errorMessages.Add($"{nextArgumentValue} não é um valor válido por não estar entre {min} e {max}");
+                        this.errorMessages.Add($"{nextArgumentValue} não é um {varName} válido por não estar entre {min} e {max}");
                     }
                     else if (parseInt == true)
                     {
@@ -92,7 +94,7 @@ namespace Server.Application
             }
             else
             {
-                this.errorMessages.Add("Informe um valor válido");
+                this.errorMessages.Add($"Informe um {varName} válido");
             }
 
             return this;
@@ -103,14 +105,7 @@ namespace Server.Application
             try
             {
                 var textValue = commandPacket.Text.Split(new string[] { " " }, this.nextArgPosition + 1, StringSplitOptions.RemoveEmptyEntries)[this.nextArgPosition];
-                if (textValue == null)
-                {
-                    this.errorMessages.Add("Você precisa informar um texto ao final deste comando");
-                }
-                else
-                {
-                    this.commandVariables.Add(varName, textValue);
-                }
+                this.commandVariables.Add(varName, textValue);
             }
             catch (Exception)
             {
@@ -122,14 +117,14 @@ namespace Server.Application
 
         public CommandValidator WithVarString(string varName)
         {
-            string nextArgumentValue = GetNextArgumentValue();
+            string nextArgumentValue = GetNextArgumentValue(varName);
             if (nextArgumentValue != null)
             {
                 commandVariables.Add(varName, nextArgumentValue);
             }
             else
             {
-                this.errorMessages.Add("Informe um valor válido");
+                this.errorMessages.Add($"Informe um {varName} válido");
             }
 
             return this;
@@ -146,10 +141,12 @@ namespace Server.Application
 
         public bool IsValid(string commandSyntax = null)
         {
-            foreach (string errorMessage in this.errorMessages)
+            for (var i = 0; i < this.errorMessages.Count; i++)
             {
-                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, $"*ARG: {errorMessage}");
+                var errorMessage = this.errorMessages[i];
+                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, $"*ARG [{variableNames[i]}]: {errorMessage}");
             }
+
             if (this.errorMessages.Count > 0 && commandSyntax != null)
             {
                 this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_WHITE, commandSyntax);
@@ -169,16 +166,16 @@ namespace Server.Application
 
         public TVarType GetVar<TVarType>(string variableName)
         {
-            object variableValue;
-            if (commandVariables.TryGetValue(variableName, out variableValue) == false)
+            if (commandVariables.TryGetValue(variableName, out var variableValue) == false)
             {
                 throw new InvalidOperationException($"GetVar<{typeof(TVarType).Name}>() failed to locate variable value for: {variableName}");
             }
             return (TVarType)variableValue;
         }
 
-        private string GetNextArgumentValue()
+        private string GetNextArgumentValue(string varName)
         {
+            this.variableNames.Add(varName);
             if (commandArgs.Length > nextArgPosition)
             {
                 var nextArgumentValue = commandArgs[nextArgPosition];
@@ -190,8 +187,7 @@ namespace Server.Application
 
         private GFPlayer GetPlayerByIdOrName(string playerStr)
         {
-            int parsedId;
-            bool parseSucceed = Int32.TryParse(playerStr, out parsedId);
+            bool parseSucceed = Int32.TryParse(playerStr, out var parsedId);
             var gfPlayerList = this.playerInfo.GetGFPlayerList();
             if (parseSucceed)
             {

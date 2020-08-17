@@ -122,7 +122,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.GO:
                     {
-                        if (commandValidator.WithAdminLevel(1).WithTargetPlayer().IsValid("USE: /ir [playerid]"))
+                        if (commandValidator.WithAdminLevel(1).WithTargetPlayer("playerid").IsValid("USE: /ir [playerid]"))
                         {
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                             var targetPosition = targetGfPlayer.Player.Character.Position + new Vector3(0f, 2f, -1f); // I don't know why this -1f???? WTF???
@@ -134,7 +134,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.BRING:
                     {
-                        if (commandValidator.WithAdminLevel(1).WithTargetPlayer().IsValid("USE: /trazer [playerid]"))
+                        if (commandValidator.WithAdminLevel(1).WithTargetPlayer("playerid").IsValid("USE: /trazer [playerid]"))
                         {
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                             var sourcePosition = sourceGFPlayer.Player.Character.Position + new Vector3(0f, 2f, -1f); // I don't know why this -1f???? WTF???
@@ -167,7 +167,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.SET_ADMIN:
                     {
-                        if (commandValidator.WithAdminLevel(3001).WithTargetPlayer().WithVarBetween<int>(0, 3001, "level").IsValid("USE: /setadmin [playerid] [nivel(0-3001)]"))
+                        if (commandValidator.WithAdminLevel(3001).WithTargetPlayer("playerid").WithVarBetween<int>(0, 3001, "level").IsValid("USE: /setadmin [playerid] [nivel(0-3001)]"))
                         {
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                             int level = commandValidator.GetVar<int>("level");
@@ -181,7 +181,7 @@ namespace Server.Application.Managers
 
                 case CommandCode.SET_ARMOUR:
                     {
-                        if (commandValidator.WithAdminLevel(1).WithTargetPlayer().WithVarBetween<int>(0, 100, "armour").IsValid("USE: /setcolete [playerid] [colete(0-100)]"))
+                        if (commandValidator.WithAdminLevel(1).WithTargetPlayer("playerid").WithVarBetween<int>(0, 100, "armour").IsValid("USE: /setcolete [playerid] [colete(0-100)]"))
                         {
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                             int value = commandValidator.GetVar<int>("armour");
@@ -242,7 +242,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.SET_HOUSE:
                     {
-                        if (commandValidator.WithAdminLevel(3001).WithTargetPlayer().WithVarBetween<int>(1, mapManager.HouseCount, "house-id").IsValid($"USE: /setcasa [playerid] [id(1-{mapManager.HouseCount})]"))
+                        if (commandValidator.WithAdminLevel(3001).WithTargetPlayer("playerid").WithVarBetween<int>(1, mapManager.HouseCount, "house-id").IsValid($"USE: /setcasa [playerid] [id(1-{mapManager.HouseCount})]"))
                         {
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                             int houseId = commandValidator.GetVar<int>("house-id");
@@ -263,7 +263,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.SET_PED:
                     {
-                        if (commandValidator.WithAdminLevel(4).WithTargetPlayer()
+                        if (commandValidator.WithAdminLevel(4).WithTargetPlayer("playerid")
                             .WithVarBetween<int>(0, PedModelsConverter.GetPedModelMaxId(), "ped-model-id")
                             .IsValid($"USE: /setskin [playerid] [id(0-{PedModelsConverter.GetPedModelMaxId()}]"))
                         {
@@ -282,7 +282,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.SET_ORG:
                     {
-                        if (commandValidator.WithAdminLevel(4).WithTargetPlayer()
+                        if (commandValidator.WithAdminLevel(4).WithTargetPlayer("playerid")
                             .WithVarBetween<int>(0, PedModelsConverter.GetPedModelMaxId(), "org-id")
                             .IsValid($"USE: /setorg [playerid] [org-id(0-{gameEntitiesManager.GetMaxOrgId()}]"))
                         {
@@ -303,7 +303,7 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.GIVE_WEAPON:
                     {
-                        if (commandValidator.WithAdminLevel(4).WithTargetPlayer()
+                        if (commandValidator.WithAdminLevel(4).WithTargetPlayer("playerid")
                             .WithVarBetween<int>(0, WeaponConverter.GetWeaponMaxId(), "weapon-id")
                             .WithVarBetween<int>(0, 1000, "ammo-count")
                             .IsValid($"USE: /dararma [playerid] [weapon-id(1-{WeaponConverter.GetWeaponMaxId()}] [ammo-count(0-1000)]"))
