@@ -1,11 +1,11 @@
 ﻿using CitizenFX.Core;
 using GF.CrossCutting;
+using GF.CrossCutting.Converters;
 using GF.CrossCutting.Dto;
 using Server.Application.Entities;
 using Shared.CrossCutting;
 using System;
 using System.Linq;
-using GF.CrossCutting.Converters;
 
 namespace Server.Application.Managers
 {
@@ -178,7 +178,19 @@ namespace Server.Application.Managers
                         }
                         return;
                     }
+                case CommandCode.SET_HEALTH:
+                    {
+                        if (commandValidator.WithAdminLevel(1).WithTargetPlayer("playerid").WithVarBetween<int>(0, 1000, "health").IsValid("USE: /setsaude [playerid] [health(0-1000)]"))
+                        {
+                            GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                            int value = commandValidator.GetVar<int>("health");
 
+                            this.playerActions.SetPlayerHealth(targetGfPlayer, value);
+                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $"Você deu {value} de saúde para {targetGfPlayer.Account.Username}");
+                            this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $"O Admin {targetGfPlayer.Account.Username} te deu {value} de saúde");
+                        }
+                        return;
+                    }
                 case CommandCode.SET_ARMOUR:
                     {
                         if (commandValidator.WithAdminLevel(1).WithTargetPlayer("playerid").WithVarBetween<int>(0, 100, "armour").IsValid("USE: /setcolete [playerid] [colete(0-100)]"))
@@ -314,7 +326,7 @@ namespace Server.Application.Managers
 
                             var weaponModelHash = WeaponConverter.GetWeaponHashById(weaponId);
                             var weaponName = WeaponConverter.GetWeaponNameById(weaponId);
-                            
+
                             this.playerActions.GiveWeaponToPlayer(sourceGFPlayer, (uint)weaponModelHash, ammoCount, false, true); // TODO: Remover isso quando sistema de armas estiver pronto
                             this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" O admin {sourceGFPlayer.Account.Username} lhe concedeu uma {weaponName} com {ammoCount} de munição");
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você concedeu uma {weaponName} com {ammoCount} de munição para {targetGfPlayer.Account.Username}");

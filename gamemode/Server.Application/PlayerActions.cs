@@ -3,7 +3,6 @@ using GF.CrossCutting;
 using Newtonsoft.Json;
 using Server.Application.Entities;
 using Server.Application.Managers;
-using Server.Domain.Enums;
 using Shared.CrossCutting;
 using System;
 
@@ -39,6 +38,11 @@ namespace Server.Application
         public void SetPlayerArmour(GFPlayer gfPlayer, int value)
         {
             gfPlayer.Player.TriggerEvent("GF:Client:SetPedArmour", value);
+        }
+
+        public void SetPlayerHealth(GFPlayer gfPlayer, int value)
+        {
+            gfPlayer.Player.TriggerEvent("GF:Client:SetPedHealth", value);
         }
 
         public void GiveWeaponToPlayer(GFPlayer gfPlayer, uint weaponHash, int ammoCount, bool isHidden, bool equipNow)

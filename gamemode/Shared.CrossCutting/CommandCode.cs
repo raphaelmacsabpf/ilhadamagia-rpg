@@ -18,6 +18,7 @@
         GO_TO_HOUSE,
         SET_PED,
         SET_ORG,
-        GIVE_WEAPON
+        GIVE_WEAPON,
+        SET_HEALTH
     }
 }

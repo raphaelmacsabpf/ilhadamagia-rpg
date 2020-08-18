@@ -257,6 +257,11 @@ namespace Client.Application
             this.playerActions.GivePlayerWeapon((WeaponHash)weaponHash, ammoCount, isHidden, equipNow);
         }
 
+        public void GFSetPedHealth(int value)
+        {
+            this.playerActions.SetPlayerHealth(value);
+        }
+
         public void GFSetPedArmour(int value)
         {
             this.playerActions.SetPlayerArmour(value);

@@ -62,6 +62,11 @@ namespace Client.Application
             API.GiveWeaponToPed(Game.PlayerPed.Handle, (uint)weaponHash, ammoCount, isHidden, equipNow);
         }
 
+        internal void SetPlayerHealth(int value)
+        {
+            API.SetEntityHealth(Game.PlayerPed.Handle, value);
+        }
+
         internal void SetPlayerArmour(int value)
         {
             API.SetPedArmour(Game.PlayerPed.Handle, value);

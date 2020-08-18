@@ -42,6 +42,7 @@ namespace Client.Application
             EventHandlers["GF:Client:Kill"] += new Action(mainClient.GFKill);
             EventHandlers["GF:Client:SetPlayerPos"] += new Action<Vector3>(mainClient.GFSetPlayerPos);
             EventHandlers["GF:Client:TeleportPlayerToPosition"] += new Action<Vector3, int>(mainClient.GFTeleportPlayerToPosition);
+            EventHandlers["GF:Client:SetPedHealth"] += new Action<int>(mainClient.GFSetPedHealth);
             EventHandlers["GF:Client:SetPedArmour"] += new Action<int>(mainClient.GFSetPedArmour);
             EventHandlers["GF:Client:GiveWeaponToPed"] += new Action<uint, int, bool, bool>(mainClient.GFGiveWeaponToPed);
             EventHandlers["Chat:GF:Client:OnClientText"] += new Action<string>(mainClient.OnClienText);

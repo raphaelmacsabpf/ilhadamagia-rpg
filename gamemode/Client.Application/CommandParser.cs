@@ -31,6 +31,7 @@ namespace Client.Application
                 case "/trazer": return CommandCode.BRING;
                 case "/save": return CommandCode.SAVE;
                 case "/setadmin": return CommandCode.SET_ADMIN;
+                case "/setsaude": return CommandCode.SET_HEALTH;
                 case "/setcolete": return CommandCode.SET_ARMOUR;
                 case "/coords": return CommandCode.GO_TO_COORDS;
                 case "/prop": return CommandCode.PROP_MENU;
