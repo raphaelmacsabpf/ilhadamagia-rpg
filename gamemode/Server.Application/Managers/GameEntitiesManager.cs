@@ -1,4 +1,5 @@
-﻿using Server.Application.Entities;
+﻿using System;
+using Server.Application.Entities;
 using Server.Database;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,7 @@ namespace Server.Application.Managers
 {
     public class GameEntitiesManager
     {
+        public event EventHandler<List<GFOrg>> OnOrgsLoad;
         private readonly int maxOrgId;
         private readonly OrgRepository orgRepository;
         private readonly List<GFOrg> orgs;
@@ -29,6 +31,12 @@ namespace Server.Application.Managers
                     maxOrgId = orgEntity.Id;
                 }
             }
+            
+        }
+
+        public void InvokeInitialEvents()
+        {
+            OnOrgsLoad?.Invoke(this, this.orgs);
         }
 
         public int GetMaxOrgId()

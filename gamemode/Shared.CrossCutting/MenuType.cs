@@ -3,5 +3,6 @@
     public enum MenuType
     {
         House = 1,
+        Org
     }
 }

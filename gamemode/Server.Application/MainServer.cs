@@ -44,6 +44,12 @@ namespace Server.Application
                 }
             }), true);
 
+            gameEntitiesManager.OnOrgsLoad += (sender, orgs) =>
+            {
+                mapManager.CreateOrgsSpawn(orgs);
+            };
+
+            gameEntitiesManager.InvokeInitialEvents();
             Console.WriteLine("[IM MainServer] Started MainServer");
         }
 

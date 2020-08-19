@@ -8,6 +8,7 @@ using Shared.CrossCutting.Dto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GF.CrossCutting.Dto;
 
 namespace Server.Application.Managers
 {
@@ -220,6 +221,29 @@ namespace Server.Application.Managers
         private bool IsValidHouseId(int houseId)
         {
             return this.houses.Exists((house) => house.Entity.Id == houseId);
+        }
+
+        public void CreateOrgsSpawn(List<GFOrg> orgs)
+        {
+            foreach (var org in orgs)
+            {
+                if (org.Entity.Id > 0)
+                {
+                    this.AddInterationMarkerWithNotification(org.Entity.SpawnX, org.Entity.SpawnY, org.Entity.SpawnZ, MarkerColor.COLOR_YELLOW, $"{org.Entity.Name}, aperte ~o~E~s~ para interagir", ((gfPlayer, player) => OnPlayerInteractWithOrg(gfPlayer, org)));
+                } 
+            }
+        }
+
+        private void OnPlayerInteractWithOrg(GFPlayer gfPlayer, GFOrg gfOrg)
+        {
+            var orgDataDto = new OrgDataDto()
+            {
+                Name = gfOrg.Entity.Name,
+                Leader = gfOrg.Entity.Leader,
+                Members = new List<string>() // TODO: Load org members from repository in the right place
+            };
+
+            playerActions.OpenMenu(gfPlayer, MenuType.Org, orgDataDto);
         }
     }
 }

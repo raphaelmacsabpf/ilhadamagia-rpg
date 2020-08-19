@@ -18,5 +18,10 @@ namespace Server.Database
         {
             return this.mySqlConnection.Query<Org>("SELECT * FROM imtb_org;");
         }
+
+        public IEnumerable<string> GetOrgMembersById(int orgId)
+        {
+            return this.mySqlConnection.Query<string>(""); // TODO: Implement GetOrgMembers query
+        }
     }
 }

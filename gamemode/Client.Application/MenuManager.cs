@@ -26,6 +26,7 @@ namespace Client.Application
             switch (menuType)
             {
                 case MenuType.House: OpenHouseMenu(jsonPayload); break;
+                case MenuType.Org: OpenOrgMenu(jsonPayload); break;
             }
         }
 
@@ -63,6 +64,16 @@ namespace Client.Application
 
             // Prevent menu opening by 'M' key
             MenuController.MenuToggleKey = (Control)(-1);
+        }
+
+        private void OpenOrgMenu(string jsonPayload)
+        {
+            var orgData = JsonConvert.DeserializeObject<OrgDataDto>(jsonPayload);
+            // TODO: Continuar daqui, fazer o parse do json OrgDataDto e inserir informações do menu
+            MenuController.MenuAlignment = MenuController.MenuAlignmentOption.Right;
+            Menu menu = new Menu("Menu - Org", orgData.Name); // TODO: Colocar nome dinâmico
+            MenuController.AddMenu(menu);
+            menu.OpenMenu();
         }
 
         private void VehicleListMenu_OnItemSelect(Menu menu, MenuItem menuItem, int itemIndex)

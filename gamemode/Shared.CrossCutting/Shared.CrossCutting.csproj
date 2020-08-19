@@ -47,6 +47,7 @@
     <Compile Include="ChatColorValue.cs" />
     <Compile Include="CommandCode.cs" />
     <Compile Include="CommandPacket.cs" />
+    <Compile Include="Dto\OrgDataDto.cs" />
     <Compile Include="Enums\GameWeaponHash.cs" />
     <Compile Include="Enums\GameVehicleHash.cs" />
     <Compile Include="Dto\InteractionTargetDto.cs" />
