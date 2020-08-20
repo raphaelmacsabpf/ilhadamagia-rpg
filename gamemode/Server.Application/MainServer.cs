@@ -82,7 +82,7 @@ namespace Server.Application
             {
                 deferrals.update("Still checking:" + (i + 1));
 
-                await Delay(20);
+                await Delay(1);
             }
             Console.WriteLine($"[Connected] ID:{player.Handle}, PlayerName: {playerName}, IP: {player.EndPoint}, License: {player.Identifiers["license"]}");
             deferrals.done();

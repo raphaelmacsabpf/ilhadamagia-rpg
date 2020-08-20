@@ -613,7 +613,7 @@ namespace GF.CrossCutting
 
         public static int GetPedModelMaxId()
         {
-            return AllPedsDictionary.Count;
+            return AllPedsDictionary.Count - 1; // TODO: avaliar se esse menos 1 é valido
         }
 
 

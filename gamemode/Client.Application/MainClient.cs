@@ -210,20 +210,12 @@ namespace Client.Application
             callbackResponse("200");
         }
 
-        public async void onVeh() // TODO: Add complete /veh command
+        public async void onVeh(uint vehicleHashUInt) // TODO: Add complete /veh command
         {
-            for (int i = 0; i < 1; i++)
-            {
-                var model = new Model(VehicleHash.Infernus);
-                // create the vehicle
-                var vehicle = await World.CreateVehicle(model, Game.PlayerPed.Position, Game.PlayerPed.Heading);
-
-                // set the player ped into the vehicle and driver seat
-                Game.PlayerPed.SetIntoVehicle(vehicle, VehicleSeat.Driver);
-                // tell the player
-                this.playerActions.SendMessageToPlayerChat(ChatColor.COLOR_GRAD1, $"Woohoo! Enjoy your new ^*{model}!");
-                await Delay(250);
-            }
+            var vehicleHash = (VehicleHash) vehicleHashUInt;
+            var model = new Model(vehicleHash);
+            var vehicle = await World.CreateVehicle(model, Game.PlayerPed.Position, Game.PlayerPed.Heading);
+            Game.PlayerPed.SetIntoVehicle(vehicle, VehicleSeat.Driver);
         }
 
         // GF Functions

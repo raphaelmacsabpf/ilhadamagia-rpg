@@ -36,9 +36,10 @@ namespace GF.CrossCutting.Converters
             var defaultWeaponName = weaponHash.ToString();
             return defaultWeaponName;
         }
+
         public static int GetWeaponMaxId()
         {
-            return Enum.GetValues(typeof(GameWeaponHash)).Length;
+            return Enum.GetValues(typeof(GameWeaponHash)).Length - 1; // TODO: avaliar se esse menos 1 é valido
         }
     }
 }

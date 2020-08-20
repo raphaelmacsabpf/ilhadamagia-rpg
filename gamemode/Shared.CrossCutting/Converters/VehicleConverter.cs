@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GF.CrossCutting.Enums;
 
 namespace GF.CrossCutting.Converters
@@ -24,6 +25,32 @@ namespace GF.CrossCutting.Converters
 
             var defaultVehicleName = vehicleHash.ToString();
             return defaultVehicleName;
+        }
+
+        public static GameVehicleHash GetVehicleHashById(int id)
+        {
+            Array values = Enum.GetValues(typeof(GameVehicleHash));
+            var vehicleHash = (GameVehicleHash)values.GetValue(id);
+            return vehicleHash;
+        }
+
+        public static string GetVehicleNameById(int id)
+        {
+            Array values = Enum.GetValues(typeof(GameVehicleHash));
+            var vehicleHash = (GameVehicleHash)values.GetValue(id);
+
+            if (vehicleNames.TryGetValue(vehicleHash, out var customVehicleName))
+            {
+                return customVehicleName;
+            }
+
+            var defaultWeaponName = vehicleHash.ToString();
+            return defaultWeaponName;
+        }
+
+        public static int GetVehicleMaxId()
+        {
+            return Enum.GetValues(typeof(GameVehicleHash)).Length - 1; // TODO: avaliar se esse menos 1 é valido
         }
     }
 }

@@ -110,7 +110,19 @@ namespace Server.Application.Managers
                 // TODO: Criar este comando corretamente
                 case CommandCode.VEH:
                     {
-                        sourceGFPlayer.Player.TriggerEvent("client:Client:Veh");
+                        if (commandValidator.WithAdminLevel(4).WithTargetPlayer("playerid")
+                            .WithVarBetween<int>(0, VehicleConverter.GetVehicleMaxId(), "vehicle-id")
+                            .IsValid($"USE: /veh [playerid] [vehicle-id(0-{VehicleConverter.GetVehicleMaxId()}]"))
+                        {
+                            GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                            var vehicleId = commandValidator.GetVar<int>("vehicle-id");
+                            var vehicleModelHash = VehicleConverter.GetVehicleHashById(vehicleId);
+                            var vehicleName = VehicleConverter.GetVehicleNameById(vehicleId);
+
+                            targetGfPlayer.Player.TriggerEvent("client:Client:Veh", (uint) vehicleModelHash); // TODO: Colocar evento dentro do playeractions
+                            this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" O admin {sourceGFPlayer.Account.Username} lhe concedeu um {vehicleName}");
+                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você concedeu um {vehicleName} para {targetGfPlayer.Account.Username}");
+                        }
                         return;
                     }
                 case CommandCode.KILL:
@@ -317,8 +329,8 @@ namespace Server.Application.Managers
                     {
                         if (commandValidator.WithAdminLevel(4).WithTargetPlayer("playerid")
                             .WithVarBetween<int>(0, WeaponConverter.GetWeaponMaxId(), "weapon-id")
-                            .WithVarBetween<int>(0, 1000, "ammo-count")
-                            .IsValid($"USE: /dararma [playerid] [weapon-id(1-{WeaponConverter.GetWeaponMaxId()}] [ammo-count(0-1000)]"))
+                            .WithVarBetween<int>(0, 250, "ammo-count")
+                            .IsValid($"USE: /dararma [playerid] [weapon-id(0-{WeaponConverter.GetWeaponMaxId()}] [ammo-count(0-250)]"))
                         {
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                             var weaponId = commandValidator.GetVar<int>("weapon-id");
@@ -327,7 +339,7 @@ namespace Server.Application.Managers
                             var weaponModelHash = WeaponConverter.GetWeaponHashById(weaponId);
                             var weaponName = WeaponConverter.GetWeaponNameById(weaponId);
 
-                            this.playerActions.GiveWeaponToPlayer(sourceGFPlayer, (uint)weaponModelHash, ammoCount, false, true); // TODO: Remover isso quando sistema de armas estiver pronto
+                            this.playerActions.GiveWeaponToPlayer(sourceGFPlayer, (uint)weaponModelHash, ammoCount, false, true);
                             this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" O admin {sourceGFPlayer.Account.Username} lhe concedeu uma {weaponName} com {ammoCount} de munição");
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você concedeu uma {weaponName} com {ammoCount} de munição para {targetGfPlayer.Account.Username}");
                         }

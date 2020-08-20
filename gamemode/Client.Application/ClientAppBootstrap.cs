@@ -34,7 +34,7 @@ namespace Client.Application
 
             // Commands
             EventHandlers["client:Client:Info"] += new Action(mainClient.OnInfo);
-            EventHandlers["client:Client:Veh"] += new Action(mainClient.onVeh);
+            EventHandlers["client:Client:Veh"] += new Action<uint>(mainClient.onVeh);
 
             // GF Events
             EventHandlers["GF:Client:SendClientMessage"] += new Action<int, string>(mainClient.GFSendClientMessage);
