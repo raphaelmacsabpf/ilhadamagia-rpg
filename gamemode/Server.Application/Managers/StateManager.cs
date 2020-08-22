@@ -215,7 +215,7 @@ namespace Server.Application.Managers
                 .OnEntry(() =>
                 {
                     var fastSpawn = gfPlayer.SpawnType == SpawnType.ToCoords;
-                    playerActions.SpawnPlayer(gfPlayer, gfPlayer.Account.PedModel, gfPlayer.SpawnPosition.X, gfPlayer.SpawnPosition.Y, gfPlayer.SpawnPosition.Z, 0, fastSpawn); // HACK: Pegar skin do banco para spawnar
+                    playerActions.SpawnPlayer(gfPlayer, gfPlayer.Account.PedModel, gfPlayer.SpawnPosition.X, gfPlayer.SpawnPosition.Y, gfPlayer.SpawnPosition.Z, 0, fastSpawn);
                     gfPlayer.SpawnType = SpawnType.Unset;
                 });
 

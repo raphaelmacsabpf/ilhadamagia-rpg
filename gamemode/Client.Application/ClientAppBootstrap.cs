@@ -32,9 +32,8 @@ namespace Client.Application
             EventHandlers["onClientMapStart"] += new Action(mainClient.OnPlayerMapStart);
             EventHandlers["onClientResourceStart"] += new Action<string>(mainClient.OnClientResourceStart);
 
-            // Commands
+            // TODO: Remover comando Info
             EventHandlers["client:Client:Info"] += new Action(mainClient.OnInfo);
-            EventHandlers["client:Client:Veh"] += new Action<uint>(mainClient.onVeh);
 
             // GF Events
             EventHandlers["GF:Client:SendClientMessage"] += new Action<int, string>(mainClient.GFSendClientMessage);
@@ -53,6 +52,7 @@ namespace Client.Application
             EventHandlers["GF:Client:OpenMenu"] += new Action<int, string, int>(menuManager.OpenMenu);
             EventHandlers["GF:Client:OpenNUIView"] += new Action<int, bool, string, int>(mainClient.OpenNUIView);
             EventHandlers["GF:Client:CloseNUIView"] += new Action<int, bool>(mainClient.CloseNUIView); // TODO: Mudar de close para Hide (faz mais sentido)
+            EventHandlers["GF:Client:CreatePlayerVehicle"] += new Action<uint>(mainClient.CreatePlayerVehicle);
             mainClientHandler = mainClient;
         }
 

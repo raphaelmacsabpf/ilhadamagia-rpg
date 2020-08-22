@@ -5,6 +5,7 @@ using Server.Application.Entities;
 using Server.Application.Managers;
 using Shared.CrossCutting;
 using System;
+using GF.CrossCutting.Enums;
 
 namespace Server.Application
 {
@@ -81,6 +82,11 @@ namespace Server.Application
         public void CloseNUIView(GFPlayer gfPlayer, NUIViewType nuiViewType, bool cancelFocus)
         {
             gfPlayer.Player.TriggerEvent("GF:Client:CloseNUIView", (int)nuiViewType, cancelFocus);
+        }
+
+        public void CreatePlayerVehicle(GFPlayer gfPlayer, GameVehicleHash vehicleHash)
+        {
+            gfPlayer.Player.TriggerEvent("GF:Client:CreatePlayerVehicle", (uint)vehicleHash);
         }
     }
 }

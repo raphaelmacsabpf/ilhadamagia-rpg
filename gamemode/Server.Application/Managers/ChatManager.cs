@@ -72,9 +72,26 @@ namespace Server.Application.Managers
             }
         }
 
+        public void ProxDetectorColorFixed(float radi, GFPlayer gfPlayer, string message, ChatColor color)
+        {
+            var player = gfPlayer.Player;
+            foreach (GFPlayer i in this.playerInfo.GetGFPlayerList())
+            {
+                var position = i.Player.Character.Position;
+                var tempposx = player.Character.Position.X - position.X;
+                var tempposy = player.Character.Position.Y - position.Y;
+                var tempposz = player.Character.Position.Z - position.Z;
+
+                if (((tempposx < radi) && (tempposx > -radi)) && ((tempposy < radi) && (tempposy > -radi)) && ((tempposz < radi) && (tempposz > -radi)))
+                {
+                    SendClientMessage(i, color, message);
+                }
+            }
+        }
+
         internal void OnChatMessage([FromSource] Player player, string message) // TODO: PROTEGER OnChatMessage
         {
-            var wholeMessageCharsIsUppercase = (message.CompareTo(message.ToUpper()) == 0);
+            var wholeMessageCharsIsUppercase = message.CompareTo(message.ToUpper()) == 0;
             var gfPlayer = playerInfo.GetGFPlayer(player);
             if (wholeMessageCharsIsUppercase)
             {

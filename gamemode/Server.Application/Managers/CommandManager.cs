@@ -107,7 +107,6 @@ namespace Server.Application.Managers
                         this.chatManager.SendClientMessageToAll(ChatColor.TEAM_ROTAM_COLOR, "Estou testando esta cor legal | " + $"[ID: {sourceGFPlayer.Player.Handle}] {sourceGFPlayer.Account.Username} diz: Teste");
                         return;
                     }
-                // TODO: Criar este comando corretamente
                 case CommandCode.VEH:
                     {
                         if (commandValidator.WithAdminLevel(4).WithTargetPlayer("playerid")
@@ -119,7 +118,7 @@ namespace Server.Application.Managers
                             var vehicleModelHash = VehicleConverter.GetVehicleHashById(vehicleId);
                             var vehicleName = VehicleConverter.GetVehicleNameById(vehicleId);
 
-                            targetGfPlayer.Player.TriggerEvent("client:Client:Veh", (uint) vehicleModelHash); // TODO: Colocar evento dentro do playeractions
+                            this.playerActions.CreatePlayerVehicle(targetGfPlayer, vehicleModelHash);
                             this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" O admin {sourceGFPlayer.Account.Username} lhe concedeu um {vehicleName}");
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você concedeu um {vehicleName} para {targetGfPlayer.Account.Username}");
                         }
@@ -129,7 +128,7 @@ namespace Server.Application.Managers
                     {
                         if (commandValidator.WithAdminLevel(1).IsValid())
                             // sourcePlayer.TriggerEvent("GF:Client:DeleteVehicle", this.mapManager.lastHandle); // TODO: Não esquecer deste exemplo aqui e continuar ele.
-                            this.playerActions.KillPlayer(sourceGFPlayer); // TODO: Algum dia, proteger esse comando para só admin pegar (desenvolver contas antes)
+                            this.playerActions.KillPlayer(sourceGFPlayer);
                         return;
                     }
                 case CommandCode.GO:
@@ -139,8 +138,8 @@ namespace Server.Application.Managers
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                             var targetPosition = targetGfPlayer.Player.Character.Position + new Vector3(0f, 2f, -1f); // I don't know why this -1f???? WTF???
                             this.playerActions.SetPlayerPos(sourceGFPlayer, targetPosition);
-                            this.chatManager.ProxDetectorColors(10.0f, targetGfPlayer, $"*Admin {sourceGFPlayer.Account.Username} veio até {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE);
-                            this.chatManager.ProxDetectorColors(10.0f, sourceGFPlayer, $"*Admin {sourceGFPlayer.Account.Username} foi até {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE);
+                            this.chatManager.ProxDetectorColorFixed(10.0f, targetGfPlayer, $"*Admin {sourceGFPlayer.Account.Username} veio até {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE);
+                            this.chatManager.ProxDetectorColorFixed(10.0f, sourceGFPlayer, $"*Admin {sourceGFPlayer.Account.Username} foi até {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE);
                         }
                         return;
                     }
@@ -151,8 +150,8 @@ namespace Server.Application.Managers
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                             var sourcePosition = sourceGFPlayer.Player.Character.Position + new Vector3(0f, 2f, -1f); // I don't know why this -1f???? WTF???
                             this.playerActions.SetPlayerPos(targetGfPlayer, sourcePosition);
-                            this.chatManager.ProxDetectorColors(10.0f, sourceGFPlayer, $"*Admin {sourceGFPlayer.Account.Username} trouxe {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE);
-                            this.chatManager.ProxDetectorColors(10.0f, targetGfPlayer, $"*Admin {sourceGFPlayer.Account.Username} levou {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE, ChatColor.COLOR_PURPLE);
+                            this.chatManager.ProxDetectorColorFixed(10.0f, sourceGFPlayer, $"*Admin {sourceGFPlayer.Account.Username} trouxe {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE);
+                            this.chatManager.ProxDetectorColorFixed(10.0f, targetGfPlayer, $"*Admin {sourceGFPlayer.Account.Username} levou {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE);
                         }
                         return;
                     }

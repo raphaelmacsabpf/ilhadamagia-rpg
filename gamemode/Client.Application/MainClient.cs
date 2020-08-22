@@ -210,7 +210,7 @@ namespace Client.Application
             callbackResponse("200");
         }
 
-        public async void onVeh(uint vehicleHashUInt) // TODO: Add complete /veh command
+        public async void CreatePlayerVehicle(uint vehicleHashUInt)
         {
             var vehicleHash = (VehicleHash) vehicleHashUInt;
             var model = new Model(vehicleHash);
