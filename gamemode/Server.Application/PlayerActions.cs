@@ -1,11 +1,11 @@
 ﻿using CitizenFX.Core;
 using GF.CrossCutting;
+using GF.CrossCutting.Enums;
 using Newtonsoft.Json;
 using Server.Application.Entities;
 using Server.Application.Managers;
 using Shared.CrossCutting;
 using System;
-using GF.CrossCutting.Enums;
 
 namespace Server.Application
 {
@@ -87,6 +87,16 @@ namespace Server.Application
         public void CreatePlayerVehicle(GFPlayer gfPlayer, GameVehicleHash vehicleHash)
         {
             gfPlayer.Player.TriggerEvent("GF:Client:CreatePlayerVehicle", (uint)vehicleHash);
+        }
+
+        public void SwitchOutPlayer(GFPlayer gfPlayer)
+        {
+            gfPlayer.Player.TriggerEvent("GF:Client:SwitchOutPlayer");
+        }
+
+        public void SwitchInPlayer(GFPlayer gfPlayer, float x, float y, float z)
+        {
+            gfPlayer.Player.TriggerEvent("GF:Client:SwitchInPlayer", x, y, z);
         }
     }
 }

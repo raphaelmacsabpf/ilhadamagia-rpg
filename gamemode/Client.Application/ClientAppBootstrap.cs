@@ -54,6 +54,8 @@ namespace Client.Application
             EventHandlers["GF:Client:OpenNUIView"] += new Action<int, bool, string, int>(mainClient.OpenNUIView);
             EventHandlers["GF:Client:CloseNUIView"] += new Action<int, bool>(mainClient.CloseNUIView); // TODO: Mudar de close para Hide (faz mais sentido)
             EventHandlers["GF:Client:CreatePlayerVehicle"] += new Action<uint>(mainClient.CreatePlayerVehicle);
+            EventHandlers["GF:Client:SwitchOutPlayer"] += new Action(mainClient.SwitchOutPlayer);
+            EventHandlers["GF:Client:SwitchInPlayer"] += new Action<float, float, float>(mainClient.SwitchInPlayer);
             mainClientHandler = mainClient;
         }
 

@@ -60,6 +60,7 @@ namespace Server.Application.Managers
             var position = gfPlayer.Player.Character.Position;
             gfPlayer.SpawnType = SpawnType.ToCoords;
             gfPlayer.SpawnPosition = position;
+            gfPlayer.SwitchInPosition = position;
             gfPlayer.FSM.Fire(PlayerConnectionTrigger.SET_TO_SPAWN);
         }
 
@@ -170,7 +171,7 @@ namespace Server.Application.Managers
                 });
 
             fsm.Configure(PlayerConnectionState.SELECT_SPAWN_POSITION)
-                .Permit(PlayerConnectionTrigger.SET_TO_SPAWN, PlayerConnectionState.SPAWNED)
+                .Permit(PlayerConnectionTrigger.SWITCHED_OUT, PlayerConnectionState.SPAWNING)
                 .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
                 .OnEntry((transition) =>
                 {
@@ -180,7 +181,9 @@ namespace Server.Application.Managers
                         {
                             if (DateTime.Now - gfPlayer.Account.UpdatedAt < TimeSpan.FromSeconds(600))
                             {
-                                gfPlayer.SpawnPosition = new Vector3(gfPlayer.Account.LastX, gfPlayer.Account.LastY, gfPlayer.Account.LastZ);
+                                var spawnPosition = new Vector3(gfPlayer.Account.LastX, gfPlayer.Account.LastY, gfPlayer.Account.LastZ);
+                                gfPlayer.SpawnPosition = spawnPosition;
+                                gfPlayer.SwitchInPosition = spawnPosition;
                                 var accountLastHouseInside = gfPlayer.Account.LastHouseInside;
                                 if (accountLastHouseInside != null)
                                 {
@@ -190,8 +193,10 @@ namespace Server.Application.Managers
                             }
                             else if (gfPlayer.SelectedHouse != null)
                             {
+                                var houseEntity = gfPlayer.SelectedHouse.Entity;
                                 gfPlayer.CurrentHouseInside = gfPlayer.SelectedHouse;
                                 gfPlayer.SpawnPosition = mapManager.GetHouseInteriorPosition(gfPlayer.SelectedHouse);
+                                gfPlayer.SwitchInPosition = new Vector3(houseEntity.EntranceX, houseEntity.EntranceY, houseEntity.EntranceZ);
                             }
                             else
                             {
@@ -204,8 +209,15 @@ namespace Server.Application.Managers
                             SetSpawnToOrganization(gfPlayer);
                         }
                     }
+                    this.playerActions.SwitchOutPlayer(gfPlayer);
+                });
 
-                    fsm.Fire(PlayerConnectionTrigger.SET_TO_SPAWN);
+            fsm.Configure(PlayerConnectionState.SPAWNING)
+                .Permit(PlayerConnectionTrigger.SWITCHED_IN, PlayerConnectionState.SPAWNED)
+                .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
+                .OnEntry(() =>
+                {
+                    this.playerActions.SwitchInPlayer(gfPlayer, gfPlayer.SwitchInPosition.X, gfPlayer.SwitchInPosition.Y, gfPlayer.SwitchInPosition.Z);
                 });
 
             fsm.Configure(PlayerConnectionState.SPAWNED)
@@ -238,14 +250,18 @@ namespace Server.Application.Managers
         private void SetSpawnToOrganization(GFPlayer gfPlayer)
         {
             var playerOrg = gameEntitiesManager.GetGFOrgById(gfPlayer.Account.OrgId);
+            Vector3 spawnPosition;
             if (playerOrg == null)
             {
-                gfPlayer.SpawnPosition = new Vector3(309.6f, -728.7297f, 29.3136f);
+                spawnPosition = new Vector3(309.6f, -728.7297f, 29.3136f);
             }
             else
             {
-                gfPlayer.SpawnPosition = new Vector3(playerOrg.Entity.SpawnX, playerOrg.Entity.SpawnY, playerOrg.Entity.SpawnZ);
+                spawnPosition = new Vector3(playerOrg.Entity.SpawnX, playerOrg.Entity.SpawnY, playerOrg.Entity.SpawnZ);
             }
+
+            gfPlayer.SpawnPosition = spawnPosition;
+            gfPlayer.SwitchInPosition = spawnPosition;
         }
     }
 }

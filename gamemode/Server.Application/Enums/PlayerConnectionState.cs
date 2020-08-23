@@ -10,6 +10,7 @@
         LOGGED,
         DROPPED,
         SELECT_SPAWN_POSITION,
+        SPAWNING,
         SPAWNED,
         DIED
     }

@@ -107,6 +107,16 @@ namespace Server.Application
                         }
                         return;
                     }
+                case "switched-out":
+                    {
+                        gfPlayer.FSM.Fire(PlayerConnectionTrigger.SWITCHED_OUT);
+                        return;
+                    }
+                case "switched-in":
+                    {
+                        gfPlayer.FSM.Fire(PlayerConnectionTrigger.SWITCHED_IN);
+                        return;
+                    }
             }
         }
     }

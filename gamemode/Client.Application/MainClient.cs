@@ -155,7 +155,6 @@ namespace Client.Application
 
         public void OnClienText(string textInput)
         {
-            
             bool cancelEvent = true;
             if (textInput[0] == '/')
             {
@@ -180,7 +179,19 @@ namespace Client.Application
         public async void OnDie(int killerType, dynamic deathCoords)
         {
             API.CancelEvent();
+            var deathScreenEffects = new[] { "DeathFailOut", "DeathFailNeutralIn", "DeathFailMPDark", "DeathFailMPIn", "RaceTurbo" };
+            var random = new Random().Next(deathScreenEffects.Length - 1);
+            API.StartScreenEffect(deathScreenEffects[random], 8000, false);
+            API.StartScreenEffect("CamPushInTrevor", 8000, false);
+            await Delay(6000);
+            API.DoScreenFadeOut(300);
+            while (API.IsScreenFadingOut())
+            {
+                await Delay(16);
+            }
             TriggerServerEvent("GF:Server:TriggerStateEvent", "die");
+            await Delay(1000);
+            API.StopAllScreenEffects();
         }
 
         public async void OnPlayerMapStart()
@@ -214,7 +225,7 @@ namespace Client.Application
 
         public async void CreatePlayerVehicle(uint vehicleHashUInt)
         {
-            var vehicleHash = (VehicleHash) vehicleHashUInt;
+            var vehicleHash = (VehicleHash)vehicleHashUInt;
             var model = new Model(vehicleHash);
             var vehicle = await World.CreateVehicle(model, Game.PlayerPed.Position, Game.PlayerPed.Heading);
             Game.PlayerPed.SetIntoVehicle(vehicle, VehicleSeat.Driver);
@@ -264,7 +275,6 @@ namespace Client.Application
         public async Task Wait1SecondTickHandler()
         {
             await Delay(1000);
-
             var missionRowJailDoorHashKey = (uint)API.GetHashKey("v_ilev_ph_cellgate");
 
             // Mission Row cell 1
@@ -286,6 +296,44 @@ namespace Client.Application
 
             // Hide police blips
             API.SetPoliceRadarBlips(false);
+        }
+
+        public async void SwitchOutPlayer()
+        {
+            if (API.IsScreenFadedOut())
+            {
+                API.DoScreenFadeIn(300);
+                while (API.IsScreenFadedIn())
+                {
+                    await Delay(16);
+                }
+            }
+            API.SwitchOutPlayer(Game.PlayerPed.Handle, 0, 1);
+            while (API.GetPlayerSwitchState() != 5)
+            {
+                await Delay(1);
+            }
+            TriggerServerEvent("GF:Server:TriggerStateEvent", "switched-out");
+        }
+
+        public async void SwitchInPlayer(float x, float y, float z)
+        {
+            Game.PlayerPed.Position = new Vector3(x, y, z);
+            if (API.IsScreenFadedOut())
+            {
+                API.DoScreenFadeIn(300);
+                while (API.IsScreenFadedIn())
+                {
+                    await Delay(16);
+                }
+            }
+
+            API.SwitchInPlayer(Game.PlayerPed.Handle);
+            while (API.GetPlayerSwitchState() != 12)
+            {
+                await Delay(1);
+            }
+            TriggerServerEvent("GF:Server:TriggerStateEvent", "switched-in");
         }
     }
 }

@@ -10,6 +10,8 @@
         ACCOUNT_SELECTED,
         SELECTING_SPAWN_POSITION,
         SET_TO_SPAWN,
-        PLAYER_DIED
+        PLAYER_DIED,
+        SWITCHED_OUT,
+        SWITCHED_IN
     }
 }

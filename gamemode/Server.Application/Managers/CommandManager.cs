@@ -126,9 +126,14 @@ namespace Server.Application.Managers
                     }
                 case CommandCode.KILL:
                     {
-                        if (commandValidator.WithAdminLevel(1).IsValid())
+                        if (commandValidator.WithAdminLevel(1).WithTargetPlayer("playerid").IsValid("USE: /kill [playerid]"))
+                        {
+                            var targetGfPlayer = commandValidator.GetTargetGFPlayer();
                             // sourcePlayer.TriggerEvent("GF:Client:DeleteVehicle", this.mapManager.lastHandle); // TODO: Não esquecer deste exemplo aqui e continuar ele.
-                            this.playerActions.KillPlayer(sourceGFPlayer);
+                            this.playerActions.KillPlayer(targetGfPlayer);
+                            this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $"*Admin {sourceGFPlayer.Account.Username} te matou");
+                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $"*Você matou {targetGfPlayer.Account.Username}");
+                        }
                         return;
                     }
                 case CommandCode.GO:

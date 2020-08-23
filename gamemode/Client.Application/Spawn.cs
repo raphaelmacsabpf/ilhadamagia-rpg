@@ -47,19 +47,12 @@ namespace Client.Application
             }
         }
 
-        public static async Task SpawnPlayer(string skin, float x, float y, float z, float heading, bool fastSpawn)
+        public static async Task SpawnPlayer(string skin, float x, float y, float z, float heading, bool fastSpawn) // TODO: 02/09/2020 Rever fastspawn após switchin
         {
             if (_spawnLock)
                 return;
 
             _spawnLock = true;
-
-            DoScreenFadeOut(fastSpawn ? 1 : 500);
-
-            while (IsScreenFadingOut())
-            {
-                await Delay(1);
-            }
 
             FreezePlayer(PlayerId(), true);
             var skinHashKey = GetHashKey(skin);
@@ -88,12 +81,6 @@ namespace Client.Application
             }
 
             ShutdownLoadingScreen();
-            DoScreenFadeIn(fastSpawn ? 1 : 500);
-
-            while (IsScreenFadingIn())
-            {
-                await Delay(1);
-            }
 
             FreezePlayer(PlayerId(), false);
             _spawnLock = false;
