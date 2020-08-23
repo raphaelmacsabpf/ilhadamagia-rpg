@@ -7,6 +7,7 @@ using Shared.CrossCutting;
 using Shared.CrossCutting.Dto;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Client.Application
 {
@@ -141,7 +142,7 @@ namespace Client.Application
                     }
                 case PayloadType.TO_STATIC_PROXIMITY_TARGETS:
                     {
-                        this.targetsManager.ProximityTargets = JsonConvert.DeserializeObject<List<ProximityTargetDto>>(payload);
+                        this.targetsManager.ProximityTargets.AddRange(JsonConvert.DeserializeObject<List<ProximityTargetDto>>(payload));
                         return;
                     }
                 case PayloadType.TO_STATIC_INTERACTION_TARGETS:
@@ -154,6 +155,7 @@ namespace Client.Application
 
         public void OnClienText(string textInput)
         {
+            
             bool cancelEvent = true;
             if (textInput[0] == '/')
             {
@@ -257,6 +259,33 @@ namespace Client.Application
         public void GFSetPedArmour(int value)
         {
             this.playerActions.SetPlayerArmour(value);
+        }
+
+        public async Task Wait1SecondTickHandler()
+        {
+            await Delay(1000);
+
+            var missionRowJailDoorHashKey = (uint)API.GetHashKey("v_ilev_ph_cellgate");
+
+            // Mission Row cell 1
+            var policeDepartmentCell1 = API.GetClosestObjectOfType(462.381f, -993.651f, 24.9149f, 1.0f, missionRowJailDoorHashKey, false, false, false);
+            API.SetEntityRotation(policeDepartmentCell1, 0, 0, -90, 0, true);
+            API.FreezeEntityPosition(policeDepartmentCell1, true);
+
+            // Mission Row cell 2
+            var policeDepartmentCell2 = API.GetClosestObjectOfType(462.331f, -998.152f, 24.9149f, 1.0f, missionRowJailDoorHashKey, false, false, false);
+            API.SetEntityRotation(policeDepartmentCell2, -180, 180, 90, 1, true);
+            API.FreezeEntityPosition(policeDepartmentCell2, true);
+
+            // Mission Row cell 3
+            var policeDepartmentCell3 = API.GetClosestObjectOfType(462.704f, -1001.92f, 24.9149f, 1.0f, missionRowJailDoorHashKey, false, false, false);
+            API.SetEntityRotation(policeDepartmentCell3, -180, 180, 90, 1, true);
+            API.FreezeEntityPosition(policeDepartmentCell3, true);
+
+            // TODO: 29/08/2020 Implementar sistema de abre e fecha das portas da DP Mission Row
+
+            // Hide police blips
+            API.SetPoliceRadarBlips(false);
         }
     }
 }
