@@ -213,22 +213,23 @@ namespace Server.Application.Managers
                 });
 
             fsm.Configure(PlayerConnectionState.SPAWNING)
+                .PermitReentry(PlayerConnectionTrigger.SET_TO_SPAWN)
                 .Permit(PlayerConnectionTrigger.SWITCHED_IN, PlayerConnectionState.SPAWNED)
                 .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
                 .OnEntry(() =>
                 {
                     this.playerActions.SwitchInPlayer(gfPlayer, gfPlayer.SwitchInPosition.X, gfPlayer.SwitchInPosition.Y, gfPlayer.SwitchInPosition.Z);
+                    var fastSpawn = gfPlayer.SpawnType == SpawnType.ToCoords;
+                    playerActions.SpawnPlayer(gfPlayer, gfPlayer.Account.PedModel, gfPlayer.SpawnPosition.X, gfPlayer.SpawnPosition.Y, gfPlayer.SpawnPosition.Z, 0, fastSpawn);
+                    gfPlayer.SpawnType = SpawnType.Unset;
                 });
 
             fsm.Configure(PlayerConnectionState.SPAWNED)
-                .PermitReentry(PlayerConnectionTrigger.SET_TO_SPAWN)
                 .Permit(PlayerConnectionTrigger.PLAYER_DIED, PlayerConnectionState.DIED)
                 .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
                 .OnEntry(() =>
                 {
-                    var fastSpawn = gfPlayer.SpawnType == SpawnType.ToCoords;
-                    playerActions.SpawnPlayer(gfPlayer, gfPlayer.Account.PedModel, gfPlayer.SpawnPosition.X, gfPlayer.SpawnPosition.Y, gfPlayer.SpawnPosition.Z, 0, fastSpawn);
-                    gfPlayer.SpawnType = SpawnType.Unset;
+                    // TODO: Implementar ações quando o player spawnar, o que? eu não sei
                 });
 
             fsm.Configure(PlayerConnectionState.DIED)
