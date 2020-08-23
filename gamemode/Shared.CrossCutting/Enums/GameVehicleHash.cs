@@ -258,6 +258,7 @@
         Benson = 2053223216,
         Tyrus = 2067820283,
         Lurcher = 2068293287,
+        Oppressor2 = 2069146067,
         Insurgent2 = 2071877360,
         Bison2 = 2072156101,
         Carbonizzare = 2072687711,
