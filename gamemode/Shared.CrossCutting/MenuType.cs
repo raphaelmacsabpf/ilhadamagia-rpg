@@ -4,6 +4,7 @@
     {
         House = 1,
         Org,
-        Ammunation
+        Ammunation,
+        GasStation
     }
 }

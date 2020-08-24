@@ -245,7 +245,7 @@ namespace Server.Application.Managers
         {
             foreach (var ammunation in ammunations)
             {
-                this.blips.Add(new BlipDto("Loja de Armas", 110, 45, ammunation.ShopCounterPosition.X, ammunation.ShopCounterPosition.Y, ammunation.ShopCounterPosition.Z));
+                this.blips.Add(new BlipDto("Loja de Armas", 110, 45, ammunation.ShopCounterPosition.X, ammunation.ShopCounterPosition.Y, ammunation.ShopCounterPosition.Z, 1.0f));
                 this.AddInterationMarkerWithNotification(ammunation.ShopCounterPosition.X, ammunation.ShopCounterPosition.Y, ammunation.ShopCounterPosition.Z, MarkerColor.COLOR_GREEN, $"Ammunation {ammunation.Name}, aperte ~o~E~s~ para interagir", ((gfPlayer, player) => OnPlayerInteractWithAmmunation(gfPlayer, ammunation)));
             }
         }
@@ -265,6 +265,20 @@ namespace Server.Application.Managers
         private void OnPlayerInteractWithAmmunation(GFPlayer gfPlayer, GFAmmunation ammunation)
         {
             playerActions.OpenMenu(gfPlayer, MenuType.Ammunation, ammunation.Name);
+        }
+
+        public void CreateGasStations(List<GFGasStation> gasStations)
+        {
+            foreach (var gasStation in gasStations)
+            {
+                this.blips.Add(new BlipDto("Posto de Gasolina", 361, 0, gasStation.Position.X, gasStation.Position.Y, gasStation.Position.Z, 0.75f));
+                this.AddInterationMarkerWithNotification(gasStation.Position.X, gasStation.Position.Y, gasStation.Position.Z, MarkerColor.COLOR_GREEN, $"Posto de gasolina {gasStation.Name}, aperte ~o~E~s~ para interagir", ((gfPlayer, player) => OnPlayerInteractWithGasStation(gfPlayer, gasStation)));
+            }
+        }
+
+        private void OnPlayerInteractWithGasStation(GFPlayer gfPlayer, GFGasStation gasStation)
+        {
+            playerActions.OpenMenu(gfPlayer, MenuType.GasStation, gasStation.Name);
         }
     }
 }

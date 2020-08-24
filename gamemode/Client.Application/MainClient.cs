@@ -164,6 +164,7 @@ namespace Client.Application
                             API.BeginTextCommandSetBlipName("STRING");
                             API.AddTextComponentString(mapBlip.Category);
                             API.EndTextCommandSetBlipName(blipHandle);
+                            API.SetBlipScale(blipHandle, mapBlip.Scale);
                         }
                         return;
                     }

@@ -54,6 +54,11 @@ namespace Server.Application
                 mapManager.CreateAmmunationsStore(ammunations);
             };
 
+            gameEntitiesManager.OnGasStationsLoad += (sender, gasStations) =>
+            {
+                mapManager.CreateGasStations(gasStations);
+            };
+
             gameEntitiesManager.InvokeInitialEvents();
             Console.WriteLine("[IM MainServer] Started MainServer");
         }

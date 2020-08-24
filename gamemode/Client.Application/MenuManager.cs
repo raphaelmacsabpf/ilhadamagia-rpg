@@ -31,6 +31,7 @@ namespace Client.Application
                 case MenuType.House: OpenHouseMenu(jsonPayload); break;
                 case MenuType.Org: OpenOrgMenu(jsonPayload); break;
                 case MenuType.Ammunation: OpenAmmunationMenu(jsonPayload); break;
+                case MenuType.GasStation: OpenGasStationMenu(jsonPayload); break;
             }
         }
 
@@ -69,7 +70,7 @@ namespace Client.Application
         private void OpenOrgMenu(string jsonPayload)
         {
             var orgData = JsonConvert.DeserializeObject<OrgDataDto>(jsonPayload);
-            Menu menu = new Menu("Menu - Org", orgData.Name);
+            Menu menu = new Menu("Organização", orgData.Name);
             MenuController.AddMenu(menu);
             menu.OpenMenu();
         }
@@ -77,7 +78,7 @@ namespace Client.Application
         private void OpenAmmunationMenu(string jsonPayload)
         {
             var ammunationName = JsonConvert.DeserializeObject<string>(jsonPayload);
-            Menu menu = new Menu("Menu - Ammunation", ammunationName);
+            Menu menu = new Menu("Ammunation", ammunationName);
             MenuController.AddMenu(menu);
 
             var pistols = new MenuItem("Pistolas");
@@ -89,6 +90,20 @@ namespace Client.Application
             pistolsMenu.AddMenuItem(new MenuItem("Heavy Revolver", "6 balas") { ItemData = new object[] { GameWeaponHash.Revolver, 6 }, LeftIcon = MenuItem.Icon.GUN });
             MenuController.AddSubmenu(menu, pistolsMenu);
             MenuController.BindMenuItem(menu, pistolsMenu, pistols);
+
+            menu.OpenMenu();
+        }
+
+        private void OpenGasStationMenu(string jsonPayload)
+        {
+            var gasStationName = JsonConvert.DeserializeObject<string>(jsonPayload);
+            Menu menu = new Menu("Posto de Gasolina", gasStationName);
+            MenuController.AddMenu(menu);
+
+            menu.AddMenuItem(new MenuItem("Abastecer 25%", "Por $1000") { ItemData = new object[] { 25 }, LeftIcon = MenuItem.Icon.INFO });
+            menu.AddMenuItem(new MenuItem("Abastecer 50%", "Por $1500") { ItemData = new object[] { 50 }, LeftIcon = MenuItem.Icon.INFO });
+            menu.AddMenuItem(new MenuItem("Abastecer 75%", "Por $2000") { ItemData = new object[] { 75 }, LeftIcon = MenuItem.Icon.INFO });
+            menu.AddMenuItem(new MenuItem("Abastecer 100%", "Por $2500") { ItemData = new object[] { 100 }, LeftIcon = MenuItem.Icon.INFO });
 
             menu.OpenMenu();
         }
