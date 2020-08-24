@@ -616,8 +616,7 @@ namespace GF.CrossCutting
             return AllPedsDictionary.Count - 1; // TODO: avaliar se esse menos 1 é valido
         }
 
-
-        public static Dictionary<string, string> AllPedsDictionary {get; set;}
+        public static Dictionary<string, string> AllPedsDictionary { get; set; }
 
         private static readonly Dictionary<string, string> MainModels = new Dictionary<string, string>()
         {

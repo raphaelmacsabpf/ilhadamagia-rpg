@@ -1,6 +1,6 @@
-﻿using System;
+﻿using GF.CrossCutting.Enums;
+using System;
 using System.Collections.Generic;
-using GF.CrossCutting.Enums;
 
 namespace GF.CrossCutting.Converters
 {
@@ -19,7 +19,7 @@ namespace GF.CrossCutting.Converters
         public static GameWeaponHash GetWeaponHashById(int id)
         {
             Array values = Enum.GetValues(typeof(GameWeaponHash));
-            var weaponHash = (GameWeaponHash) values.GetValue(id);
+            var weaponHash = (GameWeaponHash)values.GetValue(id);
             return weaponHash;
         }
 

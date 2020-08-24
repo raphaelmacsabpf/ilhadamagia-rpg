@@ -2,6 +2,7 @@
 using CitizenFX.Core.Native;
 using CitizenFX.Core.UI;
 using GF.CrossCutting;
+using GF.CrossCutting.Dto;
 using Newtonsoft.Json;
 using Shared.CrossCutting;
 using Shared.CrossCutting.Dto;
@@ -19,6 +20,7 @@ namespace Client.Application
         private readonly PlayerActions playerActions;
         private readonly TargetsManager targetsManager;
         private readonly ClientNetworkManager clientNetworkManager;
+        private List<BlipDto> mapBlips;
         private bool clientInitializationStarted;
         private string lastPayloadCompressed; // TODO: Remover este campo
         private int lastPayloadUncompressedLength; // TODO: Remover este campo
@@ -148,6 +150,21 @@ namespace Client.Application
                 case PayloadType.TO_STATIC_INTERACTION_TARGETS:
                     {
                         this.targetsManager.InteractionTargets = JsonConvert.DeserializeObject<List<InteractionTargetDto>>(payload);
+                        return;
+                    }
+                case PayloadType.TO_MAP_BLIPS:
+                    {
+                        this.mapBlips = JsonConvert.DeserializeObject<List<BlipDto>>(payload);
+                        foreach (var mapBlip in this.mapBlips)
+                        {
+                            var blipHandle = API.AddBlipForCoord(mapBlip.X, mapBlip.Y, mapBlip.Z);
+                            API.SetBlipSprite(blipHandle, mapBlip.SpriteId);
+                            API.SetBlipColour(blipHandle, mapBlip.Colour);
+                            API.SetBlipAsShortRange(blipHandle, true);
+                            API.BeginTextCommandSetBlipName("STRING");
+                            API.AddTextComponentString(mapBlip.Category);
+                            API.EndTextCommandSetBlipName(blipHandle);
+                        }
                         return;
                     }
             }

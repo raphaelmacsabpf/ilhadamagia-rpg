@@ -49,6 +49,11 @@ namespace Server.Application
                 mapManager.CreateOrgsSpawn(orgs);
             };
 
+            gameEntitiesManager.OnAmmunationsLoad += (sender, ammunations) =>
+            {
+                mapManager.CreateAmmunationsStore(ammunations);
+            };
+
             gameEntitiesManager.InvokeInitialEvents();
             Console.WriteLine("[IM MainServer] Started MainServer");
         }

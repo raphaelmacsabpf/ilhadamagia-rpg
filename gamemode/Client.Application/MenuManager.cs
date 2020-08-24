@@ -1,12 +1,11 @@
 ﻿using CitizenFX.Core;
-using GF.CrossCutting;
+using GF.CrossCutting.Converters;
 using GF.CrossCutting.Dto;
+using GF.CrossCutting.Enums;
 using MenuAPI;
 using Newtonsoft.Json;
 using Shared.CrossCutting;
 using System.Collections.Generic;
-using GF.CrossCutting.Converters;
-using GF.CrossCutting.Enums;
 
 namespace Client.Application
 {
@@ -21,19 +20,23 @@ namespace Client.Application
 
         public void OpenMenu(int menuTypeInt, string compressedJsonPayload, int uncompressedLength)
         {
+            // Prevent menu opening by 'M' key
+            MenuController.MenuToggleKey = (Control)(-1);
+            MenuController.MenuAlignment = MenuController.MenuAlignmentOption.Right;
+
             var jsonPayload = clientNetworkManager.Decompress(compressedJsonPayload, uncompressedLength);
             var menuType = (MenuType)menuTypeInt;
             switch (menuType)
             {
                 case MenuType.House: OpenHouseMenu(jsonPayload); break;
                 case MenuType.Org: OpenOrgMenu(jsonPayload); break;
+                case MenuType.Ammunation: OpenAmmunationMenu(jsonPayload); break;
             }
         }
 
         private void OpenHouseMenu(string jsonPayload)
         {
             var vehicleList = JsonConvert.DeserializeObject<List<VehicleDto>>(jsonPayload);
-            MenuController.MenuAlignment = MenuController.MenuAlignmentOption.Right;
 
             Menu menu = new Menu("Menu - Casa", "Gerencie sua proriedade");
             MenuController.AddMenu(menu);
@@ -61,18 +64,32 @@ namespace Client.Application
             vehicleListMenu.OnItemSelect += VehicleListMenu_OnItemSelect;
 
             menu.OpenMenu();
-
-            // Prevent menu opening by 'M' key
-            MenuController.MenuToggleKey = (Control)(-1);
         }
 
         private void OpenOrgMenu(string jsonPayload)
         {
             var orgData = JsonConvert.DeserializeObject<OrgDataDto>(jsonPayload);
-            // TODO: Continuar daqui, fazer o parse do json OrgDataDto e inserir informações do menu
-            MenuController.MenuAlignment = MenuController.MenuAlignmentOption.Right;
-            Menu menu = new Menu("Menu - Org", orgData.Name); // TODO: Colocar nome dinâmico
+            Menu menu = new Menu("Menu - Org", orgData.Name);
             MenuController.AddMenu(menu);
+            menu.OpenMenu();
+        }
+
+        private void OpenAmmunationMenu(string jsonPayload)
+        {
+            var ammunationName = JsonConvert.DeserializeObject<string>(jsonPayload);
+            Menu menu = new Menu("Menu - Ammunation", ammunationName);
+            MenuController.AddMenu(menu);
+
+            var pistols = new MenuItem("Pistolas");
+            menu.AddMenuItem(pistols);
+
+            var pistolsMenu = new Menu("Pistolas");
+            pistolsMenu.AddMenuItem(new MenuItem("AP Pistol", "18 balas") { ItemData = new object[] { GameWeaponHash.APPistol, 18 }, LeftIcon = MenuItem.Icon.GUN });
+            pistolsMenu.AddMenuItem(new MenuItem("Heavy Pistol", "18 balas") { ItemData = new object[] { GameWeaponHash.HeavyPistol, 18 }, LeftIcon = MenuItem.Icon.GUN });
+            pistolsMenu.AddMenuItem(new MenuItem("Heavy Revolver", "6 balas") { ItemData = new object[] { GameWeaponHash.Revolver, 6 }, LeftIcon = MenuItem.Icon.GUN });
+            MenuController.AddSubmenu(menu, pistolsMenu);
+            MenuController.BindMenuItem(menu, pistolsMenu, pistols);
+
             menu.OpenMenu();
         }
 

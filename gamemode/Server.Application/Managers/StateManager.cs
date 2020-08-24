@@ -166,6 +166,8 @@ namespace Server.Application.Managers
                     this.networkManager.SendPayloadToPlayer(gfPlayer.Player, PayloadType.TO_STATIC_PROXIMITY_TARGETS, json);
                     json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticInteractionTargetsPayload());
                     this.networkManager.SendPayloadToPlayer(gfPlayer.Player, PayloadType.TO_STATIC_INTERACTION_TARGETS, json);
+                    json = JsonConvert.SerializeObject(this.mapManager.PopUpdateBlipsPayload());
+                    this.networkManager.SendPayloadToPlayer(gfPlayer.Player, PayloadType.TO_MAP_BLIPS, json);
 
                     gfPlayer.FSM.Fire(PlayerConnectionTrigger.SELECTING_SPAWN_POSITION);
                 });

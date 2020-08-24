@@ -1,5 +1,6 @@
 ﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using GF.CrossCutting.Dto;
 using Server.Application.Entities;
 using Server.Database;
 using Server.Domain.Enums;
@@ -8,7 +9,6 @@ using Shared.CrossCutting.Dto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GF.CrossCutting.Dto;
 
 namespace Server.Application.Managers
 {
@@ -20,6 +20,7 @@ namespace Server.Application.Managers
         private readonly Dictionary<string, Action<GFPlayer, Player>> interactionTargetsCallbacks;
         private readonly List<GFHouse> houses;
         private readonly Dictionary<InteriorType, Vector3> interiorPositions;
+        private readonly List<BlipDto> blips;
 
         private readonly PlayerInfo playerInfo;
         private readonly ChatManager chatManager;
@@ -39,6 +40,7 @@ namespace Server.Application.Managers
             this.interactionTargetsCallbacks = new Dictionary<string, Action<GFPlayer, Player>>();
             this.houses = new List<GFHouse>();
             this.interiorPositions = new Dictionary<InteriorType, Vector3>();
+            this.blips = new List<BlipDto>();
 
             // Destroy all vehicles
             var currentVehicles = API.GetAllVehicles() as List<object>;
@@ -84,6 +86,11 @@ namespace Server.Application.Managers
         public List<InteractionTargetDto> PopUpdatedStaticInteractionTargetsPayload()
         {
             return this.staticInteractionTargets;
+        }
+
+        public List<BlipDto> PopUpdateBlipsPayload()
+        {
+            return this.blips;
         }
 
         public void OnPlayerTargetActionServerCallback([FromSource] Player player, string callbackId)
@@ -230,7 +237,16 @@ namespace Server.Application.Managers
                 if (org.Entity.Id > 0)
                 {
                     this.AddInterationMarkerWithNotification(org.Entity.SpawnX, org.Entity.SpawnY, org.Entity.SpawnZ, MarkerColor.COLOR_YELLOW, $"{org.Entity.Name}, aperte ~o~E~s~ para interagir", ((gfPlayer, player) => OnPlayerInteractWithOrg(gfPlayer, org)));
-                } 
+                }
+            }
+        }
+
+        public void CreateAmmunationsStore(List<GFAmmunation> ammunations)
+        {
+            foreach (var ammunation in ammunations)
+            {
+                this.blips.Add(new BlipDto("Loja de Armas", 110, 45, ammunation.ShopCounterPosition.X, ammunation.ShopCounterPosition.Y, ammunation.ShopCounterPosition.Z));
+                this.AddInterationMarkerWithNotification(ammunation.ShopCounterPosition.X, ammunation.ShopCounterPosition.Y, ammunation.ShopCounterPosition.Z, MarkerColor.COLOR_GREEN, $"Ammunation {ammunation.Name}, aperte ~o~E~s~ para interagir", ((gfPlayer, player) => OnPlayerInteractWithAmmunation(gfPlayer, ammunation)));
             }
         }
 
@@ -244,6 +260,11 @@ namespace Server.Application.Managers
             };
 
             playerActions.OpenMenu(gfPlayer, MenuType.Org, orgDataDto);
+        }
+
+        private void OnPlayerInteractWithAmmunation(GFPlayer gfPlayer, GFAmmunation ammunation)
+        {
+            playerActions.OpenMenu(gfPlayer, MenuType.Ammunation, ammunation.Name);
         }
     }
 }

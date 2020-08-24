@@ -1,6 +1,6 @@
-﻿using System;
+﻿using GF.CrossCutting.Enums;
+using System;
 using System.Collections.Generic;
-using GF.CrossCutting.Enums;
 
 namespace GF.CrossCutting.Converters
 {

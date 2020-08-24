@@ -7,6 +7,5 @@ namespace GF.CrossCutting.Dto
         public string Name { get; set; }
         public string Leader { get; set; }
         public List<string> Members { get; set; }
-
     }
 }
