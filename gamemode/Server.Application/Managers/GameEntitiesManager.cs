@@ -102,7 +102,8 @@ namespace Server.Application.Managers
                 new GFGasStation("Sandy Shores", new Vector3(2000.769f, 3773.406f, 32.17798f)),
                 new GFGasStation("Downtown Vinewood", new Vector3(619.7802f, 273.9165f, 103.082f)),
                 new GFGasStation("Morningwood", new Vector3(-1443.824f, -273.4813f, 46.21387f)),
-                new GFGasStation("Grapeseed", new Vector3(1689.046f, 4928.505f, 42.06885f))
+                new GFGasStation("Grapeseed", new Vector3(1689.046f, 4928.505f, 42.06885f)),
+                new GFGasStation("Davis", new Vector3(181.1341f, -1561.345f, 29.3136f))
             };
         }
     }
