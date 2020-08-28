@@ -5,6 +5,8 @@
         House = 1,
         Org,
         Ammunation,
-        GasStation
+        GasStation,
+        ATM,
+        ClothingStore
     }
 }

@@ -245,7 +245,7 @@ namespace Server.Application.Managers
         {
             foreach (var ammunation in ammunations)
             {
-                this.blips.Add(new BlipDto("Loja de Armas", 110, 45, ammunation.ShopCounterPosition.X, ammunation.ShopCounterPosition.Y, ammunation.ShopCounterPosition.Z, 1.0f));
+                this.blips.Add(new BlipDto("Loja de Armas", 110, 45, ammunation.ShopCounterPosition.X, ammunation.ShopCounterPosition.Y, ammunation.ShopCounterPosition.Z, 0.9f));
                 this.AddInterationMarkerWithNotification(ammunation.ShopCounterPosition.X, ammunation.ShopCounterPosition.Y, ammunation.ShopCounterPosition.Z, MarkerColor.COLOR_GREEN, $"Ammunation {ammunation.Name}, aperte ~o~E~s~ para interagir", ((gfPlayer, player) => OnPlayerInteractWithAmmunation(gfPlayer, ammunation)));
             }
         }
@@ -271,7 +271,7 @@ namespace Server.Application.Managers
         {
             foreach (var gasStation in gasStations)
             {
-                this.blips.Add(new BlipDto("Posto de Gasolina", 361, 0, gasStation.Position.X, gasStation.Position.Y, gasStation.Position.Z, 0.75f));
+                this.blips.Add(new BlipDto("Posto de Gasolina", 361, 5, gasStation.Position.X, gasStation.Position.Y, gasStation.Position.Z, 0.60f));
                 this.AddInterationMarkerWithNotification(gasStation.Position.X, gasStation.Position.Y, gasStation.Position.Z, MarkerColor.COLOR_GREEN, $"Posto de gasolina {gasStation.Name}, aperte ~o~E~s~ para interagir", ((gfPlayer, player) => OnPlayerInteractWithGasStation(gfPlayer, gasStation)));
             }
         }
@@ -279,6 +279,34 @@ namespace Server.Application.Managers
         private void OnPlayerInteractWithGasStation(GFPlayer gfPlayer, GFGasStation gasStation)
         {
             playerActions.OpenMenu(gfPlayer, MenuType.GasStation, gasStation.Name);
+        }
+
+        private void OnPlayerInteractWithATM(GFPlayer gfPlayer, GFATM atm)
+        {
+            playerActions.OpenMenu(gfPlayer, MenuType.ATM, "Caixa Eletrônico");
+        }
+
+        public void CreateATMs(List<GFATM> atmList)
+        {
+            foreach (var atm in atmList)
+            {
+                this.blips.Add(new BlipDto("Caixa Eletrônico", 276, 2, atm.Position.X, atm.Position.Y, atm.Position.Z, 1f));
+                this.AddInterationMarkerWithNotification(atm.Position.X, atm.Position.Y, atm.Position.Z, MarkerColor.COLOR_GREEN, $"Caixa eletrônico, aperte ~o~E~s~ para interagir", ((gfPlayer, player) => OnPlayerInteractWithATM(gfPlayer, atm)));
+            }
+        }
+
+        public void CreateClothingStores(List<GFClothingStore> clothingStoreList)
+        {
+            foreach (var clothingStore in clothingStoreList)
+            {
+                this.blips.Add(new BlipDto("Loja de Roupas", 73, 0, clothingStore.Position.X, clothingStore.Position.Y, clothingStore.Position.Z, 0.75f));
+                this.AddInterationMarkerWithNotification(clothingStore.Position.X, clothingStore.Position.Y, clothingStore.Position.Z, MarkerColor.COLOR_GREEN, $"Loja de roupas, aperte ~o~E~s~ para interagir", ((gfPlayer, player) => OnPlayerInteractWithClothingStore(gfPlayer, clothingStore)));
+            }
+        }
+
+        private void OnPlayerInteractWithClothingStore(GFPlayer gfPlayer, GFClothingStore clothingStore)
+        {
+            playerActions.OpenMenu(gfPlayer, MenuType.ClothingStore, "Loja de Roupas");
         }
     }
 }

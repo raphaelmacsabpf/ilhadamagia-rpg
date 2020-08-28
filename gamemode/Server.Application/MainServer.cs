@@ -59,6 +59,16 @@ namespace Server.Application
                 mapManager.CreateGasStations(gasStations);
             };
 
+            gameEntitiesManager.OnATMListLoad += (sender, atmList) =>
+            {
+                mapManager.CreateATMs(atmList);
+            };
+
+            gameEntitiesManager.OnClothingStoresLoad += (sender, clothingStoreList) =>
+            {
+                mapManager.CreateClothingStores(clothingStoreList);
+            };
+
             gameEntitiesManager.InvokeInitialEvents();
             Console.WriteLine("[IM MainServer] Started MainServer");
         }
