@@ -308,5 +308,19 @@ namespace Server.Application.Managers
         {
             playerActions.OpenMenu(gfPlayer, MenuType.ClothingStore, "Loja de Roupas");
         }
+
+        private void OnPlayerInteractWithHospital(GFPlayer gfPlayer, GFHospital hospital)
+        {
+            playerActions.OpenMenu(gfPlayer, MenuType.Hospital, "Hospital");
+        }
+
+        public void CreateHospitals(List<GFHospital> hospitalList)
+        {
+            foreach (var hospital in hospitalList)
+            {
+                this.blips.Add(new BlipDto("Hospital", 428, 1, hospital.Position.X, hospital.Position.Y, hospital.Position.Z, 0.75f));
+                this.AddInterationMarkerWithNotification(hospital.Position.X, hospital.Position.Y, hospital.Position.Z, MarkerColor.COLOR_GREEN, "Hospital, aperte ~o~E~s~ para interagir", ((gfPlayer, Player) => OnPlayerInteractWithHospital(gfPlayer, hospital)));
+            }
+        }
     }
 }

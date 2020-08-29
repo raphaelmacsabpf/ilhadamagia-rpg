@@ -7,6 +7,7 @@
         Ammunation,
         GasStation,
         ATM,
-        ClothingStore
+        ClothingStore,
+        Hospital
     }
 }

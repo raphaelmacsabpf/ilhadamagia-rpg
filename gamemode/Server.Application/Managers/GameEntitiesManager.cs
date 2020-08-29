@@ -14,6 +14,7 @@ namespace Server.Application.Managers
         public event EventHandler<List<GFGasStation>> OnGasStationsLoad;
         public event EventHandler<List<GFATM>> OnATMListLoad;
         public event EventHandler<List<GFClothingStore>> OnClothingStoresLoad;
+        public event EventHandler<List<GFHospital>> OnHospitalsLoad;
 
         private readonly int maxOrgId;
         private readonly OrgRepository orgRepository;
@@ -22,6 +23,7 @@ namespace Server.Application.Managers
         private readonly List<GFGasStation> gasStations;
         private readonly List<GFATM> atmList;
         private readonly List<GFClothingStore> clothingStores;
+        private readonly List<GFHospital> hospitals;
 
         public GameEntitiesManager(OrgRepository orgRepository)
         {
@@ -31,6 +33,7 @@ namespace Server.Application.Managers
             this.gasStations = GetGasStationsList();
             this.atmList = GetATMList();
             this.clothingStores = GetClothingStoreList();
+            this.hospitals = GetHospitalList();
             var orgList = orgRepository.GetAll();
             maxOrgId = 0;
             foreach (var orgEntity in orgList)
@@ -54,6 +57,7 @@ namespace Server.Application.Managers
             OnGasStationsLoad?.Invoke(this, this.gasStations);
             OnATMListLoad?.Invoke(this, this.atmList);
             OnClothingStoresLoad?.Invoke(this, this.clothingStores);
+            OnHospitalsLoad?.Invoke(this, this.hospitals);
         }
 
         public int GetMaxOrgId()
@@ -211,6 +215,21 @@ namespace Server.Application.Managers
                 new GFClothingStore(new Vector3(-1193.42956542969f, -772.262329101563f, 17.3244285583496f)),
                 new GFClothingStore(new Vector3(-3172.49682617188f, 1048.13330078125f, 20.8632030487061f)),
                 new GFClothingStore(new Vector3(1108.44177246094f, 2708.92358398438f, 19.1078643798828f))
+            };
+        }
+
+        private List<GFHospital> GetHospitalList()
+        {
+            return new List<GFHospital>()
+            {
+                new GFHospital(new Vector3(1839.41f, 3672.90f, 34.28f)),
+                new GFHospital(new Vector3(-247.76f, 6331.23f, 32.43f)),
+                new GFHospital(new Vector3(-449.67f, -340.83f, 34.50f)),
+                new GFHospital(new Vector3(357.43f, -593.36f, 28.79f)),
+                new GFHospital(new Vector3(295.83f, -1446.94f, 29.97f)),
+                new GFHospital(new Vector3(-676.98f, 310.68f, 83.08f)),
+                new GFHospital(new Vector3(1151.21f, -1529.62f, 35.37f)),
+                new GFHospital(new Vector3(-874.64f, -307.71f, 39.58f))
             };
         }
     }

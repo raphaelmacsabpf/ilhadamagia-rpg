@@ -62,6 +62,7 @@
     <Compile Include="Entities\GFATM.cs" />
     <Compile Include="Entities\GFClothingStore.cs" />
     <Compile Include="Entities\GFGasStation.cs" />
+    <Compile Include="Entities\GFHospital.cs" />
     <Compile Include="Entities\GFHouse.cs" />
     <Compile Include="Entities\GFOrg.cs" />
     <Compile Include="Entities\GFPlayer.cs" />

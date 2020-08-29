@@ -42,7 +42,6 @@ namespace Server.Application.Entities
         public Vector3 SpawnPosition { get; set; }
         public Vector3 SwitchInPosition { get; set; }
         public bool IsFirstSpawn { get; set; }
-
         public GFHouse CurrentHouseInside { get; set; }
         public List<Account> LicenseAccounts { get; set; }
     }

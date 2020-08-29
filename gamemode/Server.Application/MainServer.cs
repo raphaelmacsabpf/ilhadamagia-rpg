@@ -69,6 +69,11 @@ namespace Server.Application
                 mapManager.CreateClothingStores(clothingStoreList);
             };
 
+            gameEntitiesManager.OnHospitalsLoad += (sender, hospitalList) =>
+            {
+                mapManager.CreateHospitals(hospitalList);
+            };
+
             gameEntitiesManager.InvokeInitialEvents();
             Console.WriteLine("[IM MainServer] Started MainServer");
         }
