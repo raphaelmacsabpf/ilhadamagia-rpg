@@ -21,6 +21,8 @@ namespace Server.Application.Managers
 
         public event EventHandler<List<GFHospital>> OnHospitalsLoad;
 
+        public event EventHandler<List<GFPoliceDepartment>> OnPoliceDepartmentsLoad;
+
         private readonly int maxOrgId;
         private readonly OrgRepository orgRepository;
         private readonly List<GFOrg> orgs;
@@ -29,6 +31,7 @@ namespace Server.Application.Managers
         private readonly List<GFATM> atmList;
         private readonly List<GFClothingStore> clothingStores;
         private readonly List<GFHospital> hospitals;
+        private readonly List<GFPoliceDepartment> policeDepartments;
 
         public GameEntitiesManager(OrgRepository orgRepository)
         {
@@ -39,6 +42,8 @@ namespace Server.Application.Managers
             this.atmList = GetATMList();
             this.clothingStores = GetClothingStoreList();
             this.hospitals = GetHospitalList();
+            this.policeDepartments = GetPoliceDepartmentList();
+
             var orgList = orgRepository.GetAll();
             maxOrgId = 0;
             foreach (var orgEntity in orgList)
@@ -63,6 +68,7 @@ namespace Server.Application.Managers
             OnATMListLoad?.Invoke(this, this.atmList);
             OnClothingStoresLoad?.Invoke(this, this.clothingStores);
             OnHospitalsLoad?.Invoke(this, this.hospitals);
+            OnPoliceDepartmentsLoad?.Invoke(this, this.policeDepartments);
         }
 
         public int GetMaxOrgId()
@@ -243,6 +249,19 @@ namespace Server.Application.Managers
                 new GFHospital(new Vector3(-676.98f, 310.68f, 83.08f)),
                 new GFHospital(new Vector3(1151.21f, -1529.62f, 35.37f)),
                 new GFHospital(new Vector3(-874.64f, -307.71f, 39.58f))
+            };
+        }
+
+        private List<GFPoliceDepartment> GetPoliceDepartmentList()
+        {
+            return new List<GFPoliceDepartment>()
+            {
+                new GFPoliceDepartment("La Mesa", new Vector3(826.6022f, -1289.947f, 28.23511f)),
+                new GFPoliceDepartment("Mission Row", new Vector3(441.0725f, -981.1384f, 30.67834f)),
+                new GFPoliceDepartment("Sandy Shore", new Vector3(1853.96f, 3688.18f, 34.25061f)),
+                new GFPoliceDepartment("Paleto Bay", new Vector3(-447.7846f, 6013.701f, 31.70618f)),
+                new GFPoliceDepartment("Vespucci", new Vector3(-1093.015f, -809.578f, 19.27112f)),
+                new GFPoliceDepartment("Davis", new Vector3(360.8835f, -1584.567f, 29.27991f))
             };
         }
     }

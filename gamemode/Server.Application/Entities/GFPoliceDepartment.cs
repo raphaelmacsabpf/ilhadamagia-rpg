@@ -2,12 +2,14 @@
 
 namespace Server.Application.Entities
 {
-    public class GFHospital
+    public class GFPoliceDepartment
     {
+        public string Name { get; }
         public Vector3 Position { get; }
 
-        public GFHospital(Vector3 position)
+        public GFPoliceDepartment(string name, Vector3 position)
         {
+            Name = name;
             Position = position;
         }
     }

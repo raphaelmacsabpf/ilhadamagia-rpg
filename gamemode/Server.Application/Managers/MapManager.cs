@@ -322,5 +322,13 @@ namespace Server.Application.Managers
                 this.AddInterationMarkerWithNotification(hospital.Position.X, hospital.Position.Y, hospital.Position.Z, MarkerColor.COLOR_GREEN, "Hospital, aperte ~o~E~s~ para interagir", ((gfPlayer, Player) => OnPlayerInteractWithHospital(gfPlayer, hospital)));
             }
         }
+
+        public void CreatePoliceDepartments(List<GFPoliceDepartment> policeDepartmentList)
+        {
+            foreach (var policeDepartment in policeDepartmentList)
+            {
+                this.blips.Add(new BlipDto("Departamento de Polícia", 526, 38, policeDepartment.Position.X, policeDepartment.Position.Y, policeDepartment.Position.Z, 0.75f));
+            }
+        }
     }
 }

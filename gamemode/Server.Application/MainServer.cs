@@ -75,6 +75,11 @@ namespace Server.Application
                 mapManager.CreateHospitals(hospitalList);
             };
 
+            gameEntitiesManager.OnPoliceDepartmentsLoad += (sender, policeDepartmentList) =>
+            {
+                mapManager.CreatePoliceDepartments(policeDepartmentList);
+            };
+
             gameEntitiesManager.InvokeInitialEvents();
             Console.WriteLine("[IM MainServer] Started MainServer");
         }

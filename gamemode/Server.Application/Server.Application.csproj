@@ -66,6 +66,7 @@
     <Compile Include="Entities\GFHouse.cs" />
     <Compile Include="Entities\GFOrg.cs" />
     <Compile Include="Entities\GFPlayer.cs" />
+    <Compile Include="Entities\GFPoliceDepartment.cs" />
     <Compile Include="Entities\GFVehicle.cs" />
     <Compile Include="Enums\PlayerConnectionState.cs" />
     <Compile Include="Enums\PlayerConnectionTrigger.cs" />
