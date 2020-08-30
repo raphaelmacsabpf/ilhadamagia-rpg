@@ -373,6 +373,35 @@ namespace Server.Application.Managers
                         }
                         return;
                     }
+                case CommandCode.ADMINS:
+                    {
+                        var playerList = this.playerInfo.GetGFPlayerList();
+                        var admins = playerList.Where((gfPlayer) => gfPlayer.Account.AdminLevel > 0);
+
+                        chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_ROSA, "Administradores online:");
+
+                        foreach (var admin in admins)
+                        {
+                            string adminRank;
+                            switch (admin.Account.AdminLevel)
+                            {
+                                case 1337:
+                                    adminRank = "MASTER"; break;
+                                case 3001:
+                                    adminRank = ""; break;
+                                case 1:
+                                    adminRank = "HELPER"; break;
+                                default:
+                                    adminRank = $"Nível {admin.Account.AdminLevel}"; break;
+                            }
+
+                            if (adminRank != "")
+                            {
+                                chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD1, $"Admin: {admin.Account.Username} [{adminRank}]");
+                            }
+                        }
+                        return;
+                    }
                 default:
                     {
                         this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTRED, "Comando não reconhecido, use /ajuda para ver alguns comandos!");

@@ -21,5 +21,6 @@
         GIVE_WEAPON,
         SET_HEALTH,
         SET_AS_LEADER,
+        ADMINS,
     }
 }
