@@ -56,7 +56,8 @@ LastX = @LastX,
 LastY = @LastY,
 LastZ = @LastZ,
 LastHouseInside = @LastHouseInside,
-OrgId = @OrgId
+OrgId = @OrgId,
+IsLeader = @IsLeader
 WHERE Id = @Id";
 
             return this.mySqlConnection.ExecuteAsync(sqlStatement, account);

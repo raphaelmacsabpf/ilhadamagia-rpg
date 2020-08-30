@@ -323,9 +323,33 @@ namespace Server.Application.Managers
                                 return;
                             }
                             targetGfPlayer.Account.OrgId = orgId;
+                            targetGfPlayer.Account.IsLeader = false;
                             stateManager.RespawnPlayerInCurrentPosition(targetGfPlayer);
                             this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" Sua organização foi alterada para {gfOrg.Entity.Name} pelo admin {sourceGFPlayer.Account.Username}");
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você alterou a organização de {targetGfPlayer.Account.Username} para {gfOrg.Entity.Name}");
+                        }
+                        return;
+                    }
+                case CommandCode.SET_AS_LEADER:
+                    {
+                        if (commandValidator.WithAdminLevel(4).WithTargetPlayer("playerid")
+                            .WithVarBetween<int>(0, PedModelsConverter.GetPedModelMaxId(), "org-id")
+                            .IsValid($"USE: /setlider [playerid] [org-id(0-{gameEntitiesManager.GetMaxOrgId()}]"))
+                        {
+                            GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                            var orgId = commandValidator.GetVar<int>("org-id");
+                            var gfOrg = gameEntitiesManager.GetGFOrgById(orgId);
+                            if (gfOrg == null)
+                            {
+                                commandValidator.SendCommandError($"org-id {orgId} inválido", $"USE: /setorg [playerid] [id(0-{gameEntitiesManager.GetMaxOrgId()}]");
+                                return;
+                            }
+                            targetGfPlayer.Account.OrgId = orgId;
+                            targetGfPlayer.Account.IsLeader = true;
+                            gfOrg.Entity.Leader = targetGfPlayer.Account.Username;
+                            stateManager.RespawnPlayerInCurrentPosition(targetGfPlayer);
+                            this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você foi setado como lider da organização {gfOrg.Entity.Name} pelo admin {sourceGFPlayer.Account.Username}");
+                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você setou {targetGfPlayer.Account.Username} como líder da organização {gfOrg.Entity.Name}");
                         }
                         return;
                     }

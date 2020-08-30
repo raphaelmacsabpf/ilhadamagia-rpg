@@ -29,5 +29,6 @@ namespace Server.Domain.Entities
         public float LastZ { get; set; }
         public int? LastHouseInside { get; set; }
         public int OrgId { get; set; }
+        public bool IsLeader { get; set; }
     }
 }

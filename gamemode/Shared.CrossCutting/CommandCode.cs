@@ -19,6 +19,7 @@
         SET_PED,
         SET_ORG,
         GIVE_WEAPON,
-        SET_HEALTH
+        SET_HEALTH,
+        SET_AS_LEADER,
     }
 }

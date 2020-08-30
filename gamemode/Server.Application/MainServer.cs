@@ -41,6 +41,7 @@ namespace Server.Application
                     {
                         targetPlayer.FSM.Fire(PlayerConnectionTrigger.PLAYER_DROPPED);
                     }
+                    gameEntitiesManager.SaveOrgs();
                 }
             }), true);
 

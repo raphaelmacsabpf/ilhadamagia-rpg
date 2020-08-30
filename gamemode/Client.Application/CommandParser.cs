@@ -40,6 +40,7 @@ namespace Client.Application
                 case "/setskin": return CommandCode.SET_PED;
                 case "/setorg": return CommandCode.SET_ORG;
                 case "/dararma": return CommandCode.GIVE_WEAPON;
+                case "/setlider": return CommandCode.SET_AS_LEADER;
                 default: return CommandCode.INVALID_COMMAND;
             }
         }

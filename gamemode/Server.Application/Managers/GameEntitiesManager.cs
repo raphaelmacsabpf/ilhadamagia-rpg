@@ -10,10 +10,15 @@ namespace Server.Application.Managers
     public class GameEntitiesManager
     {
         public event EventHandler<List<GFOrg>> OnOrgsLoad;
+
         public event EventHandler<List<GFAmmunation>> OnAmmunationsLoad;
+
         public event EventHandler<List<GFGasStation>> OnGasStationsLoad;
+
         public event EventHandler<List<GFATM>> OnATMListLoad;
+
         public event EventHandler<List<GFClothingStore>> OnClothingStoresLoad;
+
         public event EventHandler<List<GFHospital>> OnHospitalsLoad;
 
         private readonly int maxOrgId;
@@ -68,6 +73,14 @@ namespace Server.Application.Managers
         public GFOrg GetGFOrgById(int orgId)
         {
             return this.orgs.FirstOrDefault(x => x.Entity.Id == orgId);
+        }
+
+        public void SaveOrgs()
+        {
+            foreach (var org in this.orgs)
+            {
+                orgRepository.Update(org.Entity).Wait();
+            }
         }
 
         private static List<GFAmmunation> GetAmmunationsList()
