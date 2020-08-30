@@ -59,12 +59,13 @@ namespace Server.Application
             }
         }
 
-        public PlayerVarsDto PopUpdatedPlayerVarsPayload(GFPlayer gfPlayer)
+        public void SendUpdatedPlayerVars(GFPlayer gfPlayer)
         {
             PlayerVarsDto playerVars = new PlayerVarsDto();
             playerVars.TryAdd("Money", gfPlayer.Account.Money.ToString());
             playerVars.TryAdd("Username", gfPlayer.Account.Username);
-            return playerVars;
+            var json = JsonConvert.SerializeObject(playerVars);
+            this.networkManager.SendPayloadToPlayer(gfPlayer.Player, PayloadType.TO_PLAYER_VARS, json);
         }
 
         public GFPlayer GetGFPlayer(Player player)

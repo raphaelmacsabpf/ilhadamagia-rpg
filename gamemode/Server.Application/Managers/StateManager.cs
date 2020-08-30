@@ -157,10 +157,7 @@ namespace Server.Application.Managers
                 .OnEntry(() =>
                 {
                     this.playerActions.CloseNUIView(gfPlayer, NUIViewType.SELECT_ACCOUNT, true);
-
-                    var json = JsonConvert.SerializeObject(this.playerInfo.PopUpdatedPlayerVarsPayload(gfPlayer));
-                    this.networkManager.SendPayloadToPlayer(gfPlayer.Player, PayloadType.TO_PLAYER_VARS, json);
-                    json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticMarkersPayload());
+                    var json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticMarkersPayload());
                     this.networkManager.SendPayloadToPlayer(gfPlayer.Player, PayloadType.TO_STATIC_MARKERS, json);
                     json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticProximityTargetsPayload());
                     this.networkManager.SendPayloadToPlayer(gfPlayer.Player, PayloadType.TO_STATIC_PROXIMITY_TARGETS, json);
@@ -231,7 +228,7 @@ namespace Server.Application.Managers
                 .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
                 .OnEntry(() =>
                 {
-                    // TODO: Implementar ações quando o player spawnar, o que? eu não sei
+                    this.playerInfo.SendUpdatedPlayerVars(gfPlayer);
                 });
 
             fsm.Configure(PlayerConnectionState.DIED)

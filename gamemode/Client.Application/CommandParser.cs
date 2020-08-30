@@ -42,6 +42,7 @@ namespace Client.Application
                 case "/dararma": return CommandCode.GIVE_WEAPON;
                 case "/setlider": return CommandCode.SET_AS_LEADER;
                 case "/admins": return CommandCode.ADMINS;
+                case "/dardinheiro": return CommandCode.GIVE_MONEY;
                 default: return CommandCode.INVALID_COMMAND;
             }
         }

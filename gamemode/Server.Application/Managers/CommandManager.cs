@@ -402,6 +402,22 @@ namespace Server.Application.Managers
                         }
                         return;
                     }
+                case CommandCode.GIVE_MONEY:
+                    {
+                        if (commandValidator.WithAdminLevel(1337).WithTargetPlayer("playerid")
+                            .WithVarBetween<int>(0, 1000000000, "money")
+                            .IsValid($"USE: /dardinheiro [playerid] [money(0-1000000000]"))
+                        {
+                            GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                            var money = commandValidator.GetVar<int>("money");
+
+                            targetGfPlayer.Account.Money += money;
+                            this.playerInfo.SendUpdatedPlayerVars(targetGfPlayer);
+                            this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" O admin {sourceGFPlayer.Account.Username} lhe deu ${money} de dinheiro");
+                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você deu ${money} de dinheiro para {targetGfPlayer.Account.Username}");
+                        }
+                        return;
+                    }
                 default:
                     {
                         this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTRED, "Comando não reconhecido, use /ajuda para ver alguns comandos!");
