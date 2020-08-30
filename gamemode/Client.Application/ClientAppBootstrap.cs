@@ -26,6 +26,7 @@ namespace Client.Application
             this.Tick += render.RenderTickHandler;
             this.Tick += targetsManager.TargetsTickHandler;
             this.Tick += mainClient.Wait1SecondTickHandler;
+            this.Tick += mainClient.Wait1MinuteTickHandler;
             this.Tick += OnTick;
 
             // Default Events
@@ -56,6 +57,7 @@ namespace Client.Application
             EventHandlers["GF:Client:CreatePlayerVehicle"] += new Action<uint>(mainClient.CreatePlayerVehicle);
             EventHandlers["GF:Client:SwitchOutPlayer"] += new Action(mainClient.SwitchOutPlayer);
             EventHandlers["GF:Client:SwitchInPlayer"] += new Action<float, float, float>(mainClient.SwitchInPlayer);
+            EventHandlers["GF:Client:SyncPlayerDateTime"] += new Action<string>(mainClient.SyncPlayerDateTime);
             mainClientHandler = mainClient;
         }
 

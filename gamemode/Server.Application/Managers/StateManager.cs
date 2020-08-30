@@ -120,6 +120,7 @@ namespace Server.Application.Managers
                 .Permit(PlayerConnectionTrigger.ACCOUNT_NOT_FOUND, PlayerConnectionState.NEW_ACCOUNT)
                 .OnEntry(async () =>
                 {
+                    this.networkManager.SyncPlayerDateTime(gfPlayer);
                     var accounts = (await accountRepository.GetAccountListByLicense(gfPlayer.License)).ToList();
                     if (accounts.Count > 0)
                     {

@@ -3,6 +3,7 @@ using LZ4;
 using Shared.CrossCutting;
 using System;
 using System.Text;
+using Server.Application.Entities;
 
 namespace Server.Application.Managers
 {
@@ -28,6 +29,11 @@ namespace Server.Application.Managers
         {
             var uncompressed = Encoding.UTF8.GetString(LZ4Codec.Unwrap(Convert.FromBase64String(compressed)));
             return uncompressed;
+        }
+
+        public void SyncPlayerDateTime(GFPlayer gfPlayer)
+        {
+            gfPlayer.Player.TriggerEvent("GF:Client:SyncPlayerDateTime", DateTime.Now.ToString());
         }
     }
 }

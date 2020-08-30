@@ -22,6 +22,7 @@ namespace Client.Application
         private readonly ClientNetworkManager clientNetworkManager;
         private List<BlipDto> mapBlips;
         private bool clientInitializationStarted;
+        private TimeSpan serverDateTimeOffset;
         private string lastPayloadCompressed; // TODO: Remover este campo
         private int lastPayloadUncompressedLength; // TODO: Remover este campo
 
@@ -33,6 +34,7 @@ namespace Client.Application
             this.playerActions = playerActions;
             this.targetsManager = targetsManager;
             this.clientNetworkManager = clientNetworkManager;
+            this.serverDateTimeOffset = new TimeSpan();
         }
 
         public async void CreateVehicle(uint modelHash, int primaryColor, int secondaryColor, int fuel, float x, float y, float z, float heading)
@@ -316,6 +318,13 @@ namespace Client.Application
             API.SetPoliceRadarBlips(false);
         }
 
+        public async Task Wait1MinuteTickHandler()
+        {
+            var currentDateTime = DateTime.Now + serverDateTimeOffset; // TODO: Sincronizar timer com timer do servidor
+            API.NetworkOverrideClockTime(currentDateTime.Hour, currentDateTime.Minute, currentDateTime.Second);
+            await Delay(60000);
+        }
+
         public async void SwitchOutPlayer()
         {
             if (API.IsScreenFadedOut())
@@ -352,6 +361,11 @@ namespace Client.Application
                 await Delay(1);
             }
             TriggerServerEvent("GF:Server:TriggerStateEvent", "switched-in");
+        }
+
+        public void SyncPlayerDateTime(string serverDateTime)
+        {
+            serverDateTimeOffset = DateTime.Now - DateTime.Parse(serverDateTime);
         }
     }
 }
