@@ -74,6 +74,7 @@ namespace Client.Application
 
         internal async void SpawnPlayer(string skinName, float x, float y, float z, float heading, bool fastSpawn)
         {
+            API.SetTimeScale(1f);
             await Spawn.SpawnPlayer(skinName, x, y, z, heading, fastSpawn);
         }
     }

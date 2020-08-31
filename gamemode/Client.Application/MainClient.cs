@@ -197,6 +197,7 @@ namespace Client.Application
         public async void OnDie(int killerType, dynamic deathCoords)
         {
             API.CancelEvent();
+            API.SetTimeScale(0.4f);
             var deathScreenEffects = new[] { "DeathFailOut", "DeathFailNeutralIn", "DeathFailMPDark", "DeathFailMPIn", "RaceTurbo" };
             var random = new Random().Next(deathScreenEffects.Length - 1);
             API.StartScreenEffect(deathScreenEffects[random], 8000, false);
