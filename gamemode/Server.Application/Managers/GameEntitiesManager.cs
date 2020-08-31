@@ -23,6 +23,8 @@ namespace Server.Application.Managers
 
         public event EventHandler<List<GFPoliceDepartment>> OnPoliceDepartmentsLoad;
 
+        public event EventHandler<List<GF247Store>> On247StoresLoad;
+
         private readonly int maxOrgId;
         private readonly OrgRepository orgRepository;
         private readonly List<GFOrg> orgs;
@@ -32,6 +34,7 @@ namespace Server.Application.Managers
         private readonly List<GFClothingStore> clothingStores;
         private readonly List<GFHospital> hospitals;
         private readonly List<GFPoliceDepartment> policeDepartments;
+        private readonly List<GF247Store> store247List;
 
         public GameEntitiesManager(OrgRepository orgRepository)
         {
@@ -43,6 +46,7 @@ namespace Server.Application.Managers
             this.clothingStores = GetClothingStoreList();
             this.hospitals = GetHospitalList();
             this.policeDepartments = GetPoliceDepartmentList();
+            this.store247List = Get247StoreList();
 
             var orgList = orgRepository.GetAll();
             maxOrgId = 0;
@@ -69,6 +73,7 @@ namespace Server.Application.Managers
             OnClothingStoresLoad?.Invoke(this, this.clothingStores);
             OnHospitalsLoad?.Invoke(this, this.hospitals);
             OnPoliceDepartmentsLoad?.Invoke(this, this.policeDepartments);
+            On247StoresLoad?.Invoke(this, this.store247List);
         }
 
         public int GetMaxOrgId()
@@ -91,7 +96,7 @@ namespace Server.Application.Managers
 
         private static List<GFAmmunation> GetAmmunationsList()
         {
-            return new List<GFAmmunation>()
+            return new List<GFAmmunation>
             {
                 new GFAmmunation("Polito Bay", new Vector3(-332.2681f, 6082.47f, 31.45349f)),
                 new GFAmmunation("Sandy Shores", new Vector3(1692.105f, 3758.862f, 34.6886f)),
@@ -109,7 +114,7 @@ namespace Server.Application.Managers
 
         private List<GFGasStation> GetGasStationsList()
         {
-            return new List<GFGasStation>()
+            return new List<GFGasStation>
             {
                 new GFGasStation("Little Seoul 1", new Vector3(-731.3538f, -932.4659f, 19.01831f)),
                 new GFGasStation("Chamberlain Hills", new Vector3(-68.03076f, -1758.422f, 29.39783f)),
@@ -140,7 +145,7 @@ namespace Server.Application.Managers
 
         private List<GFATM> GetATMList()
         {
-            return new List<GFATM>()
+            return new List<GFATM>
             {
                 new GFATM(new Vector3(-386.733f, 6045.953f, 31.501f)),
                 new GFATM(new Vector3(-110.753f, 6467.703f, 31.784f)),
@@ -218,7 +223,7 @@ namespace Server.Application.Managers
 
         private List<GFClothingStore> GetClothingStoreList()
         {
-            return new List<GFClothingStore>()
+            return new List<GFClothingStore>
             {
                 new GFClothingStore(new Vector3(72.2545394897461f, -1399.10229492188f, 29.3761386871338f)),
                 new GFClothingStore(new Vector3(-703.77685546875f, -152.258544921875f, 37.4151458740234f)),
@@ -239,7 +244,7 @@ namespace Server.Application.Managers
 
         private List<GFHospital> GetHospitalList()
         {
-            return new List<GFHospital>()
+            return new List<GFHospital>
             {
                 new GFHospital(new Vector3(1839.41f, 3672.90f, 34.28f)),
                 new GFHospital(new Vector3(-247.76f, 6331.23f, 32.43f)),
@@ -254,7 +259,7 @@ namespace Server.Application.Managers
 
         private List<GFPoliceDepartment> GetPoliceDepartmentList()
         {
-            return new List<GFPoliceDepartment>()
+            return new List<GFPoliceDepartment>
             {
                 new GFPoliceDepartment("La Mesa", new Vector3(826.6022f, -1289.947f, 28.23511f)),
                 new GFPoliceDepartment("Mission Row", new Vector3(441.0725f, -981.1384f, 30.67834f)),
@@ -262,6 +267,34 @@ namespace Server.Application.Managers
                 new GFPoliceDepartment("Paleto Bay", new Vector3(-447.7846f, 6013.701f, 31.70618f)),
                 new GFPoliceDepartment("Vespucci", new Vector3(-1093.015f, -809.578f, 19.27112f)),
                 new GFPoliceDepartment("Davis", new Vector3(360.8835f, -1584.567f, 29.27991f))
+            };
+        }
+
+        private List<GF247Store> Get247StoreList()
+        {
+            return new List<GF247Store>()
+            {
+                new GF247Store(new Vector3(1735.83f, 6419.51f, 35.0373f)),
+                new GF247Store(new Vector3(1960.42f, 3748.89f, 32.3438f)),
+                new GF247Store(new Vector3(2682.55f, 3282.32f, 55.24f)),
+                new GF247Store(new Vector3(1700.17f, 4927.65f, 46.93f)),
+                new GF247Store(new Vector3(-2974.73f, 390.80f, 22.50f)),
+                new GF247Store(new Vector3(29.15f, -1344.53f, 36.23f)),
+                new GF247Store(new Vector3(-1224.34f, -905.99f, 19.47f)),
+                new GF247Store(new Vector3(1394.169189f, 3599.860107f, 34.012100f)),
+                new GF247Store(new Vector3(-3038.908203f, 589.518677f, 6.904800f)),
+                new GF247Store(new Vector3(-3240.316895f, 1004.433411f, 11.830700f)),
+                new GF247Store(new Vector3(544.280212f, 2672.811279f, 41.156601f)),
+                new GF247Store(new Vector3(2559.247070f, 385.526611f, 107.623001f)),
+                new GF247Store(new Vector3(376.653290f, 323.647095f, 102.566399f)),
+                new GF247Store(new Vector3(1166.391968f, 2703.504150f, 37.157299f)),
+                new GF247Store(new Vector3(-2973.261719f, 390.818390f, 14.043300f)),
+                new GF247Store(new Vector3(-1491.056519f, -383.572815f, 39.170601f)),
+                new GF247Store(new Vector3(1698.808472f, 4929.197754f, 41.078300f)),
+                new GF247Store(new Vector3(-711.721008f, -916.696472f, 18.214500f)),
+                new GF247Store(new Vector3(-53.124001f, -1756.405396f, 28.421000f)),
+                new GF247Store(new Vector3(1159.542114f, -326.698608f, 67.922997f)),
+                new GF247Store(new Vector3(-1822.286621f, 788.005981f, 137.185898f)),
             };
         }
     }

@@ -80,6 +80,11 @@ namespace Server.Application
                 mapManager.CreatePoliceDepartments(policeDepartmentList);
             };
 
+            gameEntitiesManager.On247StoresLoad += (sender, store247List) =>
+            {
+                mapManager.Create247Stores(store247List);
+            };
+
             gameEntitiesManager.InvokeInitialEvents();
             Console.WriteLine("[IM MainServer] Started MainServer");
         }

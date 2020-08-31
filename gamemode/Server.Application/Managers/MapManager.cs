@@ -330,5 +330,13 @@ namespace Server.Application.Managers
                 this.blips.Add(new BlipDto("Departamento de Polícia", 526, 38, policeDepartment.Position.X, policeDepartment.Position.Y, policeDepartment.Position.Z, 0.75f));
             }
         }
+
+        public void Create247Stores(List<GF247Store> store247List)
+        {
+            foreach (var store247 in store247List)
+            {
+                this.blips.Add(new BlipDto("Loja 24/7", 59, 34, store247.Position.X, store247.Position.Y, store247.Position.Z, 0.75f));
+            }
+        }
     }
 }

@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandValidator.cs" />
+    <Compile Include="Entities\GF247Store.cs" />
     <Compile Include="Entities\GFAmmunation.cs" />
     <Compile Include="Entities\GFATM.cs" />
     <Compile Include="Entities\GFClothingStore.cs" />
