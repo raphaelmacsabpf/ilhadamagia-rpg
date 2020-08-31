@@ -146,8 +146,8 @@ namespace Server.Application.Managers
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                             var targetPosition = targetGfPlayer.Player.Character.Position + new Vector3(0f, 2f, -1f); // I don't know why this -1f???? WTF???
                             this.playerActions.SetPlayerPos(sourceGFPlayer, targetPosition);
-                            this.chatManager.ProxDetectorColorFixed(10.0f, targetGfPlayer, $"*Admin {sourceGFPlayer.Account.Username} veio até {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE);
-                            this.chatManager.ProxDetectorColorFixed(10.0f, sourceGFPlayer, $"*Admin {sourceGFPlayer.Account.Username} foi até {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE);
+                            this.chatManager.ProxDetectorColorFixed(10.0f, targetGfPlayer, $"*Admin {sourceGFPlayer.Account.Username} veio até {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, new[] { sourceGFPlayer });
+                            this.chatManager.ProxDetectorColorFixed(10.0f, sourceGFPlayer, $"*Admin {sourceGFPlayer.Account.Username} foi até {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, new[] { targetGfPlayer });
                         }
                         return;
                     }
@@ -158,8 +158,8 @@ namespace Server.Application.Managers
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                             var sourcePosition = sourceGFPlayer.Player.Character.Position + new Vector3(0f, 2f, -1f); // I don't know why this -1f???? WTF???
                             this.playerActions.SetPlayerPos(targetGfPlayer, sourcePosition);
-                            this.chatManager.ProxDetectorColorFixed(10.0f, sourceGFPlayer, $"*Admin {sourceGFPlayer.Account.Username} trouxe {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE);
-                            this.chatManager.ProxDetectorColorFixed(10.0f, targetGfPlayer, $"*Admin {sourceGFPlayer.Account.Username} levou {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE);
+                            this.chatManager.ProxDetectorColorFixed(10.0f, sourceGFPlayer, $"*Admin {sourceGFPlayer.Account.Username} trouxe {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, new[] { sourceGFPlayer });
+                            this.chatManager.ProxDetectorColorFixed(10.0f, targetGfPlayer, $"*Admin {sourceGFPlayer.Account.Username} levou {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, new[] { targetGfPlayer });
                         }
                         return;
                     }
@@ -419,6 +419,37 @@ namespace Server.Application.Managers
                             this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" O admin {sourceGFPlayer.Account.Username} lhe deu ${money} de dinheiro");
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você deu ${money} de dinheiro para {targetGfPlayer.Account.Username}");
                         }
+                        return;
+                    }
+                case CommandCode.PAY:
+                    {
+                        if (commandValidator.WithTargetPlayer("receiver")
+                            .WithVarBetween<long>(1, 50000, "money")
+                            .IsValid("USE: /pagar [playerid] [money(1-50000"))
+                        {
+                            GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                            var money = commandValidator.GetVar<long>("money");
+
+                            var distanceSquared = sourceGFPlayer.Player.Character.Position.DistanceToSquared(targetGfPlayer.Player.Character.Position);
+                            var maximumDistanceSquared = Math.Pow(5.0d, 2);
+                            if (distanceSquared > maximumDistanceSquared)
+                            {
+                                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, $"Jogador muito longe");
+                                return;
+                            }
+
+                            if (sourceGFPlayer != targetGfPlayer)
+                            {
+                                moneyService.Pay(sourceGFPlayer, targetGfPlayer, money);
+                                this.playerInfo.SendUpdatedPlayerVars(targetGfPlayer); // TODO: Resolver essa pendencia do sendupdatedvars, arranjar alternativa melhor
+                                var ignoredPlayersInChatEvent = new[] { sourceGFPlayer, targetGfPlayer };
+                                this.chatManager.ProxDetectorColorFixed(10.0f, sourceGFPlayer, $" * {sourceGFPlayer.Account.Username} pagou para {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, ignoredPlayersInChatEvent);
+                                this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" O jogador {sourceGFPlayer.Account.Username} lhe pagou ${money} em dinheiro");
+                            }
+                            
+                            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você pagou ${money} em dinheiro para {targetGfPlayer.Account.Username}");
+                        }
+
                         return;
                     }
                 default:

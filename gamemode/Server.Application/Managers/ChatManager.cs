@@ -2,6 +2,8 @@
 using Server.Application.Entities;
 using Shared.CrossCutting;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Server.Application.Managers
 {
@@ -72,10 +74,11 @@ namespace Server.Application.Managers
             }
         }
 
-        public void ProxDetectorColorFixed(float radi, GFPlayer gfPlayer, string message, ChatColor color)
+        public void ProxDetectorColorFixed(float radi, GFPlayer gfPlayer, string message, ChatColor color, IEnumerable<GFPlayer> ignoredPlayers)
         {
             var player = gfPlayer.Player;
-            foreach (GFPlayer i in this.playerInfo.GetGFPlayerList())
+            var playerList = this.playerInfo.GetGFPlayerList().Except(ignoredPlayers);
+            foreach (GFPlayer i in playerList)
             {
                 var position = i.Player.Character.Position;
                 var tempposx = player.Character.Position.X - position.X;

@@ -43,6 +43,7 @@ namespace Client.Application
                 case "/setlider": return CommandCode.SET_AS_LEADER;
                 case "/admins": return CommandCode.ADMINS;
                 case "/dardinheiro": return CommandCode.GIVE_MONEY;
+                case "/pagar": return CommandCode.PAY;
                 default: return CommandCode.INVALID_COMMAND;
             }
         }
