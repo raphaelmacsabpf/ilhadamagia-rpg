@@ -26,7 +26,6 @@ namespace Client.Application
             this.Tick += render.RenderTickHandler;
             this.Tick += targetsManager.TargetsTickHandler;
             this.Tick += mainClient.Wait1SecondTickHandler;
-            this.Tick += mainClient.Wait1MinuteTickHandler;
             this.Tick += OnTick;
 
             // Default Events

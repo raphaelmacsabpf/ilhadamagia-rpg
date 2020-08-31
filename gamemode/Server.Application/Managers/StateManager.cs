@@ -229,6 +229,7 @@ namespace Server.Application.Managers
                 .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
                 .OnEntry(() =>
                 {
+                    this.networkManager.SyncPlayerDateTime(gfPlayer);
                     this.playerInfo.SendUpdatedPlayerVars(gfPlayer);
                 });
 
