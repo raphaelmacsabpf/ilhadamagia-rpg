@@ -18,8 +18,8 @@ namespace Server.Domain.Entities
         public int Level { get; set; }
         public int Respect { get; set; }
         public int ConnectedTime { get; set; }
-        public int Money { get; set; }
-        public int Bank { get; set; }
+        public long Money { get; set; }
+        public long Bank { get; set; }
         public string PedModel { get; set; }
         public int? SelectedHouse { get; set; }
         public DateTime CreatedAt { get; set; }

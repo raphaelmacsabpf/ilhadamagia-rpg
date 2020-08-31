@@ -91,6 +91,21 @@ namespace Server.Application
                         commandVariables.Add(varName, nextArgumentValueInt);
                     }
                 }
+                else if (type == typeof(Int64))
+                {
+                    long nextArgumentValueLong;
+                    long minLong = (long)Convert.ChangeType(min, TypeCode.Int64);
+                    long maxLong = (long)Convert.ChangeType(max, TypeCode.Int64);
+                    bool parseLong = Int64.TryParse(nextArgumentValue, out nextArgumentValueLong);
+                    if (parseLong == false || nextArgumentValueLong < minLong || nextArgumentValueLong > maxLong)
+                    {
+                        this.errorMessages.Add($"{nextArgumentValue} não é um {varName} válido por não estar entre {min} e {max}");
+                    }
+                    else if (parseLong == true)
+                    {
+                        commandVariables.Add(varName, nextArgumentValueLong);
+                    }
+                }
             }
             else
             {

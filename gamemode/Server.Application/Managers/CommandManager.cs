@@ -6,6 +6,7 @@ using Server.Application.Entities;
 using Shared.CrossCutting;
 using System;
 using System.Linq;
+using Server.Application.Services;
 
 namespace Server.Application.Managers
 {
@@ -17,8 +18,9 @@ namespace Server.Application.Managers
         private readonly MapManager mapManager;
         private readonly StateManager stateManager;
         private readonly GameEntitiesManager gameEntitiesManager;
+        private readonly MoneyService moneyService;
 
-        public CommandManager(ChatManager chatManager, PlayerInfo playerInfo, PlayerActions playerActions, MapManager mapManager, StateManager stateManager, GameEntitiesManager gameEntitiesManager)
+        public CommandManager(ChatManager chatManager, PlayerInfo playerInfo, PlayerActions playerActions, MapManager mapManager, StateManager stateManager, GameEntitiesManager gameEntitiesManager, MoneyService moneyService)
         {
             this.chatManager = chatManager;
             this.playerInfo = playerInfo;
@@ -26,6 +28,7 @@ namespace Server.Application.Managers
             this.mapManager = mapManager;
             this.stateManager = stateManager;
             this.gameEntitiesManager = gameEntitiesManager;
+            this.moneyService = moneyService;
             Console.WriteLine("[IM CommandManager] Started CommandManager");
         }
 
@@ -405,13 +408,13 @@ namespace Server.Application.Managers
                 case CommandCode.GIVE_MONEY:
                     {
                         if (commandValidator.WithAdminLevel(1337).WithTargetPlayer("playerid")
-                            .WithVarBetween<int>(0, 1000000000, "money")
+                            .WithVarBetween<long>(0, 1000000000, "money")
                             .IsValid($"USE: /dardinheiro [playerid] [money(0-1000000000]"))
                         {
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
-                            var money = commandValidator.GetVar<int>("money");
+                            var money = commandValidator.GetVar<long>("money");
 
-                            targetGfPlayer.Account.Money += money;
+                            moneyService.AdminGiveMoney(sourceGFPlayer, targetGfPlayer, money);
                             this.playerInfo.SendUpdatedPlayerVars(targetGfPlayer);
                             this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" O admin {sourceGFPlayer.Account.Username} lhe deu ${money} de dinheiro");
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você deu ${money} de dinheiro para {targetGfPlayer.Account.Username}");

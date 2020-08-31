@@ -4,6 +4,7 @@ using Server.Application.Managers;
 using Server.Database;
 using System;
 using System.Diagnostics;
+using Server.Application.Services;
 
 namespace Server.Application
 {
@@ -29,6 +30,7 @@ namespace Server.Application
             builder.RegisterType<HouseRepository>().As<HouseRepository>().SingleInstance();
             builder.RegisterType<VehicleRepository>().As<VehicleRepository>().SingleInstance();
             builder.RegisterType<OrgRepository>().As<OrgRepository>().SingleInstance();
+            builder.RegisterType<MoneyTransactionRepository>().As<MoneyTransactionRepository>();
             builder.RegisterType<MenuManager>().As<MenuManager>().SingleInstance();
             builder.RegisterType<ChatManager>().As<ChatManager>().SingleInstance();
             builder.RegisterType<MapManager>().As<MapManager>().SingleInstance();
@@ -36,10 +38,10 @@ namespace Server.Application
             builder.RegisterType<PlayerActions>().As<PlayerActions>().SingleInstance();
             builder.RegisterType<PlayerInfo>().As<PlayerInfo>().SingleInstance();
             builder.RegisterType<StateManager>().As<StateManager>().SingleInstance();
-
             builder.RegisterType<NetworkManager>().As<NetworkManager>().SingleInstance();
             builder.RegisterType<CommandManager>().As<CommandManager>().SingleInstance();
             builder.RegisterType<MainServer>().As<MainServer>();
+            builder.RegisterType<MoneyService>().As<MoneyService>();
 
             var module = new DebugResolveModule();
             builder.RegisterModule(module);
