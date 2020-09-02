@@ -1,7 +1,7 @@
-﻿using System;
-using Server.Application.Entities;
+﻿using Server.Application.Entities;
 using Server.Database;
 using Server.Domain.Entities;
+using System;
 
 namespace Server.Application.Services
 {
@@ -20,7 +20,6 @@ namespace Server.Application.Services
             moneyTransactionRepository.Create(moneyTransaction).Wait();
             sender.Account.Money -= ammount;
             receiver.Account.Money += ammount;
-
         }
 
         public void AdminGiveMoney(GFPlayer admin, GFPlayer receiver, long ammount)

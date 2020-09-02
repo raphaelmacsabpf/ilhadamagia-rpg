@@ -3,10 +3,10 @@ using GF.CrossCutting;
 using GF.CrossCutting.Converters;
 using GF.CrossCutting.Dto;
 using Server.Application.Entities;
+using Server.Application.Services;
 using Shared.CrossCutting;
 using System;
 using System.Linq;
-using Server.Application.Services;
 
 namespace Server.Application.Managers
 {
@@ -446,7 +446,7 @@ namespace Server.Application.Managers
                                 this.chatManager.ProxDetectorColorFixed(10.0f, sourceGFPlayer, $" * {sourceGFPlayer.Account.Username} pagou para {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, ignoredPlayersInChatEvent);
                                 this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" O jogador {sourceGFPlayer.Account.Username} lhe pagou ${money} em dinheiro");
                             }
-                            
+
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você pagou ${money} em dinheiro para {targetGfPlayer.Account.Username}");
                         }
 

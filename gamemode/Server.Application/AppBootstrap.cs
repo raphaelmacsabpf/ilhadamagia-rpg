@@ -1,10 +1,10 @@
 ﻿using Autofac;
 using CitizenFX.Core;
 using Server.Application.Managers;
+using Server.Application.Services;
 using Server.Database;
 using System;
 using System.Diagnostics;
-using Server.Application.Services;
 
 namespace Server.Application
 {
