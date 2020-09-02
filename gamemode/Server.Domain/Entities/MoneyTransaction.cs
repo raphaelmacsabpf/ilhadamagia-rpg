@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Server.Domain.Enums;
+using System;
 
 namespace Server.Domain.Entities
 {
@@ -7,12 +8,12 @@ namespace Server.Domain.Entities
         public int SenderId { get; set; }
         public int ReceiverId { get; set; }
         public long Ammount { get; set; }
-        public string Type { get; set; }
+        public MoneyTransactionType Type { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? FinishedAt { get; set; }
-        public string Status { get; set; }
+        public MoneyTransactionStatus Status { get; set; }
 
-        public MoneyTransaction(int senderId, int receiverId, long ammount, string type, DateTime createdAt, DateTime? finishedAt, string status)
+        public MoneyTransaction(int senderId, int receiverId, long ammount, MoneyTransactionType type, DateTime createdAt, DateTime? finishedAt)
         {
             SenderId = senderId;
             ReceiverId = receiverId;
@@ -20,7 +21,7 @@ namespace Server.Domain.Entities
             Type = type;
             CreatedAt = createdAt;
             FinishedAt = finishedAt;
-            Status = status;
+            this.Status = MoneyTransactionStatus.INIT;
         }
     }
 }

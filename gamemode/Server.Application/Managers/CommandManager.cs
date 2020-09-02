@@ -4,6 +4,7 @@ using GF.CrossCutting.Converters;
 using GF.CrossCutting.Dto;
 using Server.Application.Entities;
 using Server.Application.Services;
+using Server.Domain.Enums;
 using Shared.CrossCutting;
 using System;
 using System.Linq;
@@ -414,11 +415,19 @@ namespace Server.Application.Managers
                             GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                             var money = commandValidator.GetVar<long>("money");
 
-                            moneyService.AdminGiveMoney(sourceGFPlayer, targetGfPlayer, money);
-                            this.playerInfo.SendUpdatedPlayerVars(targetGfPlayer);
+                            var moneyTransaction = moneyService.AdminGiveMoney(sourceGFPlayer, targetGfPlayer, money);
+
+                            if (moneyTransaction.Status == MoneyTransactionStatus.RECEIVER_AT_MAXIMUM_FUNDS)
+                            {
+                                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, $"* {targetGfPlayer.Account.Username} não pode receber esta quantia no momento.");
+                                return;
+                            }
+
+                            this.playerInfo.SendUpdatedPlayerVars(targetGfPlayer); // TODO: Melhorar essa atualização de variáveis (não é tão prioritário assim ainda)
                             this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" O admin {sourceGFPlayer.Account.Username} lhe deu ${money} de dinheiro");
                             this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você deu ${money} de dinheiro para {targetGfPlayer.Account.Username}");
                         }
+
                         return;
                     }
                 case CommandCode.PAY:
@@ -440,7 +449,19 @@ namespace Server.Application.Managers
 
                             if (sourceGFPlayer != targetGfPlayer)
                             {
-                                moneyService.Pay(sourceGFPlayer, targetGfPlayer, money);
+                                var moneyTransaction = moneyService.Pay(sourceGFPlayer, targetGfPlayer, money);
+                                if (moneyTransaction.Status == MoneyTransactionStatus.SENDER_INSUFFICIENT_FUNDS)
+                                {
+                                    this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, $"* Dinheiro insuficiente. Você possui ${targetGfPlayer.Account.Money} de dinheiro no momento."); // TODO: Criar formatação para dinheiro
+                                    return;
+                                }
+
+                                if (moneyTransaction.Status == MoneyTransactionStatus.RECEIVER_AT_MAXIMUM_FUNDS)
+                                {
+                                    this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, $"* {targetGfPlayer.Account.Username} não pode receber esta quantia no momento.");
+                                    return;
+                                }
+
                                 this.playerInfo.SendUpdatedPlayerVars(targetGfPlayer); // TODO: Resolver essa pendencia do sendupdatedvars, arranjar alternativa melhor
                                 var ignoredPlayersInChatEvent = new[] { sourceGFPlayer, targetGfPlayer };
                                 this.chatManager.ProxDetectorColorFixed(10.0f, sourceGFPlayer, $" * {sourceGFPlayer.Account.Username} pagou para {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, ignoredPlayersInChatEvent);

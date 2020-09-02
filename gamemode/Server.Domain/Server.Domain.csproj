@@ -47,6 +47,8 @@
     <Compile Include="Entities\Org.cs" />
     <Compile Include="Entities\Vehicle.cs" />
     <Compile Include="Enums\InteriorType.cs" />
+    <Compile Include="Enums\MoneyTransactionStatus.cs" />
+    <Compile Include="Enums\MoneyTransactionType.cs" />
     <Compile Include="Enums\PropertySellState.cs" />
     <Compile Include="Enums\PropertyType.cs" />
     <Compile Include="Enums\SpawnType.cs" />
