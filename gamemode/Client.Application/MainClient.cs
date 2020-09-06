@@ -22,6 +22,7 @@ namespace Client.Application
         private readonly ClientNetworkManager clientNetworkManager;
         private List<BlipDto> mapBlips;
         private bool clientInitializationStarted;
+        private bool deathCheckIsEnable;
         private string lastPayloadCompressed; // TODO: Remover este campo
         private int lastPayloadUncompressedLength; // TODO: Remover este campo
 
@@ -196,21 +197,7 @@ namespace Client.Application
 
         public async void OnDie(int killerType, dynamic deathCoords)
         {
-            API.CancelEvent();
-            API.SetTimeScale(0.4f);
-            var deathScreenEffects = new[] { "DeathFailOut", "DeathFailNeutralIn", "DeathFailMPDark", "DeathFailMPIn", "RaceTurbo" };
-            var random = new Random().Next(deathScreenEffects.Length - 1);
-            API.StartScreenEffect(deathScreenEffects[random], 8000, false);
-            API.StartScreenEffect("CamPushInTrevor", 8000, false);
-            await Delay(6000);
-            API.DoScreenFadeOut(300);
-            while (API.IsScreenFadingOut())
-            {
-                await Delay(16);
-            }
-            TriggerServerEvent("GF:Server:TriggerStateEvent", "die");
-            await Delay(1000);
-            API.StopAllScreenEffects();
+            // TODO: Criar sistema de tratamento de mortes.
         }
 
         public async void OnPlayerMapStart()
@@ -258,6 +245,7 @@ namespace Client.Application
 
         public async void GFSpawnPlayer(string skinName, float x, float y, float z, float heading, bool fastSpawn)
         {
+            this.deathCheckIsEnable = true;
             this.playerActions.SpawnPlayer(skinName, x, y, z, heading, fastSpawn);
         }
 
@@ -360,6 +348,37 @@ namespace Client.Application
             var server = DateTime.Parse(serverDateTimeAsString);
             API.NetworkOverrideClockTime(server.Hour, server.Minute, server.Second);
             API.SetMillisecondsPerGameMinute(60000);
+        }
+
+        public async Task PlayerStateTickHandler()
+        {
+            if (this.deathCheckIsEnable)
+            {
+                await Delay(50);
+                if (API.IsEntityDead(Game.PlayerPed.Handle))
+                {
+                    this.deathCheckIsEnable = false;
+                    API.SetTimeScale(0.4f);
+                    var deathScreenEffects = new[] { "DeathFailOut", "DeathFailNeutralIn", "DeathFailMPDark", "DeathFailMPIn", "RaceTurbo" };
+                    var random = new Random().Next(deathScreenEffects.Length - 1);
+                    API.StartScreenEffect(deathScreenEffects[random], 8000, false);
+                    API.StartScreenEffect("CamPushInTrevor", 8000, false);
+                    await Delay(6000);
+                    API.DoScreenFadeOut(300);
+                    while (API.IsScreenFadingOut())
+                    {
+                        await Delay(16);
+                    }
+                    await Delay(1000);
+                    API.StopAllScreenEffects();
+                    TriggerServerEvent("GF:Server:TriggerStateEvent", "die");
+                    await Delay(3000);
+                }
+            }
+            else
+            {
+                await Delay(1000);
+            }
         }
     }
 }

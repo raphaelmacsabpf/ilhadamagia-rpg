@@ -463,6 +463,7 @@ namespace Server.Application.Managers
                                 }
 
                                 this.playerInfo.SendUpdatedPlayerVars(targetGfPlayer); // TODO: Resolver essa pendencia do sendupdatedvars, arranjar alternativa melhor
+                                this.playerInfo.SendUpdatedPlayerVars(sourceGFPlayer); // TODO: Resolver essa pendencia do sendupdatedvars, arranjar alternativa melhor
                                 var ignoredPlayersInChatEvent = new[] { sourceGFPlayer, targetGfPlayer };
                                 this.chatManager.ProxDetectorColorFixed(10.0f, sourceGFPlayer, $" * {sourceGFPlayer.Account.Username} pagou para {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, ignoredPlayersInChatEvent);
                                 this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" O jogador {sourceGFPlayer.Account.Username} lhe pagou ${money} em dinheiro");

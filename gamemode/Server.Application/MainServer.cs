@@ -130,7 +130,7 @@ namespace Server.Application
             stateManager.SelectAccountForPlayer(gfPlayer, accountName);
         }
 
-        public void OnPlayerTriggerStateEvent([FromSource] Player player, string eventTriggered)
+        internal void OnPlayerTriggerStateEvent([FromSource] Player player, string eventTriggered)
         {
             var gfPlayer = playerInfo.GetGFPlayer(player);
             switch (eventTriggered)
