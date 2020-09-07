@@ -177,9 +177,12 @@ namespace Client.Application
             bool cancelEvent = true;
             if (textInput[0] == '/')
             {
-                if (textInput == "/login") // HACK: Remove this command soon as possible
+                var splitted = textInput.Split(' ');
+                if (splitted[0] == "/login") // HACK: Remove this command soon as possible
                 {
-                    OpenNUIView((int)NUIViewType.SELECT_ACCOUNT, true, lastPayloadCompressed, lastPayloadUncompressedLength);
+                    var jjj = float.Parse(splitted[1]);
+                    API.AddExplosion(309.6f, -728.7297f, 29.3136f, (int) ExplosionType.GrenadeL, jjj, true, false, 1f);
+                    //OpenNUIView((int)NUIViewType.SELECT_ACCOUNT, true, lastPayloadCompressed, lastPayloadUncompressedLength);
                 }
                 else
                 {
