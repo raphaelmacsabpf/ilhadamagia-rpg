@@ -2,6 +2,7 @@
 {
     public enum NUIViewType
     {
-        SELECT_ACCOUNT
+        SELECT_ACCOUNT,
+        CREATE_ACCOUNT
     }
 }

@@ -2,14 +2,17 @@ import React, { Component } from 'react';
 import './styles.css';
 import Nui from '../../util/Nui';
 import AccountList from '../AccountList';
+import CreateAccount from '../CreateAccount';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       viewSelectAccountVisible: false,
+      viewCreateAccountVisible: false,
     }
     this.accountListComponent = undefined;
+    this.createAccountComponent = undefined;
   }
 
   componentWillMount() {
@@ -36,6 +39,8 @@ class App extends Component {
     if(viewName == 'SELECT_ACCOUNT') {
       this.setState({ viewSelectAccountVisible: true});
       this.accountListComponent.updateAccounts(payload);
+    } else if(viewName == 'CREATE_ACCOUNT') {
+      this.setState({ viewCreateAccountVisible: true});
     }
   }
 
@@ -43,6 +48,8 @@ class App extends Component {
     console.log(`Closing view ${viewName}`); // TODO: Remover esse log
     if(viewName == 'SELECT_ACCOUNT') {
       this.setState({ viewSelectAccountVisible: false});
+    } else if(viewName == 'CREATE_ACCOUNT') {
+      this.setState({ viewCreateAccountVisible: false});
     }
   }
 
@@ -57,7 +64,14 @@ class App extends Component {
             }}/>
           )
         }
-
+        {
+          this.state.viewCreateAccountVisible &&
+          (
+            <CreateAccount ref={component => {
+              this.createAccountComponent = component;
+            }}/>
+          )
+        }
       </div>
     )
   }

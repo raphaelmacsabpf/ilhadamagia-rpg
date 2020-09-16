@@ -137,6 +137,15 @@ namespace Server.Application.Managers
                     }
                 });
 
+            fsm.Configure(PlayerConnectionState.NEW_ACCOUNT)
+                .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
+                .OnEntry(async () =>
+                {
+                    var json = JsonConvert.SerializeObject(null);
+                    var compressedJson = networkManager.Compress(json);
+                    this.playerActions.OpenNUIView(gfPlayer, NUIViewType.CREATE_ACCOUNT, true, compressedJson, json.Length);
+                });
+
             fsm.Configure(PlayerConnectionState.LOADING_ACCOUNT)
                 .Permit(PlayerConnectionTrigger.ACCOUNT_SELECTED, PlayerConnectionState.LOGGED)
                 .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
