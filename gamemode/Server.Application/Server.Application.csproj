@@ -85,6 +85,7 @@
     <Compile Include="PlayerActions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\MoneyService.cs" />
+    <Compile Include="Services\OrgService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Shared.CrossCutting\Shared.CrossCutting.csproj">

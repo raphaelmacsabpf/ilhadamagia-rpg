@@ -3,7 +3,7 @@ module.exports = {
   development: {
     client: 'mysql2',
     connection: {
-      host: '192.168.99.100',
+      host: '127.0.0.1',
       database: 'ilhadamagia',
       user:     'root',
       password: 'PQPMELANCIAAZEDA'
@@ -20,7 +20,7 @@ module.exports = {
   staging: {
     client: 'mysql2',
     connection: {
-      host: '192.168.99.100',
+      host: '127.0.0.1',
       database: 'ilhadamagia',
       user:     'root',
       password: 'PQPMELANCIAAZEDA'
@@ -37,7 +37,7 @@ module.exports = {
   production: {
     client: 'mysql2',
     connection: {
-      host: '192.168.99.100',
+      host: '127.0.0.1',
       database: 'ilhadamagia',
       user:     'root',
       password: 'PQPMELANCIAAZEDA'

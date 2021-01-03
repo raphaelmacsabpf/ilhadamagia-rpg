@@ -1,5 +1,6 @@
 ﻿using CitizenFX.Core;
 using Server.Application.Entities;
+using Server.Application.Services;
 using Server.Database;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace Server.Application.Managers
         public event EventHandler<List<GF247Store>> On247StoresLoad;
 
         private readonly int maxOrgId;
-        private readonly OrgRepository orgRepository;
+        private readonly OrgService orgService;
         private readonly List<GFOrg> orgs;
         private readonly List<GFAmmunation> ammunations;
         private readonly List<GFGasStation> gasStations;
@@ -36,9 +37,9 @@ namespace Server.Application.Managers
         private readonly List<GFPoliceDepartment> policeDepartments;
         private readonly List<GF247Store> store247List;
 
-        public GameEntitiesManager(OrgRepository orgRepository)
+        public GameEntitiesManager(OrgService orgService)
         {
-            this.orgRepository = orgRepository;
+            this.orgService = orgService;
             this.orgs = new List<GFOrg>();
             this.ammunations = GetAmmunationsList();
             this.gasStations = GetGasStationsList();
@@ -48,7 +49,7 @@ namespace Server.Application.Managers
             this.policeDepartments = GetPoliceDepartmentList();
             this.store247List = Get247StoreList();
 
-            var orgList = orgRepository.GetAll();
+            var orgList = this.orgService.GetAllOrgs();
             maxOrgId = 0;
             foreach (var orgEntity in orgList)
             {
@@ -84,14 +85,6 @@ namespace Server.Application.Managers
         public GFOrg GetGFOrgById(int orgId)
         {
             return this.orgs.FirstOrDefault(x => x.Entity.Id == orgId);
-        }
-
-        public void SaveOrgs()
-        {
-            foreach (var org in this.orgs)
-            {
-                orgRepository.Update(org.Entity).Wait();
-            }
         }
 
         private static List<GFAmmunation> GetAmmunationsList()
