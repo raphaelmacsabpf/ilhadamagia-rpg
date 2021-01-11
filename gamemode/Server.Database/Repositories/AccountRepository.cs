@@ -1,13 +1,13 @@
 ﻿using Dapper;
 using MySqlConnector;
 using Server.Domain.Entities;
-using System;
+using Server.Domain.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Server.Database
+namespace Server.Database.Repositories
 {
-    public class AccountRepository
+    public class AccountRepository : IAccountRepository
     {
         private readonly MySqlConnection mySqlConnection;
 
@@ -16,7 +16,7 @@ namespace Server.Database
             this.mySqlConnection = mySqlConnectionPool.GetRandomConnection();
         }
 
-        public Task<IEnumerable<Account>> GetAccountListByLicense(string license)
+        public Task<IEnumerable<Account>> GetAccountList(string license)
         {
             const string sqlStatement = @"
 SELECT * FROM imtb_account
@@ -39,7 +39,6 @@ SELECT LAST_INSERT_ID();";
 
         public Task Update(Account account)
         {
-            account.UpdatedAt = DateTime.Now;
             const string sqlStatement = @"
 UPDATE imtb_account SET
 UpdatedAt = @UpdatedAt,
@@ -56,7 +55,6 @@ LastX = @LastX,
 LastY = @LastY,
 LastZ = @LastZ,
 LastHouseInside = @LastHouseInside,
-OrgId = @OrgId,
 IsLeader = @IsLeader
 WHERE Id = @Id";
 

@@ -1,15 +1,23 @@
 ﻿using Autofac;
 using CitizenFX.Core;
+using Server.Application.CommandLibraries;
 using Server.Application.Managers;
-using Server.Application.Services;
 using Server.Database;
+using Server.Database.Repositories;
+using Server.Domain.Interfaces;
+using Server.Domain.Services;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Server.Application
 {
     public class AppBootstrap : BaseScript
     {
+        private CommandLibraryFactory commandLibraryFactory;
+        private MySqlConnectionPool mysqlConnectionPool;
         public AppBootstrap()
         {
             Stopwatch initializationStopwatch = new Stopwatch();
@@ -24,13 +32,24 @@ namespace Server.Application
 
             Console.WriteLine("[IM AppBootstrap] Building DI Container");
 
+            this.mysqlConnectionPool = new MySqlConnectionPool(20);
+            this.commandLibraryFactory = new CommandLibraryFactory();
+
             var builder = new ContainerBuilder();
-            builder.RegisterInstance(new MySqlConnectionPool(20)).As<MySqlConnectionPool>();
-            builder.RegisterType<AccountRepository>().As<AccountRepository>().SingleInstance();
-            builder.RegisterType<HouseRepository>().As<HouseRepository>().SingleInstance();
-            builder.RegisterType<VehicleRepository>().As<VehicleRepository>().SingleInstance();
-            builder.RegisterType<OrgRepository>().As<OrgRepository>().SingleInstance();
-            builder.RegisterType<MoneyTransactionRepository>().As<MoneyTransactionRepository>();
+            builder.RegisterInstance(this.mysqlConnectionPool).As<MySqlConnectionPool>();
+            builder.RegisterInstance(this.commandLibraryFactory).As<CommandLibraryFactory>();
+            builder.RegisterType<AdminCommands>().As<AdminCommands>().SingleInstance();
+            builder.RegisterType<ChatCommands>().As<ChatCommands>().SingleInstance();
+            builder.RegisterType<HouseCommands>().As<HouseCommands>().SingleInstance();
+            builder.RegisterType<MiscCommands>().As<MiscCommands>().SingleInstance();
+            builder.RegisterType<MoneyCommands>().As<MoneyCommands>().SingleInstance();
+            builder.RegisterType<AccountService>().As<AccountService>().SingleInstance();
+            builder.RegisterType<VehicleService>().As<VehicleService>().SingleInstance();
+            builder.RegisterType<AccountRepository>().As<IAccountRepository>().SingleInstance();
+            builder.RegisterType<HouseRepository>().As<IHouseRepository>().SingleInstance();
+            builder.RegisterType<VehicleRepository>().As<IVehicleRepository>().SingleInstance();
+            builder.RegisterType<OrgRepository>().As<IOrgRepository>().SingleInstance();
+            builder.RegisterType<MoneyTransactionRepository>().As<IMoneyTransactionRepository>();
             builder.RegisterType<MenuManager>().As<MenuManager>().SingleInstance();
             builder.RegisterType<ChatManager>().As<ChatManager>().SingleInstance();
             builder.RegisterType<MapManager>().As<MapManager>().SingleInstance();
@@ -51,9 +70,11 @@ namespace Server.Application
             using (var scope = Container.BeginLifetimeScope())
             {
                 Console.WriteLine("[IM AppBootstrap] Resolving Scope");
+                this.BuildCommandLibraryFactory(scope);
                 var mainServer = scope.Resolve<MainServer>();
                 var chatManager = scope.Resolve<ChatManager>();
                 var menuManager = scope.Resolve<MenuManager>();
+                
 
                 Console.WriteLine("[IM AppBootstrap] Registering EventHanlders");
 
@@ -61,7 +82,7 @@ namespace Server.Application
                 EventHandlers["playerDropped"] += new Action<Player, string>(mainServer.OnPlayerDropped);
                 EventHandlers["GF:Server:OnClientReady"] += new Action<Player>(mainServer.OnClientReady);
                 EventHandlers["GF:Server:OnChatMessage"] += new Action<Player, string>(chatManager.OnChatMessage);
-                EventHandlers["GF:Server:OnClientCommand"] += new Action<Player, int, bool, string>(mainServer.CommandManager.OnClientCommand);
+                EventHandlers["GF:Server:OnClientCommand"] += new Action<Player, string, bool, string>(mainServer.CommandManager.OnClientCommand);
                 EventHandlers["GF:Server:OnPlayerTargetActionServerCallback"] += new Action<Player, string>(mainServer.MapManager.OnPlayerTargetActionServerCallback);
                 EventHandlers["GF:Server:OnMenuAction"] += new Action<Player, int, string>(menuManager.OnPlayerMenuAction);
                 EventHandlers["GF:Server:ResponseAccountSelect"] += new Action<Player, string>(mainServer.OnPlayerSelectAccount);
@@ -71,6 +92,18 @@ namespace Server.Application
             initializationStopwatch.Stop();
             Console.WriteLine($"[IM AppBootstrap] Started successful in {initializationStopwatch.ElapsedMilliseconds}ms!");
             Console.WriteLine("\n");
+        }
+
+        private void BuildCommandLibraryFactory(ILifetimeScope scope)
+        {
+            this.commandLibraryFactory.SetAvailableCommandLibraries(new Dictionary<Type, CommandLibrary>()
+            {
+                { typeof(AdminCommands), scope.Resolve<AdminCommands>() },
+                { typeof(ChatCommands), scope.Resolve<ChatCommands>() },
+                { typeof(HouseCommands), scope.Resolve<HouseCommands>() },
+                { typeof(MiscCommands), scope.Resolve<MiscCommands>() },
+                { typeof(MoneyCommands), scope.Resolve<MoneyCommands>() },
+            });
         }
 
         private static IContainer Container { get; set; }

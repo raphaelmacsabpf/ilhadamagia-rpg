@@ -3,8 +3,9 @@ using GF.CrossCutting;
 using Newtonsoft.Json;
 using Server.Application.Entities;
 using Server.Application.Enums;
-using Server.Database;
 using Server.Domain.Enums;
+using Server.Domain.Interfaces;
+using Server.Domain.Services;
 using Shared.CrossCutting;
 using Stateless;
 using Stateless.Graph;
@@ -20,18 +21,16 @@ namespace Server.Application.Managers
         private readonly NetworkManager networkManager;
         private readonly MapManager mapManager;
         private readonly PlayerActions playerActions;
-        private readonly AccountRepository accountRepository;
-        private readonly GameEntitiesManager gameEntitiesManager;
+        private readonly AccountService accountService;
 
-        public StateManager(ChatManager chatManager, PlayerInfo playerInfo, NetworkManager networkManager, MapManager mapManager, PlayerActions playerActions, AccountRepository accountRepository, GameEntitiesManager gameEntitiesManager)
+        public StateManager(ChatManager chatManager, PlayerInfo playerInfo, NetworkManager networkManager, MapManager mapManager, PlayerActions playerActions, AccountService accountService)
         {
             this.chatManager = chatManager;
             this.playerInfo = playerInfo;
             this.networkManager = networkManager;
             this.mapManager = mapManager;
             this.playerActions = playerActions;
-            this.accountRepository = accountRepository;
-            this.gameEntitiesManager = gameEntitiesManager;
+            this.accountService = accountService;
         }
 
         public void PrepareFSMForPlayer(Player player)
@@ -93,14 +92,7 @@ namespace Server.Application.Managers
                     if (gfPlayer.Account != null)
                     {
                         var playerPosition = gfPlayer.Player.Character.Position;
-                        gfPlayer.Account.LastX = playerPosition.X;
-                        gfPlayer.Account.LastY = playerPosition.Y;
-                        gfPlayer.Account.LastZ = playerPosition.Z;
-                        gfPlayer.Account.LastHouseInside = gfPlayer.CurrentHouseInside != null
-                            ? Convert.ToInt32(gfPlayer.CurrentHouseInside.Entity.Id)
-                            : (int?)null;
-
-                        accountRepository.Update(gfPlayer.Account);
+                        accountService.EndSession(gfPlayer.Account, playerPosition.X, playerPosition.Y, playerPosition.Z, gfPlayer.CurrentHouseInside?.Entity);
                         Console.WriteLine($"Player dropped #{gfPlayer.Player.Handle} Name: {gfPlayer.Player.Name}, Username: {gfPlayer.Account.Username}");
                         this.playerInfo.UnloadGFPlayer(gfPlayer);
                     }
@@ -121,7 +113,7 @@ namespace Server.Application.Managers
                 .OnEntry(async () =>
                 {
                     this.networkManager.SyncPlayerDateTime(gfPlayer);
-                    var accounts = (await accountRepository.GetAccountListByLicense(gfPlayer.License)).ToList();
+                    var accounts = (await accountService.GetAccountListForLicense(gfPlayer.License)).ToList();
                     if (accounts.Count > 0)
                     {
                         foreach (var account in accounts)
@@ -260,7 +252,7 @@ namespace Server.Application.Managers
 
         private void SetSpawnToOrganization(GFPlayer gfPlayer)
         {
-            var playerOrg = gameEntitiesManager.GetGFOrgById(gfPlayer.Account.OrgId);
+            GFOrg playerOrg = null; // HACK: load player org properly
             Vector3 spawnPosition;
             if (playerOrg == null)
             {

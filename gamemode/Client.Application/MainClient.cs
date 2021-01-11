@@ -181,13 +181,13 @@ namespace Client.Application
                 if (splitted[0] == "/login") // HACK: Remove this command soon as possible
                 {
                     var jjj = float.Parse(splitted[1]);
-                    API.AddExplosion(309.6f, -728.7297f, 29.3136f, (int) ExplosionType.GrenadeL, jjj, true, false, 1f);
+                    API.AddExplosion(309.6f, -728.7297f, 29.3136f, (int)ExplosionType.GrenadeL, jjj, true, false, 1f);
                     //OpenNUIView((int)NUIViewType.SELECT_ACCOUNT, true, lastPayloadCompressed, lastPayloadUncompressedLength);
                 }
                 else
                 {
-                    var commandPacket = CommandParser.Parse(textInput);
-                    TriggerServerEvent("GF:Server:OnClientCommand", (int)commandPacket.CommandCode, commandPacket.HasArgs, commandPacket.Text);
+                    var commandPacket = new CommandPacket(textInput);
+                    TriggerServerEvent("GF:Server:OnClientCommand", commandPacket.Command, commandPacket.HasArgs, commandPacket.Text);
                 }
                 if (cancelEvent)
                 {

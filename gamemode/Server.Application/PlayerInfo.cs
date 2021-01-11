@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Server.Application.Entities;
 using Server.Application.Managers;
-using Server.Database;
+using Server.Domain.Interfaces;
 using Shared.CrossCutting;
 using Shared.CrossCutting.Dto;
 using System;
@@ -18,9 +18,8 @@ namespace Server.Application
         private ConcurrentQueue<Tuple<PlayerVarsDto, GFPlayer>> playerVarsToUpdateQueue;
         private Thread updatePlayerVarsThread;
         private readonly NetworkManager networkManager;
-        private readonly AccountRepository accountRepository;
 
-        public PlayerInfo(NetworkManager networkManager, AccountRepository accountRepository)
+        public PlayerInfo(NetworkManager networkManager)
         {
             this.playerToGFPlayerDictionary = new ConcurrentDictionary<Player, GFPlayer>();
             this.playerVarsToUpdateQueue = new ConcurrentQueue<Tuple<PlayerVarsDto, GFPlayer>>();
@@ -30,7 +29,6 @@ namespace Server.Application
             this.updatePlayerVarsThread.IsBackground = true;
             this.updatePlayerVarsThread.Start();
             this.networkManager = networkManager;
-            this.accountRepository = accountRepository;
         }
 
         public void LoadGFPlayer(GFPlayer gfPlayer)
@@ -41,22 +39,6 @@ namespace Server.Application
         public void UnloadGFPlayer(GFPlayer gfPlayer)
         {
             playerToGFPlayerDictionary.TryRemove(gfPlayer.Player, out _); // TODO: Melhorar implementação de dicionário de playerinfo
-        }
-
-        private void UpdatePlayerVarsThreadHandler()
-        {
-            while (true)
-            {
-                Tuple<PlayerVarsDto, GFPlayer> playerVarsTuple;
-                while (playerVarsToUpdateQueue.TryDequeue(out playerVarsTuple))
-                {
-                    var json = JsonConvert.SerializeObject(playerVarsTuple.Item1);
-                    this.networkManager.SendPayloadToPlayer(playerVarsTuple.Item2.Player, PayloadType.TO_PLAYER_VARS, json);
-                    Thread.Sleep(10);
-                }
-
-                Thread.Sleep(1000);
-            }
         }
 
         public void SendUpdatedPlayerVars(GFPlayer gfPlayer)
@@ -76,6 +58,22 @@ namespace Server.Application
         public IEnumerable<GFPlayer> GetGFPlayerList()
         {
             return this.playerToGFPlayerDictionary.Values;
+        }
+
+        private void UpdatePlayerVarsThreadHandler()
+        {
+            while (true)
+            {
+                Tuple<PlayerVarsDto, GFPlayer> playerVarsTuple;
+                while (playerVarsToUpdateQueue.TryDequeue(out playerVarsTuple))
+                {
+                    var json = JsonConvert.SerializeObject(playerVarsTuple.Item1);
+                    this.networkManager.SendPayloadToPlayer(playerVarsTuple.Item2.Player, PayloadType.TO_PLAYER_VARS, json);
+                    Thread.Sleep(10);
+                }
+
+                Thread.Sleep(1000);
+            }
         }
 
         // TODO: Rever sistema de atualização de variáveis do jogador., atualização 21/07/2020 - Foi mexido, falta validar

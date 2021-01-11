@@ -45,7 +45,6 @@
   <ItemGroup>
     <Compile Include="ChatColor.cs" />
     <Compile Include="ChatColorValue.cs" />
-    <Compile Include="CommandCode.cs" />
     <Compile Include="CommandPacket.cs" />
     <Compile Include="Dto\BlipDto.cs" />
     <Compile Include="Dto\OrgDataDto.cs" />

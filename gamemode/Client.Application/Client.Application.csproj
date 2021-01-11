@@ -62,7 +62,6 @@
   <ItemGroup>
     <Compile Include="ClientAppBootstrap.cs" />
     <Compile Include="ClientNetworkManager.cs" />
-    <Compile Include="CommandParser.cs" />
     <Compile Include="MainClient.cs" />
     <Compile Include="MarkersManager.cs" />
     <Compile Include="MenuManager.cs" />

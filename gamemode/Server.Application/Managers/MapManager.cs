@@ -2,8 +2,9 @@
 using CitizenFX.Core.Native;
 using GF.CrossCutting.Dto;
 using Server.Application.Entities;
-using Server.Database;
 using Server.Domain.Enums;
+using Server.Domain.Interfaces;
+using Server.Domain.Services;
 using Shared.CrossCutting;
 using Shared.CrossCutting.Dto;
 using System;
@@ -25,15 +26,16 @@ namespace Server.Application.Managers
         private readonly PlayerInfo playerInfo;
         private readonly ChatManager chatManager;
         private readonly PlayerActions playerActions;
-        private readonly HouseRepository houseRepository;
+        private readonly IHouseRepository houseRepository;
+        private readonly VehicleService vehicleService;
 
-        public MapManager(PlayerInfo playerInfo, ChatManager chatManager, PlayerActions playerActions, HouseRepository houseRepository, VehicleRepository vehicleRepository)
+        public MapManager(PlayerInfo playerInfo, ChatManager chatManager, PlayerActions playerActions, IHouseRepository houseRepository, VehicleService vehicleService)
         {
             this.playerInfo = playerInfo;
             this.chatManager = chatManager;
             this.playerActions = playerActions;
             this.houseRepository = houseRepository;
-            this.VehicleRepository = vehicleRepository;
+            this.vehicleService = vehicleService;
             this.staticMarkers = new List<MarkerDto>();
             this.staticProximityTargets = new List<ProximityTargetDto>();
             this.staticInteractionTargets = new List<InteractionTargetDto>();
@@ -62,11 +64,9 @@ namespace Server.Application.Managers
             return this.houses.Where((house) => house.Entity.Owner == ownerUsername);
         }
 
-        public VehicleRepository VehicleRepository { get; }
-
         public void GFPlayerCallPropertyVehicle(GFPlayer gfPlayer, string vehicleGuid)
         {
-            var playerVehicles = VehicleRepository.GetAccountVehicles(gfPlayer.Account);
+            var playerVehicles = vehicleService.GetAccountVehicles(gfPlayer.Account);
             var vehicle = playerVehicles.FirstOrDefault((_) => _.Guid == vehicleGuid);
             if (vehicle == null) return;
             var gfHouse = GetClosestHouseInRadius(gfPlayer, 3.0f);
@@ -255,7 +255,7 @@ namespace Server.Application.Managers
             var orgDataDto = new OrgDataDto()
             {
                 Name = gfOrg.Entity.Name,
-                Leader = gfOrg.Entity.Leader,
+                Leader = "Leader_Name", // TODO: Load org leader name properly
                 Members = new List<string>() // TODO: Load org members from repository in the right place
             };
 

@@ -1,11 +1,12 @@
 ﻿using Dapper;
 using MySqlConnector;
 using Server.Domain.Entities;
+using Server.Domain.Interfaces;
 using System.Threading.Tasks;
 
-namespace Server.Database
+namespace Server.Database.Repositories
 {
-    public class MoneyTransactionRepository
+    public class MoneyTransactionRepository : IMoneyTransactionRepository
     {
         private readonly MySqlConnection mySqlConnection;
 

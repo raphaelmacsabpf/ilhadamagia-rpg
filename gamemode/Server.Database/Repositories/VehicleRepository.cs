@@ -1,11 +1,12 @@
 ﻿using Dapper;
 using MySqlConnector;
 using Server.Domain.Entities;
+using Server.Domain.Interfaces;
 using System.Collections.Generic;
 
-namespace Server.Database
+namespace Server.Database.Repositories
 {
-    public class VehicleRepository
+    public class VehicleRepository : IVehicleRepository
     {
         private readonly MySqlConnection mySqlConnection;
 

@@ -2,11 +2,16 @@
 {
     public class Org
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Leader { get; set; }
-        public float SpawnX { get; set; }
-        public float SpawnY { get; set; }
-        public float SpawnZ { get; set; }
+        public int Id { get; }
+        public string Name { get; }
+        public int? Leader { get; private set; }
+        public float SpawnX { get; }
+        public float SpawnY { get; }
+        public float SpawnZ { get; }
+
+        public void SetLeader(Account account)
+        {
+            this.Leader = account.Id;
+        }
     }
 }

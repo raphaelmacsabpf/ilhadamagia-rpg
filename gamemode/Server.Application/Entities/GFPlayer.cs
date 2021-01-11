@@ -33,7 +33,8 @@ namespace Server.Application.Entities
                 selectedHouse = value;
                 if (value?.Entity != null && this.Account != null)
                 {
-                    this.Account.SelectedHouse = value.Entity.Id;
+                    this.Account.SetSelectedHouse(value.Entity);
+                    //HACK: Retirado refatoração DDD|this.Account.SelectedHouse = value.Entity.Id;
                 }
             }
         }
@@ -44,5 +45,6 @@ namespace Server.Application.Entities
         public bool IsFirstSpawn { get; set; }
         public GFHouse CurrentHouseInside { get; set; }
         public List<Account> LicenseAccounts { get; set; }
+        public int OrgId { get; set; }
     }
 }

@@ -53,7 +53,17 @@
     <Compile Include="Enums\PropertyType.cs" />
     <Compile Include="Enums\SpawnType.cs" />
     <Compile Include="Enums\WeaponHash.cs" />
+    <Compile Include="Interfaces\IAccountRepository.cs" />
+    <Compile Include="Interfaces\IHouseRepository.cs" />
+    <Compile Include="Interfaces\IOrgRepository.cs" />
+    <Compile Include="Interfaces\IVehicleRepository.cs" />
+    <Compile Include="Interfaces\IMoneyTransactionRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\AccountService.cs" />
+    <Compile Include="Services\HouseService.cs" />
+    <Compile Include="Services\MoneyService.cs" />
+    <Compile Include="Services\OrgService.cs" />
+    <Compile Include="Services\VehicleService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -1,12 +1,13 @@
 ﻿using Dapper;
 using MySqlConnector;
 using Server.Domain.Entities;
+using Server.Domain.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Server.Database
+namespace Server.Database.Repositories
 {
-    public class OrgRepository
+    public class OrgRepository : IOrgRepository
     {
         private readonly MySqlConnection mySqlConnection;
 

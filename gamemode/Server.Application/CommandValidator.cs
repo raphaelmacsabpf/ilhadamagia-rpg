@@ -42,6 +42,9 @@ namespace Server.Application
             this.commandVariables = new Dictionary<string, object>();
         }
 
+        public GFPlayer SourceGFPlayer { get => this.sourceGFPlayer; }
+        public CommandPacket CommandPacket { get => this.commandPacket; }
+
         public CommandValidator WithAdminLevel(int minAdminLevel)
         {
             if (this.sourceGFPlayer.Account.AdminLevel < minAdminLevel)

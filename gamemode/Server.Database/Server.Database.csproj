@@ -60,13 +60,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AccountRepository.cs" />
-    <Compile Include="HouseRepository.cs" />
-    <Compile Include="MoneyTransactionRepository.cs" />
+    <Compile Include="Repositories\AccountRepository.cs" />
+    <Compile Include="Repositories\HouseRepository.cs" />
+    <Compile Include="Repositories\MoneyTransactionRepository.cs" />
     <Compile Include="MySQLConnectionPool.cs" />
-    <Compile Include="OrgRepository.cs" />
+    <Compile Include="Repositories\OrgRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VehicleRepository.cs" />
+    <Compile Include="Repositories\VehicleRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
