@@ -2,7 +2,7 @@
 
 namespace Server.Application.CommandLibraries
 {
-    class CommandAttribute : Attribute
+    internal class CommandAttribute : Attribute
     {
         public CommandAttribute(string command)
         {

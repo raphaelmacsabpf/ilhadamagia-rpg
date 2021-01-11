@@ -14,7 +14,7 @@ namespace Server.Application.CommandLibraries
 
         public CommandLibrary GetCommandLibraryInstance(Type commandLibraryType)
         {
-            if(this.commandLibraryInstanceDictionary.ContainsKey(commandLibraryType))
+            if (this.commandLibraryInstanceDictionary.ContainsKey(commandLibraryType))
             {
                 return this.commandLibraryInstanceDictionary[commandLibraryType];
             }

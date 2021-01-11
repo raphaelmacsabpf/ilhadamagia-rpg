@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 using Server.Application.Entities;
 using Server.Application.Enums;
 using Server.Domain.Enums;
-using Server.Domain.Interfaces;
 using Server.Domain.Services;
 using Shared.CrossCutting;
 using Stateless;

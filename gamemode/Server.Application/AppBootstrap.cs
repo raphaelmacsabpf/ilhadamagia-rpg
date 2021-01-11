@@ -9,8 +9,6 @@ using Server.Domain.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Reflection;
-using System.Threading.Tasks;
 
 namespace Server.Application
 {
@@ -18,6 +16,7 @@ namespace Server.Application
     {
         private CommandLibraryFactory commandLibraryFactory;
         private MySqlConnectionPool mysqlConnectionPool;
+
         public AppBootstrap()
         {
             Stopwatch initializationStopwatch = new Stopwatch();
@@ -74,7 +73,6 @@ namespace Server.Application
                 var mainServer = scope.Resolve<MainServer>();
                 var chatManager = scope.Resolve<ChatManager>();
                 var menuManager = scope.Resolve<MenuManager>();
-                
 
                 Console.WriteLine("[IM AppBootstrap] Registering EventHanlders");
 

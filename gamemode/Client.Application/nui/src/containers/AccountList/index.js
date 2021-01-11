@@ -11,36 +11,36 @@ class AccountList extends Component {
     }
 
     updateAccounts(newAccountList) {
-      let mappedAccountList = newAccountList.map((element) => {
-        return element.Username;
-      });
-      this.setState({accounts: mappedAccountList});
+        let mappedAccountList = newAccountList.map((element) => {
+            return element.Username;
+        });
+        this.setState({ accounts: mappedAccountList });
     }
 
     handleAccountSelect(account) {
-      Nui.send('NUI_ENDPOINT', { type: 'RESPONSE_ACCOUNT_SELECTED', account });
+        Nui.send('NUI_ENDPOINT', { type: 'RESPONSE_ACCOUNT_SELECTED', account });
     }
 
     renderAccount(account) {
-      let functionHandle = this.handleAccountSelect;
-      return (
-        <div className="account" key={account}>
-          <li>{account}</li>
-          <button onClick={ (e) => functionHandle(account) }>Selecionar</button>
-        </div>
-      )
+        let functionHandle = this.handleAccountSelect;
+        return (
+            <div className="account" key={account}>
+                <li>{account}</li>
+                <button onClick={(e) => functionHandle(account)}>Selecionar</button>
+            </div>
+        )
     }
 
-    render () {
-      return (
-        <div className="container">
-          <h1>Escolha sua conta</h1>
-          <ul>
-            {this.state.accounts.map(this.renderAccount.bind(this))}
-          </ul>
-          <button onClick={ (e) => this.handleAccountSelect(e) }>Selecionards</button>
-        </div>
-      )
+    render() {
+        return (
+            <div className="container">
+                <h1>Escolha sua conta</h1>
+                <ul>
+                    {this.state.accounts.map(this.renderAccount.bind(this))}
+                </ul>
+                <button onClick={(e) => this.handleAccountSelect(e)}>Selecionards</button>
+            </div>
+        )
     }
 }
 

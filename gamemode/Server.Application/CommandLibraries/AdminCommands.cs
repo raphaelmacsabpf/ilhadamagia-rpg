@@ -128,7 +128,7 @@ namespace Server.Application.CommandLibraries
 
         [Command("/setcasa")]
         public void SetHouse(CommandValidator commandValidator)
-        { 
+        {
             if (commandValidator.WithAdminLevel(3001).WithTargetPlayer("playerid").WithVarBetween<int>(1, mapManager.HouseCount, "house-id").IsValid($"USE: /setcasa [playerid] [id(1-{mapManager.HouseCount})]"))
             {
                 GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
@@ -171,7 +171,7 @@ namespace Server.Application.CommandLibraries
 
         [Command("/setorg")]
         public void SetOrg(CommandValidator commandValidator)
-        { 
+        {
             if (commandValidator.WithAdminLevel(4).WithTargetPlayer("playerid")
                 .WithVarBetween<int>(0, PedModelsConverter.GetPedModelMaxId(), "org-id")
                 .IsValid($"USE: /setorg [playerid] [org-id(0-{gameEntitiesManager.GetMaxOrgId()}]"))
@@ -218,7 +218,7 @@ namespace Server.Application.CommandLibraries
 
         [Command("/dararma")]
         public void GiveWeapon(CommandValidator commandValidator)
-        { 
+        {
             if (commandValidator.WithAdminLevel(4).WithTargetPlayer("playerid")
                 .WithVarBetween<int>(0, WeaponConverter.GetWeaponMaxId(), "weapon-id")
                 .WithVarBetween<int>(0, 250, "ammo-count")

@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using Server.Application.Entities;
 using Server.Application.Managers;
-using Server.Domain.Interfaces;
 using Shared.CrossCutting;
 using Shared.CrossCutting.Dto;
 using System;

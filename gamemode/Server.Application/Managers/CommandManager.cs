@@ -69,7 +69,7 @@ namespace Server.Application.Managers
             }
         }
 
-        private void ProcessCommandForPlayer(GFPlayer sourceGFPlayer,string command, bool hasArgs, string text)
+        private void ProcessCommandForPlayer(GFPlayer sourceGFPlayer, string command, bool hasArgs, string text)
         {
             CommandPacket commandPacket = new CommandPacket(text);
             commandPacket.Command = command;
