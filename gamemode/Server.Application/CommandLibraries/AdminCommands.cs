@@ -3,6 +3,7 @@ using GF.CrossCutting;
 using GF.CrossCutting.Converters;
 using Server.Application.Entities;
 using Server.Application.Managers;
+using Server.Application.Services;
 using Server.Domain.Enums;
 using Server.Domain.Services;
 using Shared.CrossCutting;
@@ -19,8 +20,9 @@ namespace Server.Application.CommandLibraries
         private readonly StateManager stateManager;
         private readonly GameEntitiesManager gameEntitiesManager;
         private readonly MoneyService moneyService;
+        private readonly PlayerService playerService;
 
-        public AdminCommands(PlayerActions playerActions, ChatManager chatManager, PlayerInfo playerInfo, MapManager mapManager, StateManager stateManager, GameEntitiesManager gameEntitiesManager, MoneyService moneyService)
+        public AdminCommands(PlayerActions playerActions, ChatManager chatManager, PlayerInfo playerInfo, MapManager mapManager, StateManager stateManager, GameEntitiesManager gameEntitiesManager, MoneyService moneyService, PlayerService playerService)
         {
             this.playerActions = playerActions;
             this.chatManager = chatManager;
@@ -29,6 +31,7 @@ namespace Server.Application.CommandLibraries
             this.stateManager = stateManager;
             this.gameEntitiesManager = gameEntitiesManager;
             this.moneyService = moneyService;
+            this.playerService = playerService;
         }
 
         [Command("/ir")]
@@ -37,10 +40,7 @@ namespace Server.Application.CommandLibraries
             if (commandValidator.WithAdminLevel(1).WithTargetPlayer("playerid").IsValid("USE: /ir [playerid]"))
             {
                 GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
-                var targetPosition = targetGfPlayer.Player.Character.Position + new Vector3(0f, 2f, -1f); // I don't know why this -1f???? WTF???
-                this.playerActions.SetPlayerPos(commandValidator.SourceGFPlayer, targetPosition);
-                this.chatManager.ProxDetectorColorFixed(10.0f, targetGfPlayer, $"*Admin {commandValidator.SourceGFPlayer.Account.Username} veio até {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, new[] { commandValidator.SourceGFPlayer });
-                this.chatManager.ProxDetectorColorFixed(10.0f, commandValidator.SourceGFPlayer, $"*Admin {commandValidator.SourceGFPlayer.Account.Username} foi até {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, new[] { targetGfPlayer });
+                this.playerService.AdminGoToPlayer(commandValidator.SourceGFPlayer, targetGfPlayer);
             }
         }
 
@@ -50,10 +50,7 @@ namespace Server.Application.CommandLibraries
             if (commandValidator.WithAdminLevel(1).WithTargetPlayer("playerid").IsValid("USE: /trazer [playerid]"))
             {
                 GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
-                var sourcePosition = commandValidator.SourceGFPlayer.Player.Character.Position + new Vector3(0f, 2f, -1f); // I don't know why this -1f???? WTF???
-                this.playerActions.SetPlayerPos(targetGfPlayer, sourcePosition);
-                this.chatManager.ProxDetectorColorFixed(10.0f, commandValidator.SourceGFPlayer, $"*Admin {commandValidator.SourceGFPlayer.Account.Username} trouxe {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, new[] { commandValidator.SourceGFPlayer });
-                this.chatManager.ProxDetectorColorFixed(10.0f, targetGfPlayer, $"*Admin {commandValidator.SourceGFPlayer.Account.Username} levou {targetGfPlayer.Account.Username}", ChatColor.COLOR_PURPLE, new[] { targetGfPlayer });
+                this.playerService.AdminBringPlayer(commandValidator.SourceGFPlayer, targetGfPlayer);
             }
         }
 
@@ -75,10 +72,7 @@ namespace Server.Application.CommandLibraries
             {
                 GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                 int level = commandValidator.GetVar<int>("level");
-
-                targetGfPlayer.Account.SetAdminLevel(level);
-                this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $"  Você foi promovido a nivel {level} de admin, pelo admin {commandValidator.SourceGFPlayer.Account.Username}");
-                this.chatManager.SendClientMessage(commandValidator.SourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você promoveu {targetGfPlayer.Account.Username} para nivel {level} de admin.");
+                this.playerService.SetAsAdmin(commandValidator.SourceGFPlayer, targetGfPlayer, level);
             }
         }
 

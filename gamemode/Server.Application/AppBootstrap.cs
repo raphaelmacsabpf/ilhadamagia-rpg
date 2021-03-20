@@ -2,6 +2,7 @@
 using CitizenFX.Core;
 using Server.Application.CommandLibraries;
 using Server.Application.Managers;
+using Server.Application.Services;
 using Server.Database;
 using Server.Database.Repositories;
 using Server.Domain.Interfaces;
@@ -44,6 +45,7 @@ namespace Server.Application
             builder.RegisterType<MoneyCommands>().As<MoneyCommands>().SingleInstance();
             builder.RegisterType<AccountService>().As<AccountService>().SingleInstance();
             builder.RegisterType<VehicleService>().As<VehicleService>().SingleInstance();
+            builder.RegisterType<PlayerService>().As<PlayerService>().SingleInstance();
             builder.RegisterType<AccountRepository>().As<IAccountRepository>().SingleInstance();
             builder.RegisterType<HouseRepository>().As<IHouseRepository>().SingleInstance();
             builder.RegisterType<VehicleRepository>().As<IVehicleRepository>().SingleInstance();
