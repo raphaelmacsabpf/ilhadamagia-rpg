@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Server.Application.Managers
 {
-    public class ChatManager : BaseScript
+    public class ChatManager
     {
         private readonly PlayerInfo playerInfo;
 
@@ -28,11 +28,6 @@ namespace Server.Application.Managers
         public void SendClientMessage(GFPlayer gfPlayer, ChatColor chatColor, string message)
         {
             gfPlayer.Player.TriggerEvent("GF:Client:SendClientMessage", (int)chatColor, message);
-        }
-
-        public void PlayerChat(GFPlayer gfPlayer, string message)
-        {
-            ProxDetectorChat(20.0f, gfPlayer, message);
         }
 
         public void PlayerScream(GFPlayer gfPlayer, string message)
@@ -92,24 +87,14 @@ namespace Server.Application.Managers
             }
         }
 
-        internal void OnChatMessage([FromSource] Player player, string message) // TODO: PROTEGER OnChatMessage
-        {
-            var wholeMessageCharsIsUppercase = message.CompareTo(message.ToUpper()) == 0;
-            var gfPlayer = playerInfo.GetGFPlayer(player);
-            if (wholeMessageCharsIsUppercase)
-            {
-                PlayerScream(gfPlayer, message);
-            }
-            else
-            {
-                var messageToChat = $"[ID: {player.Handle}] {gfPlayer.Account.Username} diz: {message}";
-                PlayerChat(gfPlayer, messageToChat);
-            }
-        }
-
         private void ProxDetectorChat(float radi, GFPlayer gfPlayer, string message)
         {
             ProxDetectorColors(radi, gfPlayer, message, ChatColor.COLOR_FADE1, ChatColor.COLOR_FADE2, ChatColor.COLOR_FADE3, ChatColor.COLOR_FADE4, ChatColor.COLOR_FADE5);
+        }
+
+        internal void PlayerChat(GFPlayer gfPlayer, string message)
+        {
+            ProxDetectorChat(20.0f, gfPlayer, message);
         }
     }
 }

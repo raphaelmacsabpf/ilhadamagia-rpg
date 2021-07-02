@@ -3,6 +3,8 @@ using GF.CrossCutting;
 using Newtonsoft.Json;
 using Server.Application.Entities;
 using Server.Application.Enums;
+using Server.Application.Services;
+using Server.Domain.Entities;
 using Server.Domain.Enums;
 using Server.Domain.Services;
 using Shared.CrossCutting;
@@ -21,8 +23,10 @@ namespace Server.Application.Managers
         private readonly MapManager mapManager;
         private readonly PlayerActions playerActions;
         private readonly AccountService accountService;
+        private readonly OrgService orgService;
+        private readonly PlayerService playerService;
 
-        public StateManager(ChatManager chatManager, PlayerInfo playerInfo, NetworkManager networkManager, MapManager mapManager, PlayerActions playerActions, AccountService accountService)
+        public StateManager(ChatManager chatManager, PlayerInfo playerInfo, NetworkManager networkManager, MapManager mapManager, PlayerActions playerActions, AccountService accountService, OrgService orgService, PlayerService playerService)
         {
             this.chatManager = chatManager;
             this.playerInfo = playerInfo;
@@ -30,14 +34,8 @@ namespace Server.Application.Managers
             this.mapManager = mapManager;
             this.playerActions = playerActions;
             this.accountService = accountService;
-        }
-
-        public void PrepareFSMForPlayer(Player player)
-        {
-            var gfPlayer = new GFPlayer(player);
-            var fsm = CreatePlayerConnectionFSM(gfPlayer);
-            gfPlayer.FSM = fsm;
-            playerInfo.LoadGFPlayer(gfPlayer);
+            this.orgService = orgService;
+            this.playerService = playerService;
         }
 
         public void SelectAccountForPlayer(GFPlayer gfPlayer, string accountName)
@@ -47,22 +45,13 @@ namespace Server.Application.Managers
             gfPlayer.Account = account;
             if (account.SelectedHouse != null)
             {
-                var houses = mapManager.GetAllHousesFromOwner(account.Username).ToList();
+                var houses = mapManager.GetAllHousesFromOwner(account.Username);
                 gfPlayer.SelectedHouse = houses.FirstOrDefault((gfHouse) => gfHouse.Entity != null && gfHouse.Entity.Id == account.SelectedHouse);
             }
             gfPlayer.FSM.Fire(PlayerConnectionTrigger.ACCOUNT_SELECTED);
         }
 
-        public void RespawnPlayerInCurrentPosition(GFPlayer gfPlayer)
-        {
-            var position = gfPlayer.Player.Character.Position;
-            gfPlayer.SpawnType = SpawnType.ToCoords;
-            gfPlayer.SpawnPosition = position;
-            gfPlayer.SwitchInPosition = position;
-            gfPlayer.FSM.Fire(PlayerConnectionTrigger.SET_TO_SPAWN);
-        }
-
-        private StateMachine<PlayerConnectionState, PlayerConnectionTrigger> CreatePlayerConnectionFSM(GFPlayer gfPlayer)
+        public StateMachine<PlayerConnectionState, PlayerConnectionTrigger> CreatePlayerConnectionFSM(GFPlayer gfPlayer)
         {
             var fsm = new StateMachine<PlayerConnectionState, PlayerConnectionTrigger>(PlayerConnectionState.INITIAL);
 
@@ -190,6 +179,7 @@ namespace Server.Application.Managers
                                     var lastHouseInt = Convert.ToInt32(accountLastHouseInside);
                                     gfPlayer.CurrentHouseInside = mapManager.GetGFHouseFromId(lastHouseInt);
                                 }
+                                chatManager.SendClientMessage(gfPlayer, ChatColor.COLOR_LIGHTBLUE, "Local de nascimento: Última posição");
                             }
                             else if (gfPlayer.SelectedHouse != null)
                             {
@@ -197,16 +187,19 @@ namespace Server.Application.Managers
                                 gfPlayer.CurrentHouseInside = gfPlayer.SelectedHouse;
                                 gfPlayer.SpawnPosition = mapManager.GetHouseInteriorPosition(gfPlayer.SelectedHouse);
                                 gfPlayer.SwitchInPosition = new Vector3(houseEntity.EntranceX, houseEntity.EntranceY, houseEntity.EntranceZ);
+                                chatManager.SendClientMessage(gfPlayer, ChatColor.COLOR_LIGHTBLUE, "Local de nascimento: Interior da casa");
                             }
                             else
                             {
                                 SetSpawnToOrganization(gfPlayer);
+                                chatManager.SendClientMessage(gfPlayer, ChatColor.COLOR_LIGHTBLUE, "Local de nascimento: Spawn organização");
                             }
                             gfPlayer.IsFirstSpawn = false;
                         }
                         else
                         {
                             SetSpawnToOrganization(gfPlayer);
+                            chatManager.SendClientMessage(gfPlayer, ChatColor.COLOR_LIGHTBLUE, "Local de nascimento: Spawn organização");
                         }
                     }
                     this.playerActions.SwitchOutPlayer(gfPlayer);
@@ -218,13 +211,11 @@ namespace Server.Application.Managers
                 .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
                 .OnEntry(() =>
                 {
-                    this.playerActions.SwitchInPlayer(gfPlayer, gfPlayer.SwitchInPosition.X, gfPlayer.SwitchInPosition.Y, gfPlayer.SwitchInPosition.Z);
-                    var fastSpawn = gfPlayer.SpawnType == SpawnType.ToCoords;
-                    playerActions.SpawnPlayer(gfPlayer, gfPlayer.Account.PedModel, gfPlayer.SpawnPosition.X, gfPlayer.SpawnPosition.Y, gfPlayer.SpawnPosition.Z, 0, fastSpawn);
-                    gfPlayer.SpawnType = SpawnType.Unset;
+                    this.playerService.SpawnPlayer(gfPlayer);
                 });
 
             fsm.Configure(PlayerConnectionState.SPAWNED)
+                .Permit(PlayerConnectionTrigger.SET_TO_SPAWN, PlayerConnectionState.SELECT_SPAWN_POSITION)
                 .Permit(PlayerConnectionTrigger.PLAYER_DIED, PlayerConnectionState.DIED)
                 .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
                 .OnEntry(() =>
@@ -251,7 +242,7 @@ namespace Server.Application.Managers
 
         private void SetSpawnToOrganization(GFPlayer gfPlayer)
         {
-            GFOrg playerOrg = null; // HACK: load player org properly
+            Org playerOrg = orgService.GetAccountOrg(gfPlayer.Account);
             Vector3 spawnPosition;
             if (playerOrg == null)
             {
@@ -259,7 +250,7 @@ namespace Server.Application.Managers
             }
             else
             {
-                spawnPosition = new Vector3(playerOrg.Entity.SpawnX, playerOrg.Entity.SpawnY, playerOrg.Entity.SpawnZ);
+                spawnPosition = new Vector3(playerOrg.SpawnX, playerOrg.SpawnY, playerOrg.SpawnZ);
             }
 
             gfPlayer.SpawnPosition = spawnPosition;

@@ -51,7 +51,6 @@ namespace Server.Application
             builder.RegisterType<VehicleRepository>().As<IVehicleRepository>().SingleInstance();
             builder.RegisterType<OrgRepository>().As<IOrgRepository>().SingleInstance();
             builder.RegisterType<MoneyTransactionRepository>().As<IMoneyTransactionRepository>();
-            builder.RegisterType<MenuManager>().As<MenuManager>().SingleInstance();
             builder.RegisterType<ChatManager>().As<ChatManager>().SingleInstance();
             builder.RegisterType<MapManager>().As<MapManager>().SingleInstance();
             builder.RegisterType<GameEntitiesManager>().As<GameEntitiesManager>().SingleInstance();
@@ -74,17 +73,16 @@ namespace Server.Application
                 this.BuildCommandLibraryFactory(scope);
                 var mainServer = scope.Resolve<MainServer>();
                 var chatManager = scope.Resolve<ChatManager>();
-                var menuManager = scope.Resolve<MenuManager>();
 
                 Console.WriteLine("[IM AppBootstrap] Registering EventHanlders");
 
                 EventHandlers["playerConnecting"] += new Action<Player, string, dynamic, dynamic>(mainServer.OnPlayerConnecting);
                 EventHandlers["playerDropped"] += new Action<Player, string>(mainServer.OnPlayerDropped);
                 EventHandlers["GF:Server:OnClientReady"] += new Action<Player>(mainServer.OnClientReady);
-                EventHandlers["GF:Server:OnChatMessage"] += new Action<Player, string>(chatManager.OnChatMessage);
-                EventHandlers["GF:Server:OnClientCommand"] += new Action<Player, string, bool, string>(mainServer.CommandManager.OnClientCommand);
+                EventHandlers["GF:Server:OnChatMessage"] += new Action<Player, string>(mainServer.OnChatMessage);
+                EventHandlers["GF:Server:OnClientCommand"] += new Action<Player, string, bool, string>(mainServer.OnClientCommand);
                 EventHandlers["GF:Server:OnPlayerTargetActionServerCallback"] += new Action<Player, string>(mainServer.MapManager.OnPlayerTargetActionServerCallback);
-                EventHandlers["GF:Server:OnMenuAction"] += new Action<Player, int, string>(menuManager.OnPlayerMenuAction);
+                EventHandlers["GF:Server:OnMenuAction"] += new Action<Player, int, string>(mainServer.OnPlayerMenuAction);
                 EventHandlers["GF:Server:ResponseAccountSelect"] += new Action<Player, string>(mainServer.OnPlayerSelectAccount);
                 EventHandlers["GF:Server:TriggerStateEvent"] += new Action<Player, string>(mainServer.OnPlayerTriggerStateEvent);
             }

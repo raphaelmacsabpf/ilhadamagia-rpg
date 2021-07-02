@@ -13,7 +13,7 @@ using System.Linq;
 
 namespace Server.Application.Managers
 {
-    public class MapManager : BaseScript
+    public class MapManager
     {
         private readonly List<MarkerDto> staticMarkers;
         private readonly List<ProximityTargetDto> staticProximityTargets;

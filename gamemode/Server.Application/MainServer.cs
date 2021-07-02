@@ -1,7 +1,10 @@
 ﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using Newtonsoft.Json;
+using Server.Application.Entities;
 using Server.Application.Enums;
 using Server.Application.Managers;
+using Shared.CrossCutting;
 using System;
 using System.Collections.Generic;
 
@@ -28,7 +31,7 @@ namespace Server.Application
             this.gameEntitiesManager = gameEntitiesManager;
             foreach (var player in this.Players)
             {
-                stateManager.PrepareFSMForPlayer(player);
+                this.PrepareFSMForPlayer(player);
                 var gfPlayer = playerInfo.GetGFPlayer(player);
                 gfPlayer.FSM.Fire(PlayerConnectionTrigger.GAMEMODE_LOAD);
             }
@@ -94,7 +97,7 @@ namespace Server.Application
 
         internal async void OnClientReady([FromSource] Player player)
         {
-            stateManager.PrepareFSMForPlayer(player);
+            this.PrepareFSMForPlayer(player);
             var gfPlayer = playerInfo.GetGFPlayer(player);
             gfPlayer.FSM.Fire(PlayerConnectionTrigger.CLIENT_READY);
         }
@@ -154,5 +157,58 @@ namespace Server.Application
                     }
             }
         }
+
+        internal void OnPlayerMenuAction([FromSource] Player player, int menuActionInt, string compressedPayload)
+        {
+            var uncompressedPayload = networkManager.Decompress(compressedPayload);
+            var menuAction = (MenuAction)menuActionInt;
+            var gfPlayer = this.playerInfo.GetGFPlayer(player);
+
+            switch (menuAction)
+            {
+                case MenuAction.CALL_HOUSE_VEHICLE:
+                    var vehicleGuid = JsonConvert.DeserializeObject<string>(uncompressedPayload);
+                    MapManager.GFPlayerCallPropertyVehicle(gfPlayer, vehicleGuid);
+                    break;
+            }
+        }
+
+        private void PrepareFSMForPlayer(Player player)
+        {
+            var gfPlayer = new GFPlayer(player);
+            var fsm = stateManager.CreatePlayerConnectionFSM(gfPlayer);
+            gfPlayer.FSM = fsm;
+            playerInfo.LoadGFPlayer(gfPlayer);
+        }
+
+        internal void OnChatMessage([FromSource] Player player, string message) // TODO: PROTEGER OnChatMessage
+        {
+            var wholeMessageCharsIsUppercase = message.CompareTo(message.ToUpper()) == 0;
+            var gfPlayer = playerInfo.GetGFPlayer(player);
+            if (wholeMessageCharsIsUppercase)
+            {
+                chatManager.PlayerScream(gfPlayer, message);
+            }
+            else
+            {
+                var messageToChat = $"[ID: {player.Handle}] {gfPlayer.Account.Username} diz: {message}";
+                chatManager.PlayerChat(gfPlayer, messageToChat);
+            }
+        }
+        internal void OnClientCommand([FromSource] Player sourcePlayer, string command, bool hasArgs, string text)
+        {
+            var sourceGFPlayer = playerInfo.GetGFPlayer(sourcePlayer);
+            try
+            {
+                CommandManager.ProcessCommandForPlayer(sourceGFPlayer, command, hasArgs, text);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("[IM CommandManager] Unhandled command exception: " + ex.Message); // TODO: Inserir informações do player
+                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTRED, "Comando não reconhecido, use /ajuda para ver alguns comandos!");
+                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, "Peça ajuda também a um Administrador, use /relatorio."); // This '.' DOT at the end is the trick
+            }
+        }
+
     }
 }

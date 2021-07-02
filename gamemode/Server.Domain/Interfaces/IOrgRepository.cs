@@ -11,5 +11,7 @@ namespace Server.Domain.Interfaces
         IEnumerable<string> GetOrgMembersById(int orgId);
 
         Task Update(Org org);
+
+        Org GetOrgFromUsername(string username);
     }
 }

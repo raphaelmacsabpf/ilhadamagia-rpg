@@ -17,21 +17,21 @@ namespace Server.Application.CommandLibraries
         private readonly ChatManager chatManager;
         private readonly PlayerInfo playerInfo;
         private readonly MapManager mapManager;
-        private readonly StateManager stateManager;
         private readonly GameEntitiesManager gameEntitiesManager;
         private readonly MoneyService moneyService;
         private readonly PlayerService playerService;
+        private readonly OrgService orgService;
 
-        public AdminCommands(PlayerActions playerActions, ChatManager chatManager, PlayerInfo playerInfo, MapManager mapManager, StateManager stateManager, GameEntitiesManager gameEntitiesManager, MoneyService moneyService, PlayerService playerService)
+        public AdminCommands(PlayerActions playerActions, ChatManager chatManager, PlayerInfo playerInfo, MapManager mapManager, GameEntitiesManager gameEntitiesManager, MoneyService moneyService, PlayerService playerService, OrgService orgService)
         {
             this.playerActions = playerActions;
             this.chatManager = chatManager;
             this.playerInfo = playerInfo;
             this.mapManager = mapManager;
-            this.stateManager = stateManager;
             this.gameEntitiesManager = gameEntitiesManager;
             this.moneyService = moneyService;
             this.playerService = playerService;
+            this.orgService = orgService;
         }
 
         [Command("/ir")]
@@ -84,9 +84,7 @@ namespace Server.Application.CommandLibraries
                 GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                 int value = commandValidator.GetVar<int>("health");
 
-                this.playerActions.SetPlayerHealth(targetGfPlayer, value);
-                this.chatManager.SendClientMessage(commandValidator.SourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $"Você deu {value} de saúde para {targetGfPlayer.Account.Username}");
-                this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $"O Admin {targetGfPlayer.Account.Username} te deu {value} de saúde");
+                this.playerService.SetPlayerHealth(commandValidator.SourceGFPlayer, targetGfPlayer, value);
             }
         }
 
@@ -98,9 +96,7 @@ namespace Server.Application.CommandLibraries
                 GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                 int value = commandValidator.GetVar<int>("armour");
 
-                this.playerActions.SetPlayerArmour(targetGfPlayer, value);
-                this.chatManager.SendClientMessage(commandValidator.SourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $"Você deu {value} de colete para {targetGfPlayer.Account.Username}");
-                this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $"O Admin {targetGfPlayer.Account.Username} te deu {value} de colete");
+                this.playerService.SetPlayerArmour(commandValidator.SourceGFPlayer, targetGfPlayer, value);
             }
         }
 
@@ -111,12 +107,12 @@ namespace Server.Application.CommandLibraries
             {
                 var vectorStr = commandValidator.CommandPacket.Text.Split(new string[] { " " }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
                 var vectorPositions = vectorStr.Split(',');
-                var targetVector = new Vector3(
+                var position = new Vector3(
                     float.Parse(vectorPositions[0]),
                     float.Parse(vectorPositions[1]),
                     float.Parse(vectorPositions[2])
                 );
-                this.playerActions.SetPlayerPos(commandValidator.SourceGFPlayer, targetVector);
+                this.playerService.SetPlayerPos(commandValidator.SourceGFPlayer, position);
             }
         }
 
@@ -127,8 +123,7 @@ namespace Server.Application.CommandLibraries
             {
                 GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
                 int houseId = commandValidator.GetVar<int>("house-id");
-                targetGfPlayer.SelectedHouse = mapManager.GetGFHouseFromId(houseId);
-                this.chatManager.SendClientMessage(commandValidator.SourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você setou a casa de {targetGfPlayer.Account.Username} para ID {houseId}.");
+                playerService.SetPlayerSelectedHouse(commandValidator.SourceGFPlayer, targetGfPlayer, houseId);
             }
         }
 
@@ -138,8 +133,7 @@ namespace Server.Application.CommandLibraries
             if (commandValidator.WithAdminLevel(4).WithVarBetween<int>(1, mapManager.HouseCount, "house-id").IsValid($"USE: /ircasa [id(1-{mapManager.HouseCount})]"))
             {
                 int houseId = commandValidator.GetVar<int>("house-id");
-                var gfHouse = mapManager.GetGFHouseFromId(houseId);
-                this.playerActions.TeleportPlayerToPosition(commandValidator.SourceGFPlayer, new Vector3(gfHouse.Entity.EntranceX, gfHouse.Entity.EntranceY, gfHouse.Entity.EntranceZ), 500);
+                this.playerService.TeleportPlayerToHouse(commandValidator.SourceGFPlayer, houseId);
             }
         }
 
@@ -155,10 +149,7 @@ namespace Server.Application.CommandLibraries
                 var pedModelHash = PedModelsConverter.GetHashStringById(pedId);
                 if (pedModelHash != null)
                 {
-                    targetGfPlayer.Account.SetPedModel(pedModelHash);
-                    stateManager.RespawnPlayerInCurrentPosition(targetGfPlayer);
-                    this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" Sua skin foi alterada pelo admin {commandValidator.SourceGFPlayer.Account.Username}");
-                    this.chatManager.SendClientMessage(commandValidator.SourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você alterou a skin de {targetGfPlayer.Account.Username}");
+                    playerService.SetSkin(commandValidator.SourceGFPlayer, targetGfPlayer, pedModelHash);
                 }
             }
         }
@@ -178,11 +169,7 @@ namespace Server.Application.CommandLibraries
                     commandValidator.SendCommandError($"org-id {orgId} inválido", $"USE: /setorg [playerid] [id(0-{gameEntitiesManager.GetMaxOrgId()}]");
                     return;
                 }
-                //HACK: Retirado refatoração DDD|targetGfPlayer.Account.OrgId = orgId;
-                //HACK: Retirado refatoração DDD|targetGfPlayer.Account.IsLeader = false;
-                stateManager.RespawnPlayerInCurrentPosition(targetGfPlayer);
-                this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" Sua organização foi alterada para {gfOrg.Entity.Name} pelo admin {commandValidator.SourceGFPlayer.Account.Username}");
-                this.chatManager.SendClientMessage(commandValidator.SourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você alterou a organização de {targetGfPlayer.Account.Username} para {gfOrg.Entity.Name}");
+                orgService.InvitePlayerToOrg(gfOrg, commandValidator.SourceGFPlayer, targetGfPlayer);
             }
         }
 
@@ -201,12 +188,7 @@ namespace Server.Application.CommandLibraries
                     commandValidator.SendCommandError($"org-id {orgId} inválido", $"USE: /setorg [playerid] [id(0-{gameEntitiesManager.GetMaxOrgId()}]");
                     return;
                 }
-                //HACK: Retirado refatoração DDD|targetGfPlayer.Account.OrgId = orgId;
-                //HACK: Retirado refatoração DDD|targetGfPlayer.Account.IsLeader = true;
-                gfOrg.Entity.SetLeader(targetGfPlayer.Account);
-                stateManager.RespawnPlayerInCurrentPosition(targetGfPlayer);
-                this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você foi setado como lider da organização {gfOrg.Entity.Name} pelo admin {commandValidator.SourceGFPlayer.Account.Username}");
-                this.chatManager.SendClientMessage(commandValidator.SourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você setou {targetGfPlayer.Account.Username} como líder da organização {gfOrg.Entity.Name}");
+                orgService.SetOrgLeader(gfOrg, commandValidator.SourceGFPlayer, targetGfPlayer);
             }
         }
 

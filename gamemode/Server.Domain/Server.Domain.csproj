@@ -62,7 +62,6 @@
     <Compile Include="Services\AccountService.cs" />
     <Compile Include="Services\HouseService.cs" />
     <Compile Include="Services\MoneyService.cs" />
-    <Compile Include="Services\OrgService.cs" />
     <Compile Include="Services\VehicleService.cs" />
   </ItemGroup>
   <ItemGroup>

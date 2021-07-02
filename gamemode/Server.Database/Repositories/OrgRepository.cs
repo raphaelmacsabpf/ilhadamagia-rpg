@@ -3,6 +3,7 @@ using MySqlConnector;
 using Server.Domain.Entities;
 using Server.Domain.Interfaces;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Server.Database.Repositories
@@ -36,6 +37,11 @@ WHERE Id = @Id";
         public IEnumerable<string> GetOrgMembersById(int orgId)
         {
             return this.mySqlConnection.Query<string>(""); // TODO: Implement GetOrgMembers query
+        }
+
+        public Org GetOrgFromUsername(string username)
+        {
+            return this.mySqlConnection.Query<Org>("SELECT * FROM imtb_org o JOIN imtb_player_orgs po ON o.Id = po.OrgId WHERE po.Username = @Username LIMIT 1", new { Username = username }).FirstOrDefault();
         }
     }
 }
