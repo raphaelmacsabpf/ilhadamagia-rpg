@@ -66,7 +66,7 @@
     <Compile Include="CommandLibraries\MiscCommands.cs" />
     <Compile Include="CommandLibraries\MoneyCommands.cs" />
     <Compile Include="CommandValidator.cs" />
-    <Compile Include="Entities\GFPlayer.cs" />
+    <Compile Include="Entities\PlayerHandle.cs" />
     <Compile Include="Enums\PlayerConnectionState.cs" />
     <Compile Include="Enums\PlayerConnectionTrigger.cs" />
     <Compile Include="CommandLibraries\CommandLibrary.cs" />

@@ -7,11 +7,11 @@ using System.Collections.Generic;
 
 namespace Server.Application.Entities
 {
-    public class GFPlayer
+    public class PlayerHandle
     {
         private House selectedHouse;
 
-        public GFPlayer(Player player)
+        public PlayerHandle(Player player)
         {
             this.Player = player;
             this.License = player.Identifiers["license"];

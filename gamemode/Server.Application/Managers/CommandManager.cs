@@ -53,13 +53,13 @@ namespace Server.Application.Managers
             }
         }
 
-        internal void ProcessCommandForPlayer(GFPlayer sourceGFPlayer, string command, bool hasArgs, string text)
+        internal void ProcessCommandForPlayer(PlayerHandle sourcePlayerHandle, string command, bool hasArgs, string text)
         {
             CommandPacket commandPacket = new CommandPacket(text);
             commandPacket.Command = command;
             commandPacket.HasArgs = hasArgs;
             commandPacket.Text = text;
-            var commandValidator = new CommandValidator(this.playerInfo, this.chatManager, sourceGFPlayer, commandPacket);
+            var commandValidator = new CommandValidator(this.playerInfo, this.chatManager, sourcePlayerHandle, commandPacket);
 
             if (this.registeredCommands.ContainsKey(commandPacket.Command))
             {
@@ -68,8 +68,8 @@ namespace Server.Application.Managers
             }
             else
             {
-                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTRED, "Comando não reconhecido, use /ajuda para ver alguns comandos!");
-                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, "Peça ajuda também a um Administrador, use /relatorio");
+                this.chatManager.SendClientMessage(sourcePlayerHandle, ChatColor.COLOR_LIGHTRED, "Comando não reconhecido, use /ajuda para ver alguns comandos!");
+                this.chatManager.SendClientMessage(sourcePlayerHandle, ChatColor.COLOR_LIGHTBLUE, "Peça ajuda também a um Administrador, use /relatorio");
             }
         }
     }

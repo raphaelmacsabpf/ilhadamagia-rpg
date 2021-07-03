@@ -1,7 +1,7 @@
 ﻿using CitizenFX.Core;
-using GF.CrossCutting.Converters;
-using GF.CrossCutting.Dto;
-using GF.CrossCutting.Enums;
+using Shared.CrossCutting.Converters;
+using Shared.CrossCutting.Dto;
+using Shared.CrossCutting.Enums;
 using MenuAPI;
 using Newtonsoft.Json;
 using Shared.CrossCutting;

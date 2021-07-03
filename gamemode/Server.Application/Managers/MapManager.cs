@@ -1,6 +1,6 @@
 ﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
-using GF.CrossCutting.Dto;
+using Shared.CrossCutting.Dto;
 using Server.Application.Entities;
 using Server.Domain.Entities;
 using Server.Domain.Enums;
@@ -19,7 +19,7 @@ namespace Server.Application.Managers
         private readonly List<MarkerDto> staticMarkers;
         private readonly List<ProximityTargetDto> staticProximityTargets;
         private readonly List<InteractionTargetDto> staticInteractionTargets;
-        private readonly Dictionary<string, Action<GFPlayer, Player>> interactionTargetsCallbacks;
+        private readonly Dictionary<string, Action<PlayerHandle, Player>> interactionTargetsCallbacks;
         private readonly IEnumerable<House> houses;
         private readonly Dictionary<InteriorType, Vector3> interiorPositions;
         private readonly List<BlipDto> blips;
@@ -40,7 +40,7 @@ namespace Server.Application.Managers
             this.staticMarkers = new List<MarkerDto>();
             this.staticProximityTargets = new List<ProximityTargetDto>();
             this.staticInteractionTargets = new List<InteractionTargetDto>();
-            this.interactionTargetsCallbacks = new Dictionary<string, Action<GFPlayer, Player>>();
+            this.interactionTargetsCallbacks = new Dictionary<string, Action<PlayerHandle, Player>>();
             this.houses = houseRepository.GetAll();
             this.interiorPositions = new Dictionary<InteriorType, Vector3>();
             this.blips = new List<BlipDto>();
@@ -65,13 +65,13 @@ namespace Server.Application.Managers
             return this.houses.Where((house) => house.Owner == ownerUsername);
         }
 
-        public void GFPlayerCallPropertyVehicle(GFPlayer gfPlayer, string vehicleGuid)
+        public void PlayerHandleCallPropertyVehicle(PlayerHandle playerHandle, string vehicleGuid)
         {
-            var playerVehicles = vehicleService.GetAccountVehicles(gfPlayer.Account);
+            var playerVehicles = vehicleService.GetAccountVehicles(playerHandle.Account);
             var vehicle = playerVehicles.FirstOrDefault((_) => _.Guid == vehicleGuid);
             if (vehicle == null) return;
-            var gfHouse = GetClosestHouseInRadius(gfPlayer, 3.0f);
-            playerActions.CreateVehicle(gfPlayer, new Vector3(gfHouse.VehiclePositionX, gfHouse.VehiclePositionY, gfHouse.VehiclePositionZ), gfHouse.VehicleHeading, vehicle);
+            var gfHouse = GetClosestHouseInRadius(playerHandle, 3.0f);
+            playerActions.CreateVehicle(playerHandle, new Vector3(gfHouse.VehiclePositionX, gfHouse.VehiclePositionY, gfHouse.VehiclePositionZ), gfHouse.VehicleHeading, vehicle);
         }
 
         public List<MarkerDto> PopUpdatedStaticMarkersPayload()
@@ -105,10 +105,10 @@ namespace Server.Application.Managers
                     }
             }
 
-            if (interactionTargetsCallbacks.TryGetValue(callbackId, out Action<GFPlayer, Player> serverCallback))
+            if (interactionTargetsCallbacks.TryGetValue(callbackId, out Action<PlayerHandle, Player> serverCallback))
             {
-                var gfPlayer = this.playerInfo.GetGFPlayer(player);
-                serverCallback(gfPlayer, player);
+                var playerHandle = this.playerInfo.GetPlayerHandle(player);
+                serverCallback(playerHandle, player);
             }
         }
 
@@ -119,14 +119,14 @@ namespace Server.Application.Managers
 
         private void BuildMarkers()
         {
-            this.AddInterationMarkerWithNotification(307.8857f, -727.8989f, 29.3136f - 0.5f, MarkerColor.COLOR_ORANGE, "Bem vindo ao ~b~Ilha da Magia RPG~s~, aperte ~o~E~s~ para interagir.", (gfPlayer, player) =>
+            this.AddInterationMarkerWithNotification(307.8857f, -727.8989f, 29.3136f - 0.5f, MarkerColor.COLOR_ORANGE, "Bem vindo ao ~b~Ilha da Magia RPG~s~, aperte ~o~E~s~ para interagir.", (playerHandle, player) =>
             {
-                chatManager.SendClientMessage(gfPlayer, ChatColor.COLOR_ROSA, "aeEEEE Atingiu o target tio.");
+                chatManager.SendClientMessage(playerHandle, ChatColor.COLOR_ROSA, "aeEEEE Atingiu o target tio.");
             });
 
-            this.AddInterationMarkerWithNotification(319.0022f, -713.1561f, 29.3136f - 0.5f, MarkerColor.COLOR_GREEN, "Bem vindo ao ~b~Ilha da Magia NEEEWS RPG~s~, aperte ~o~E~s~ para interagir.", (gfPlayer, player) =>
+            this.AddInterationMarkerWithNotification(319.0022f, -713.1561f, 29.3136f - 0.5f, MarkerColor.COLOR_GREEN, "Bem vindo ao ~b~Ilha da Magia NEEEWS RPG~s~, aperte ~o~E~s~ para interagir.", (playerHandle, player) =>
             {
-                chatManager.SendClientMessage(gfPlayer, ChatColor.COLOR_NEWS, "aeEEEE Atingiu o target NEWS tio.");
+                chatManager.SendClientMessage(playerHandle, ChatColor.COLOR_NEWS, "aeEEEE Atingiu o target NEWS tio.");
             });
         }
 
@@ -137,7 +137,7 @@ namespace Server.Application.Managers
 
             foreach (var interiorPosition in this.interiorPositions.Values)
             {
-                this.AddInterationMarkerWithNotification(interiorPosition.X, interiorPosition.Y, interiorPosition.Z, MarkerColor.COLOR_BLUE, "Aperte ~o~E~s~ para sair", (gfPlayer, player) => HouseExit(gfPlayer));
+                this.AddInterationMarkerWithNotification(interiorPosition.X, interiorPosition.Y, interiorPosition.Z, MarkerColor.COLOR_BLUE, "Aperte ~o~E~s~ para sair", (playerHandle, player) => HouseExit(playerHandle));
             }
         }
 
@@ -145,13 +145,13 @@ namespace Server.Application.Managers
         {
             foreach (var house in this.houses)
             {
-                this.AddInterationMarkerWithNotification(house.EntranceX, house.EntranceY, house.EntranceZ, MarkerColor.COLOR_BLUE, $"Casa de {house.Owner}, aperte ~o~E~s~ para entrar", (gfPlayer, player) => HouseEnter(gfPlayer, house));
+                this.AddInterationMarkerWithNotification(house.EntranceX, house.EntranceY, house.EntranceZ, MarkerColor.COLOR_BLUE, $"Casa de {house.Owner}, aperte ~o~E~s~ para entrar", (playerHandle, player) => HouseEnter(playerHandle, house));
             }
         }
 
-        private House GetClosestHouseInRadius(GFPlayer gfPlayer, float radius)
+        private House GetClosestHouseInRadius(PlayerHandle playerHandle, float radius)
         {
-            var playerPosition = gfPlayer.Player.Character.Position;
+            var playerPosition = playerHandle.Player.Character.Position;
             House closestHouse = null;
             var closestDistance = float.MaxValue;
 
@@ -172,23 +172,23 @@ namespace Server.Application.Managers
             return interiorPositions[house.Interior];
         }
 
-        private void HouseEnter(GFPlayer gfPlayer, House house)
+        private void HouseEnter(PlayerHandle playerHandle, House house)
         {
-            gfPlayer.CurrentHouseInside = house;
-            this.playerActions.TeleportPlayerToPosition(gfPlayer, GetHouseInteriorPosition(house), 1000);
+            playerHandle.CurrentHouseInside = house;
+            this.playerActions.TeleportPlayerToPosition(playerHandle, GetHouseInteriorPosition(house), 1000);
         }
 
-        private void HouseExit(GFPlayer gfPlayer)
+        private void HouseExit(PlayerHandle playerHandle)
         {
-            var house = gfPlayer.CurrentHouseInside;
+            var house = playerHandle.CurrentHouseInside;
             if (house != null)
             {
-                this.playerActions.TeleportPlayerToPosition(gfPlayer, new Vector3(house.EntranceX, house.EntranceY, house.EntranceZ), 3000);
-                gfPlayer.CurrentHouseInside = null;
+                this.playerActions.TeleportPlayerToPosition(playerHandle, new Vector3(house.EntranceX, house.EntranceY, house.EntranceZ), 3000);
+                playerHandle.CurrentHouseInside = null;
             }
         }
 
-        private void AddInterationMarkerWithNotification(float x, float y, float z, MarkerColor color, string notification, Action<GFPlayer, Player> serverCallback)
+        private void AddInterationMarkerWithNotification(float x, float y, float z, MarkerColor color, string notification, Action<PlayerHandle, Player> serverCallback)
         {
             this.AddDefaultMarker(x, y, z, color);
             this.AddProximityNotificationTarget(x, y, z, notification);
@@ -205,7 +205,7 @@ namespace Server.Application.Managers
             this.staticInteractionTargets.Add(new InteractionTargetDto(x, y, z, "INFO_TO_PLAYER", message));
         }
 
-        private void AddInteractionToServerCallbackTarget(float x, float y, float z, Action<GFPlayer, Player> serverCallback)
+        private void AddInteractionToServerCallbackTarget(float x, float y, float z, Action<PlayerHandle, Player> serverCallback)
         {
             var random = new Random();
             var callbackId = $"{random.Next()}.{random.Next()}.{random.Next()}.{serverCallback.GetHashCode()}";
@@ -229,7 +229,7 @@ namespace Server.Application.Managers
             {
                 if (org.Id > 0)
                 {
-                    this.AddInterationMarkerWithNotification(org.SpawnX, org.SpawnY, org.SpawnZ, MarkerColor.COLOR_YELLOW, $"{org.Name}, aperte ~o~E~s~ para interagir", ((gfPlayer, player) => OnPlayerInteractWithOrg(gfPlayer, org)));
+                    this.AddInterationMarkerWithNotification(org.SpawnX, org.SpawnY, org.SpawnZ, MarkerColor.COLOR_YELLOW, $"{org.Name}, aperte ~o~E~s~ para interagir", ((playerHandle, player) => OnPlayerInteractWithOrg(playerHandle, org)));
                 }
             }
         }
@@ -239,11 +239,11 @@ namespace Server.Application.Managers
             foreach (var ammunation in ammunations)
             {
                 this.blips.Add(new BlipDto("Loja de Armas", 110, 45, ammunation.PositionX, ammunation.PositionY, ammunation.PositionZ, 0.9f));
-                this.AddInterationMarkerWithNotification(ammunation.PositionX, ammunation.PositionX, ammunation.PositionZ, MarkerColor.COLOR_GREEN, $"Ammunation {ammunation.Name}, aperte ~o~E~s~ para interagir", ((gfPlayer, player) => OnPlayerInteractWithAmmunation(gfPlayer, ammunation)));
+                this.AddInterationMarkerWithNotification(ammunation.PositionX, ammunation.PositionX, ammunation.PositionZ, MarkerColor.COLOR_GREEN, $"Ammunation {ammunation.Name}, aperte ~o~E~s~ para interagir", ((playerHandle, player) => OnPlayerInteractWithAmmunation(playerHandle, ammunation)));
             }
         }
 
-        private void OnPlayerInteractWithOrg(GFPlayer gfPlayer, Org org)
+        private void OnPlayerInteractWithOrg(PlayerHandle playerHandle, Org org)
         {
             var orgDataDto = new OrgDataDto()
             {
@@ -252,12 +252,12 @@ namespace Server.Application.Managers
                 Members = new List<string>() // TODO: Load org members from repository in the right place
             };
 
-            playerActions.OpenMenu(gfPlayer, MenuType.Org, orgDataDto);
+            playerActions.OpenMenu(playerHandle, MenuType.Org, orgDataDto);
         }
 
-        private void OnPlayerInteractWithAmmunation(GFPlayer gfPlayer, Ammunation ammunation)
+        private void OnPlayerInteractWithAmmunation(PlayerHandle playerHandle, Ammunation ammunation)
         {
-            playerActions.OpenMenu(gfPlayer, MenuType.Ammunation, ammunation.Name);
+            playerActions.OpenMenu(playerHandle, MenuType.Ammunation, ammunation.Name);
         }
 
         public void CreateGasStations(List<GasStation> gasStations)
@@ -265,18 +265,18 @@ namespace Server.Application.Managers
             foreach (var gasStation in gasStations)
             {
                 this.blips.Add(new BlipDto("Posto de Gasolina", 361, 5, gasStation.PositionX, gasStation.PositionY, gasStation.PositionZ, 0.60f));
-                this.AddInterationMarkerWithNotification(gasStation.PositionX, gasStation.PositionY, gasStation.PositionZ, MarkerColor.COLOR_GREEN, $"Posto de gasolina {gasStation.Name}, aperte ~o~E~s~ para interagir", ((gfPlayer, player) => OnPlayerInteractWithGasStation(gfPlayer, gasStation)));
+                this.AddInterationMarkerWithNotification(gasStation.PositionX, gasStation.PositionY, gasStation.PositionZ, MarkerColor.COLOR_GREEN, $"Posto de gasolina {gasStation.Name}, aperte ~o~E~s~ para interagir", ((playerHandle, player) => OnPlayerInteractWithGasStation(playerHandle, gasStation)));
             }
         }
 
-        private void OnPlayerInteractWithGasStation(GFPlayer gfPlayer, GasStation gasStation)
+        private void OnPlayerInteractWithGasStation(PlayerHandle playerHandle, GasStation gasStation)
         {
-            playerActions.OpenMenu(gfPlayer, MenuType.GasStation, gasStation.Name);
+            playerActions.OpenMenu(playerHandle, MenuType.GasStation, gasStation.Name);
         }
 
-        private void OnPlayerInteractWithATM(GFPlayer gfPlayer, ATM atm)
+        private void OnPlayerInteractWithATM(PlayerHandle playerHandle, ATM atm)
         {
-            playerActions.OpenMenu(gfPlayer, MenuType.ATM, "Caixa Eletrônico");
+            playerActions.OpenMenu(playerHandle, MenuType.ATM, "Caixa Eletrônico");
         }
 
         public void CreateATMs(List<ATM> atmList)
@@ -284,7 +284,7 @@ namespace Server.Application.Managers
             foreach (var atm in atmList)
             {
                 this.blips.Add(new BlipDto("Caixa Eletrônico", 276, 2, atm.PositionX, atm.PositionY, atm.PositionZ, 1f));
-                this.AddInterationMarkerWithNotification(atm.PositionX, atm.PositionY, atm.PositionZ, MarkerColor.COLOR_GREEN, $"Caixa eletrônico, aperte ~o~E~s~ para interagir", ((gfPlayer, player) => OnPlayerInteractWithATM(gfPlayer, atm)));
+                this.AddInterationMarkerWithNotification(atm.PositionX, atm.PositionY, atm.PositionZ, MarkerColor.COLOR_GREEN, $"Caixa eletrônico, aperte ~o~E~s~ para interagir", ((playerHandle, player) => OnPlayerInteractWithATM(playerHandle, atm)));
             }
         }
 
@@ -293,18 +293,18 @@ namespace Server.Application.Managers
             foreach (var clothingStore in clothingStoreList)
             {
                 this.blips.Add(new BlipDto("Loja de Roupas", 73, 0, clothingStore.PositionX, clothingStore.PositionY, clothingStore.PositionZ, 0.75f));
-                this.AddInterationMarkerWithNotification(clothingStore.PositionX, clothingStore.PositionY, clothingStore.PositionZ, MarkerColor.COLOR_GREEN, $"Loja de roupas, aperte ~o~E~s~ para interagir", ((gfPlayer, player) => OnPlayerInteractWithClothingStore(gfPlayer, clothingStore)));
+                this.AddInterationMarkerWithNotification(clothingStore.PositionX, clothingStore.PositionY, clothingStore.PositionZ, MarkerColor.COLOR_GREEN, $"Loja de roupas, aperte ~o~E~s~ para interagir", ((playerHandle, player) => OnPlayerInteractWithClothingStore(playerHandle, clothingStore)));
             }
         }
 
-        private void OnPlayerInteractWithClothingStore(GFPlayer gfPlayer, ClothingStore clothingStore)
+        private void OnPlayerInteractWithClothingStore(PlayerHandle playerHandle, ClothingStore clothingStore)
         {
-            playerActions.OpenMenu(gfPlayer, MenuType.ClothingStore, "Loja de Roupas");
+            playerActions.OpenMenu(playerHandle, MenuType.ClothingStore, "Loja de Roupas");
         }
 
-        private void OnPlayerInteractWithHospital(GFPlayer gfPlayer, Hospital hospital)
+        private void OnPlayerInteractWithHospital(PlayerHandle playerHandle, Hospital hospital)
         {
-            playerActions.OpenMenu(gfPlayer, MenuType.Hospital, "Hospital");
+            playerActions.OpenMenu(playerHandle, MenuType.Hospital, "Hospital");
         }
 
         public void CreateHospitals(List<Hospital> hospitalList)
@@ -312,7 +312,7 @@ namespace Server.Application.Managers
             foreach (var hospital in hospitalList)
             {
                 this.blips.Add(new BlipDto("Hospital", 428, 1, hospital.PositionX, hospital.PositionY, hospital.PositionZ, 0.75f));
-                this.AddInterationMarkerWithNotification(hospital.PositionX, hospital.PositionY, hospital.PositionZ, MarkerColor.COLOR_GREEN, "Hospital, aperte ~o~E~s~ para interagir", ((gfPlayer, Player) => OnPlayerInteractWithHospital(gfPlayer, hospital)));
+                this.AddInterationMarkerWithNotification(hospital.PositionX, hospital.PositionY, hospital.PositionZ, MarkerColor.COLOR_GREEN, "Hospital, aperte ~o~E~s~ para interagir", ((playerHandle, Player) => OnPlayerInteractWithHospital(playerHandle, hospital)));
             }
         }
 

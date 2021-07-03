@@ -18,10 +18,10 @@ namespace Server.Application.CommandLibraries
         [Command("/admins")]
         public void AdminList(CommandValidator commandValidator)
         {
-            var playerList = this.playerInfo.GetGFPlayerList();
-            var admins = playerList.Where((gfPlayer) => gfPlayer.Account.AdminLevel > 0);
+            var playerList = this.playerInfo.GetPlayerHandleList();
+            var admins = playerList.Where((playerHandle) => playerHandle.Account.AdminLevel > 0);
 
-            chatManager.SendClientMessage(commandValidator.SourceGFPlayer, ChatColor.COLOR_ROSA, "Administradores online:");
+            chatManager.SendClientMessage(commandValidator.SourcePlayerHandle, ChatColor.COLOR_ROSA, "Administradores online:");
 
             foreach (var admin in admins)
             {
@@ -40,7 +40,7 @@ namespace Server.Application.CommandLibraries
 
                 if (adminRank != "")
                 {
-                    chatManager.SendClientMessage(commandValidator.SourceGFPlayer, ChatColor.COLOR_GRAD1, $"Admin: {admin.Account.Username} [{adminRank}]");
+                    chatManager.SendClientMessage(commandValidator.SourcePlayerHandle, ChatColor.COLOR_GRAD1, $"Admin: {admin.Account.Username} [{adminRank}]");
                 }
             }
         }

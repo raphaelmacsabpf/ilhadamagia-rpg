@@ -1,8 +1,8 @@
-﻿using GF.CrossCutting.Enums;
+﻿using Shared.CrossCutting.Enums;
 using System;
 using System.Collections.Generic;
 
-namespace GF.CrossCutting.Converters
+namespace Shared.CrossCutting.Converters
 {
     public static class VehicleConverter
     {

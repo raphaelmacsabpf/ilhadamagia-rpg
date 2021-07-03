@@ -29,14 +29,14 @@ namespace Server.Application.Services
             return orgRepository.GetOrgFromUsername(account.Username);
         }
 
-        public void InvitePlayerToOrg(Org org, GFPlayer admin, GFPlayer targetPlayer)
+        public void InvitePlayerToOrg(Org org, PlayerHandle admin, PlayerHandle targetPlayer)
         {
             targetPlayer.FSM.Fire(PlayerConnectionTrigger.SET_TO_SPAWN);
             this.chatManager.SendClientMessage(targetPlayer, ChatColor.COLOR_LIGHTBLUE, $" Sua organização foi alterada para {org.Name} pelo admin {admin.Account.Username}");
             this.chatManager.SendClientMessage(admin, ChatColor.COLOR_LIGHTBLUE, $" Você alterou a organização de {targetPlayer.Account.Username} para {org.Name}");
         }
 
-        internal void SetOrgLeader(Org org, GFPlayer admin, GFPlayer targetPlayer)
+        internal void SetOrgLeader(Org org, PlayerHandle admin, PlayerHandle targetPlayer)
         {
             org.SetLeader(targetPlayer.Account);
             targetPlayer.FSM.Fire(PlayerConnectionTrigger.SET_TO_SPAWN);

@@ -31,9 +31,9 @@ namespace Server.Application.Managers
             return uncompressed;
         }
 
-        public void SyncPlayerDateTime(GFPlayer gfPlayer)
+        public void SyncPlayerDateTime(PlayerHandle playerHandle)
         {
-            gfPlayer.Player.TriggerEvent("GF:Client:SyncPlayerDateTime", DateTime.Now.ToString());
+            playerHandle.Player.TriggerEvent("GF:Client:SyncPlayerDateTime", DateTime.Now.ToString());
         }
     }
 }

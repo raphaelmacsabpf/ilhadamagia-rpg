@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace GF.CrossCutting
+namespace Shared.CrossCutting
 {
     public class PedModelsConverter
     {

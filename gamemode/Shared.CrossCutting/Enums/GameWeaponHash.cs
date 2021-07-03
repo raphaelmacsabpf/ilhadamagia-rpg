@@ -1,4 +1,4 @@
-﻿namespace GF.CrossCutting.Enums
+﻿namespace Shared.CrossCutting.Enums
 {
     public enum GameWeaponHash : uint
     {
