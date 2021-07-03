@@ -29,19 +29,19 @@ namespace Server.Application.Services
             return orgRepository.GetOrgFromUsername(account.Username);
         }
 
-        public void InvitePlayerToOrg(GFOrg gfOrg, GFPlayer admin, GFPlayer targetPlayer)
+        public void InvitePlayerToOrg(Org org, GFPlayer admin, GFPlayer targetPlayer)
         {
             targetPlayer.FSM.Fire(PlayerConnectionTrigger.SET_TO_SPAWN);
-            this.chatManager.SendClientMessage(targetPlayer, ChatColor.COLOR_LIGHTBLUE, $" Sua organização foi alterada para {gfOrg.Entity.Name} pelo admin {admin.Account.Username}");
-            this.chatManager.SendClientMessage(admin, ChatColor.COLOR_LIGHTBLUE, $" Você alterou a organização de {targetPlayer.Account.Username} para {gfOrg.Entity.Name}");
+            this.chatManager.SendClientMessage(targetPlayer, ChatColor.COLOR_LIGHTBLUE, $" Sua organização foi alterada para {org.Name} pelo admin {admin.Account.Username}");
+            this.chatManager.SendClientMessage(admin, ChatColor.COLOR_LIGHTBLUE, $" Você alterou a organização de {targetPlayer.Account.Username} para {org.Name}");
         }
 
-        internal void SetOrgLeader(GFOrg gfOrg, GFPlayer admin, GFPlayer targetPlayer)
+        internal void SetOrgLeader(Org org, GFPlayer admin, GFPlayer targetPlayer)
         {
-            gfOrg.Entity.SetLeader(targetPlayer.Account);
+            org.SetLeader(targetPlayer.Account);
             targetPlayer.FSM.Fire(PlayerConnectionTrigger.SET_TO_SPAWN);
-            this.chatManager.SendClientMessage(targetPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você foi setado como lider da organização {gfOrg.Entity.Name} pelo admin {admin.Account.Username}");
-            this.chatManager.SendClientMessage(admin, ChatColor.COLOR_LIGHTBLUE, $" Você setou {targetPlayer.Account.Username} como líder da organização {gfOrg.Entity.Name}");
+            this.chatManager.SendClientMessage(targetPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você foi setado como lider da organização {org.Name} pelo admin {admin.Account.Username}");
+            this.chatManager.SendClientMessage(admin, ChatColor.COLOR_LIGHTBLUE, $" Você setou {targetPlayer.Account.Username} como líder da organização {org.Name}");
         }
     }
 }

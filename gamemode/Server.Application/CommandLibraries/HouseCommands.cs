@@ -31,7 +31,7 @@ namespace Server.Application.CommandLibraries
                 return;
             }
 
-            var distanceFromPlayerToHerHouse = commandValidator.SourceGFPlayer.Player.Character.Position.DistanceToSquared(new Vector3(playerHouse.Entity.EntranceX, playerHouse.Entity.EntranceY, playerHouse.Entity.EntranceZ));
+            var distanceFromPlayerToHerHouse = commandValidator.SourceGFPlayer.Player.Character.Position.DistanceToSquared(new Vector3(playerHouse.EntranceX, playerHouse.EntranceY, playerHouse.EntranceZ));
             Console.WriteLine($"Distance is: {distanceFromPlayerToHerHouse}"); // TODO: Remover este LOG quando entender os problemas de sincronia
             if (distanceFromPlayerToHerHouse > Math.Pow(1.5f, 2))
             {

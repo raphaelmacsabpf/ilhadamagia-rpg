@@ -66,17 +66,7 @@
     <Compile Include="CommandLibraries\MiscCommands.cs" />
     <Compile Include="CommandLibraries\MoneyCommands.cs" />
     <Compile Include="CommandValidator.cs" />
-    <Compile Include="Entities\GF247Store.cs" />
-    <Compile Include="Entities\GFAmmunation.cs" />
-    <Compile Include="Entities\GFATM.cs" />
-    <Compile Include="Entities\GFClothingStore.cs" />
-    <Compile Include="Entities\GFGasStation.cs" />
-    <Compile Include="Entities\GFHospital.cs" />
-    <Compile Include="Entities\GFHouse.cs" />
-    <Compile Include="Entities\GFOrg.cs" />
     <Compile Include="Entities\GFPlayer.cs" />
-    <Compile Include="Entities\GFPoliceDepartment.cs" />
-    <Compile Include="Entities\GFVehicle.cs" />
     <Compile Include="Enums\PlayerConnectionState.cs" />
     <Compile Include="Enums\PlayerConnectionTrigger.cs" />
     <Compile Include="CommandLibraries\CommandLibrary.cs" />

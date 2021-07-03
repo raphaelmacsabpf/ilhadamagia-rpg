@@ -9,7 +9,7 @@ namespace Server.Application.Entities
 {
     public class GFPlayer
     {
-        private GFHouse selectedHouse;
+        private House selectedHouse;
 
         public GFPlayer(Player player)
         {
@@ -25,15 +25,15 @@ namespace Server.Application.Entities
         public Account Account { get; set; }
         public Player Player { get; }
 
-        public GFHouse SelectedHouse
+        public House SelectedHouse
         {
             get => selectedHouse;
             set
             {
                 selectedHouse = value;
-                if (value?.Entity != null && this.Account != null)
+                if (value != null && this.Account != null)
                 {
-                    this.Account.SetSelectedHouse(value.Entity);
+                    this.Account.SetSelectedHouse(value);
                     //HACK: Retirado refatoração DDD|this.Account.SelectedHouse = value.Entity.Id;
                 }
             }
@@ -43,7 +43,7 @@ namespace Server.Application.Entities
         public Vector3 SpawnPosition { get; set; }
         public Vector3 SwitchInPosition { get; set; }
         public bool IsFirstSpawn { get; set; }
-        public GFHouse CurrentHouseInside { get; set; }
+        public House CurrentHouseInside { get; set; }
         public List<Account> LicenseAccounts { get; set; }
         public int OrgId { get; set; }
     }

@@ -46,7 +46,7 @@ namespace Server.Application.Managers
             if (account.SelectedHouse != null)
             {
                 var houses = mapManager.GetAllHousesFromOwner(account.Username);
-                gfPlayer.SelectedHouse = houses.FirstOrDefault((gfHouse) => gfHouse.Entity != null && gfHouse.Entity.Id == account.SelectedHouse);
+                gfPlayer.SelectedHouse = houses.FirstOrDefault((gfHouse) => gfHouse != null && gfHouse.Id == account.SelectedHouse);
             }
             gfPlayer.FSM.Fire(PlayerConnectionTrigger.ACCOUNT_SELECTED);
         }
@@ -80,7 +80,7 @@ namespace Server.Application.Managers
                     if (gfPlayer.Account != null)
                     {
                         var playerPosition = gfPlayer.Player.Character.Position;
-                        accountService.EndSession(gfPlayer.Account, playerPosition.X, playerPosition.Y, playerPosition.Z, gfPlayer.CurrentHouseInside?.Entity);
+                        accountService.EndSession(gfPlayer.Account, playerPosition.X, playerPosition.Y, playerPosition.Z, gfPlayer.CurrentHouseInside);
                         Console.WriteLine($"Player dropped #{gfPlayer.Player.Handle} Name: {gfPlayer.Player.Name}, Username: {gfPlayer.Account.Username}");
                         this.playerInfo.UnloadGFPlayer(gfPlayer);
                     }
@@ -183,7 +183,7 @@ namespace Server.Application.Managers
                             }
                             else if (gfPlayer.SelectedHouse != null)
                             {
-                                var houseEntity = gfPlayer.SelectedHouse.Entity;
+                                var houseEntity = gfPlayer.SelectedHouse;
                                 gfPlayer.CurrentHouseInside = gfPlayer.SelectedHouse;
                                 gfPlayer.SpawnPosition = mapManager.GetHouseInteriorPosition(gfPlayer.SelectedHouse);
                                 gfPlayer.SwitchInPosition = new Vector3(houseEntity.EntranceX, houseEntity.EntranceY, houseEntity.EntranceZ);

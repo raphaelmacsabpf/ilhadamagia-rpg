@@ -4,7 +4,6 @@ using Server.Application.Enums;
 using Server.Application.Managers;
 using Server.Domain.Enums;
 using Shared.CrossCutting;
-using System;
 
 namespace Server.Application.Services
 {
@@ -72,7 +71,7 @@ namespace Server.Application.Services
         internal void TeleportPlayerToHouse(GFPlayer targetPlayer, int houseId)
         {
             var gfHouse = mapManager.GetGFHouseFromId(houseId);
-            this.playerActions.TeleportPlayerToPosition(targetPlayer, new Vector3(gfHouse.Entity.EntranceX, gfHouse.Entity.EntranceY, gfHouse.Entity.EntranceZ), 500);
+            this.playerActions.TeleportPlayerToPosition(targetPlayer, new Vector3(gfHouse.EntranceX, gfHouse.EntranceY, gfHouse.EntranceZ), 500);
         }
 
         internal void SetSkin(GFPlayer admin, GFPlayer targetPlayer, string pedModelHash)

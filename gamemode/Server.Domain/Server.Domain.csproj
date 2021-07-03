@@ -42,9 +42,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\Account.cs" />
+    <Compile Include="Entities\Ammunation.cs" />
+    <Compile Include="Entities\ATM.cs" />
+    <Compile Include="Entities\ClothingStore.cs" />
+    <Compile Include="Entities\GasStation.cs" />
+    <Compile Include="Entities\Hospital.cs" />
     <Compile Include="Entities\House.cs" />
     <Compile Include="Entities\MoneyTransaction.cs" />
     <Compile Include="Entities\Org.cs" />
+    <Compile Include="Entities\PoliceDepartment.cs" />
+    <Compile Include="Entities\The247Store.cs" />
     <Compile Include="Entities\Vehicle.cs" />
     <Compile Include="Enums\InteriorType.cs" />
     <Compile Include="Enums\MoneyTransactionStatus.cs" />
