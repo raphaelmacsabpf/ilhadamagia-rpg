@@ -13,27 +13,27 @@ namespace Server.Application.Managers
         {
         }
 
-        public void SendPayloadToPlayer(PlayerHandle playerHandle, PayloadType payloadType, string jsonPayload)
-        {
-            var compressedJsonPayload = Compress(jsonPayload);
-            playerHandle.TriggerScriptEvent(ScriptEvent.SendPayload, (int)payloadType, compressedJsonPayload, jsonPayload.Length);
-        }
-
-        public string Compress(string text)
+        public static string Compress(string text)
         {
             var compressed = Convert.ToBase64String(LZ4Codec.Wrap(Encoding.UTF8.GetBytes(text)));
             return compressed;
         }
 
-        public string Decompress(string compressed)
+        public static string Decompress(string compressed)
         {
             var uncompressed = Encoding.UTF8.GetString(LZ4Codec.Unwrap(Convert.FromBase64String(compressed)));
             return uncompressed;
         }
 
+        public void SendPayloadToPlayer(PlayerHandle playerHandle, PayloadType payloadType, string jsonPayload)
+        {
+            var compressedJsonPayload = Compress(jsonPayload);
+            playerHandle.CallClientAction(ClientEvent.SendPayload, (int)payloadType, compressedJsonPayload, jsonPayload.Length);
+        }
+
         public void SyncPlayerDateTime(PlayerHandle playerHandle)
         {
-            playerHandle.TriggerScriptEvent(ScriptEvent.SyncPlayerDateTime, DateTime.Now.ToString());
+            playerHandle.CallClientAction(ClientEvent.SyncPlayerDateTime, DateTime.Now.ToString());
         }
     }
 }

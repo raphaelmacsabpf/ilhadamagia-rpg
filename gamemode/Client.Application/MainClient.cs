@@ -4,15 +4,14 @@ using CitizenFX.Core.UI;
 using Shared.CrossCutting;
 using Shared.CrossCutting.Dto;
 using Newtonsoft.Json;
-using Shared.CrossCutting;
-using Shared.CrossCutting.Dto;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GF.CrossCutting.Enums;
 
 namespace Client.Application
 {
-    public class MainClient : BaseScript
+    public class MainClient : BaseClientScript
     {
         private readonly PlayerInfo playerInfo;
         private readonly MarkersManager markersManager;
@@ -78,7 +77,7 @@ namespace Client.Application
             }
             API.ShutdownLoadingScreen();
             await Delay(1000);
-            TriggerServerEvent("GF:Server:OnClientReady");
+            CallServerAction(ServerEvent.OnClientReady);
         }
 
         public void OpenNUIView(int nuiViewTypeInt, bool setFocus, string compressedJsonPayload, int uncompressedLength)
@@ -187,7 +186,7 @@ namespace Client.Application
                 else
                 {
                     var commandPacket = new CommandPacket(textInput);
-                    TriggerServerEvent("GF:Server:OnClientCommand", commandPacket.Command, commandPacket.HasArgs, commandPacket.Text);
+                    CallServerAction(ServerEvent.OnClientCommand, commandPacket.Command, commandPacket.HasArgs, commandPacket.Text);
                 }
                 if (cancelEvent)
                 {
@@ -195,7 +194,7 @@ namespace Client.Application
                 }
             }
             else
-                TriggerServerEvent("GF:Server:OnChatMessage", textInput);
+                CallServerAction(ServerEvent.OnChatMessage, textInput);
         }
 
         public async void OnDie(int killerType, dynamic deathCoords)
@@ -227,7 +226,7 @@ namespace Client.Application
             if (responseType == "RESPONSE_ACCOUNT_SELECTED")
             {
                 var account = data["account"].ToString();
-                TriggerServerEvent("GF:Server:ResponseAccountSelect", account);
+                CallServerAction(ServerEvent.ResponseAccountSelect, account);
             }
             callbackResponse("200");
         }
@@ -323,7 +322,7 @@ namespace Client.Application
             {
                 await Delay(1);
             }
-            TriggerServerEvent("GF:Server:TriggerStateEvent", "switched-out");
+            CallServerAction(ServerEvent.TriggerStateEvent, "switched-out");
         }
 
         public async void SwitchInPlayer(float x, float y, float z)
@@ -343,7 +342,7 @@ namespace Client.Application
             {
                 await Delay(1);
             }
-            TriggerServerEvent("GF:Server:TriggerStateEvent", "switched-in");
+            CallServerAction(ServerEvent.TriggerStateEvent, "switched-in");
         }
 
         public void SyncPlayerDateTime(string serverDateTimeAsString)
@@ -374,7 +373,7 @@ namespace Client.Application
                     }
                     await Delay(1000);
                     API.StopAllScreenEffects();
-                    TriggerServerEvent("GF:Server:TriggerStateEvent", "die");
+                    CallServerAction(ServerEvent.TriggerStateEvent, "die");
                     await Delay(3000);
                 }
             }

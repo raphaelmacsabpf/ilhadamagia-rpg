@@ -26,15 +26,13 @@ namespace Server.Application.Managers
 
         private readonly PlayerInfo playerInfo;
         private readonly ChatManager chatManager;
-        private readonly PlayerActions playerActions;
         private readonly IHouseRepository houseRepository;
         private readonly VehicleService vehicleService;
 
-        public MapManager(PlayerInfo playerInfo, ChatManager chatManager, PlayerActions playerActions, IHouseRepository houseRepository, VehicleService vehicleService)
+        public MapManager(PlayerInfo playerInfo, ChatManager chatManager, IHouseRepository houseRepository, VehicleService vehicleService)
         {
             this.playerInfo = playerInfo;
             this.chatManager = chatManager;
-            this.playerActions = playerActions;
             this.houseRepository = houseRepository;
             this.vehicleService = vehicleService;
             this.staticMarkers = new List<MarkerDto>();
@@ -71,7 +69,7 @@ namespace Server.Application.Managers
             var vehicle = playerVehicles.FirstOrDefault((_) => _.Guid == vehicleGuid);
             if (vehicle == null) return;
             var gfHouse = GetClosestHouseInRadius(playerHandle, 3.0f);
-            playerActions.CreateVehicle(playerHandle, new Vector3(gfHouse.VehiclePositionX, gfHouse.VehiclePositionY, gfHouse.VehiclePositionZ), gfHouse.VehicleHeading, vehicle);
+            playerHandle.CreateVehicle(new Vector3(gfHouse.VehiclePositionX, gfHouse.VehiclePositionY, gfHouse.VehiclePositionZ), gfHouse.VehicleHeading, vehicle);
         }
 
         public List<MarkerDto> PopUpdatedStaticMarkersPayload()
@@ -175,7 +173,7 @@ namespace Server.Application.Managers
         private void HouseEnter(PlayerHandle playerHandle, House house)
         {
             playerHandle.CurrentHouseInside = house;
-            this.playerActions.TeleportPlayerToPosition(playerHandle, GetHouseInteriorPosition(house), 1000);
+            playerHandle.TeleportPlayerToPosition(GetHouseInteriorPosition(house), 1000);
         }
 
         private void HouseExit(PlayerHandle playerHandle)
@@ -183,7 +181,7 @@ namespace Server.Application.Managers
             var house = playerHandle.CurrentHouseInside;
             if (house != null)
             {
-                this.playerActions.TeleportPlayerToPosition(playerHandle, new Vector3(house.EntranceX, house.EntranceY, house.EntranceZ), 3000);
+                playerHandle.TeleportPlayerToPosition(new Vector3(house.EntranceX, house.EntranceY, house.EntranceZ), 3000);
                 playerHandle.CurrentHouseInside = null;
             }
         }
@@ -252,12 +250,12 @@ namespace Server.Application.Managers
                 Members = new List<string>() // TODO: Load org members from repository in the right place
             };
 
-            playerActions.OpenMenu(playerHandle, MenuType.Org, orgDataDto);
+            playerHandle.OpenMenu(MenuType.Org, orgDataDto);
         }
 
         private void OnPlayerInteractWithAmmunation(PlayerHandle playerHandle, Ammunation ammunation)
         {
-            playerActions.OpenMenu(playerHandle, MenuType.Ammunation, ammunation.Name);
+            playerHandle.OpenMenu(MenuType.Ammunation, ammunation.Name);
         }
 
         public void CreateGasStations(List<GasStation> gasStations)
@@ -271,12 +269,12 @@ namespace Server.Application.Managers
 
         private void OnPlayerInteractWithGasStation(PlayerHandle playerHandle, GasStation gasStation)
         {
-            playerActions.OpenMenu(playerHandle, MenuType.GasStation, gasStation.Name);
+            playerHandle.OpenMenu(MenuType.GasStation, gasStation.Name);
         }
 
         private void OnPlayerInteractWithATM(PlayerHandle playerHandle, ATM atm)
         {
-            playerActions.OpenMenu(playerHandle, MenuType.ATM, "Caixa Eletrônico");
+            playerHandle.OpenMenu(MenuType.ATM, "Caixa Eletrônico");
         }
 
         public void CreateATMs(List<ATM> atmList)
@@ -299,12 +297,12 @@ namespace Server.Application.Managers
 
         private void OnPlayerInteractWithClothingStore(PlayerHandle playerHandle, ClothingStore clothingStore)
         {
-            playerActions.OpenMenu(playerHandle, MenuType.ClothingStore, "Loja de Roupas");
+            playerHandle.OpenMenu(MenuType.ClothingStore, "Loja de Roupas");
         }
 
         private void OnPlayerInteractWithHospital(PlayerHandle playerHandle, Hospital hospital)
         {
-            playerActions.OpenMenu(playerHandle, MenuType.Hospital, "Hospital");
+            playerHandle.OpenMenu(MenuType.Hospital, "Hospital");
         }
 
         public void CreateHospitals(List<Hospital> hospitalList)

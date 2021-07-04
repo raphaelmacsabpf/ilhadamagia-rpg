@@ -13,7 +13,6 @@ namespace Server.Application.CommandLibraries
 {
     public class AdminCommands : CommandLibrary
     {
-        private readonly PlayerActions playerActions;
         private readonly ChatManager chatManager;
         private readonly PlayerInfo playerInfo;
         private readonly MapManager mapManager;
@@ -21,15 +20,13 @@ namespace Server.Application.CommandLibraries
         private readonly PlayerService playerService;
         private readonly OrgService orgService;
 
-        public AdminCommands(PlayerActions playerActions, 
-                             ChatManager chatManager, 
+        public AdminCommands(ChatManager chatManager, 
                              PlayerInfo playerInfo, 
                              MapManager mapManager, 
                              MoneyService moneyService, 
                              PlayerService playerService, 
                              OrgService orgService)
         {
-            this.playerActions = playerActions;
             this.chatManager = chatManager;
             this.playerInfo = playerInfo;
             this.mapManager = mapManager;
@@ -211,7 +208,7 @@ namespace Server.Application.CommandLibraries
                 var weaponModelHash = WeaponConverter.GetWeaponHashById(weaponId);
                 var weaponName = WeaponConverter.GetWeaponNameById(weaponId);
 
-                this.playerActions.GiveWeaponToPlayer(commandValidator.SourcePlayerHandle, (uint)weaponModelHash, ammoCount, false, true);
+                commandValidator.SourcePlayerHandle.GiveWeaponToPlayer((uint)weaponModelHash, ammoCount, false, true);
                 this.chatManager.SendClientMessage(targetPlayerHandle, ChatColor.COLOR_LIGHTBLUE, $" O admin {commandValidator.SourcePlayerHandle.Account.Username} lhe concedeu uma {weaponName} com {ammoCount} de munição");
                 this.chatManager.SendClientMessage(commandValidator.SourcePlayerHandle, ChatColor.COLOR_LIGHTBLUE, $" Você concedeu uma {weaponName} com {ammoCount} de munição para {targetPlayerHandle.Account.Username}");
             }
@@ -247,7 +244,7 @@ namespace Server.Application.CommandLibraries
             if (commandValidator.WithAdminLevel(1).WithTargetPlayer("playerid").IsValid("USE: /kill [playerid]"))
             {
                 var targetPlayerHandle = commandValidator.GetTargetPlayerHandle();
-                this.playerActions.KillPlayer(targetPlayerHandle);
+                targetPlayerHandle.KillPlayer();
                 this.chatManager.SendClientMessage(targetPlayerHandle, ChatColor.COLOR_LIGHTBLUE, $"*Admin {commandValidator.SourcePlayerHandle.Account.Username} te matou");
                 this.chatManager.SendClientMessage(commandValidator.SourcePlayerHandle, ChatColor.COLOR_LIGHTBLUE, $"*Você matou {targetPlayerHandle.Account.Username}");
             }
@@ -265,7 +262,7 @@ namespace Server.Application.CommandLibraries
                 var vehicleModelHash = VehicleConverter.GetVehicleHashById(vehicleId);
                 var vehicleName = VehicleConverter.GetVehicleNameById(vehicleId);
 
-                this.playerActions.CreatePlayerVehicle(targetPlayerHandle, vehicleModelHash);
+                targetPlayerHandle.CreatePlayerVehicle(vehicleModelHash);
                 this.chatManager.SendClientMessage(targetPlayerHandle, ChatColor.COLOR_LIGHTBLUE, $" O admin {commandValidator.SourcePlayerHandle.Account.Username} lhe concedeu um {vehicleName}");
                 this.chatManager.SendClientMessage(commandValidator.SourcePlayerHandle, ChatColor.COLOR_LIGHTBLUE, $" Você concedeu um {vehicleName} para {targetPlayerHandle.Account.Username}");
             }

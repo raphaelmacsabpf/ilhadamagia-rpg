@@ -1,6 +1,6 @@
 ﻿namespace GF.CrossCutting.Enums
 {
-    public enum ScriptEvent
+    public enum ClientEvent
     {
         SendClientMessage,
         SpawnPlayer,

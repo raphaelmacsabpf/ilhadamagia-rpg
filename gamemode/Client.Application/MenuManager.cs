@@ -6,10 +6,11 @@ using MenuAPI;
 using Newtonsoft.Json;
 using Shared.CrossCutting;
 using System.Collections.Generic;
+using GF.CrossCutting.Enums;
 
 namespace Client.Application
 {
-    public class MenuManager : BaseScript
+    public class MenuManager : BaseClientScript
     {
         private readonly ClientNetworkManager clientNetworkManager;
 
@@ -118,7 +119,7 @@ namespace Client.Application
         {
             var jsonPayload = JsonConvert.SerializeObject(payload);
             var compressedPayload = clientNetworkManager.Compress(jsonPayload);
-            TriggerServerEvent("GF:Server:OnMenuAction", (int)menuAction, compressedPayload);
+            CallServerAction(ServerEvent.OnMenuAction, (int)menuAction, compressedPayload);
         }
     }
 }

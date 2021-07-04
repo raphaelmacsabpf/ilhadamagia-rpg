@@ -10,13 +10,11 @@ namespace Server.Application.Services
     public class PlayerService
     {
         private readonly ChatManager chatManager;
-        private readonly PlayerActions playerActions;
         private readonly MapManager mapManager;
 
-        public PlayerService(ChatManager chatManager, PlayerActions playerActions, MapManager mapManager)
+        public PlayerService(ChatManager chatManager, MapManager mapManager)
         {
             this.chatManager = chatManager;
-            this.playerActions = playerActions;
             this.mapManager = mapManager;
         }
 
@@ -30,7 +28,7 @@ namespace Server.Application.Services
         public void AdminGoToPlayer(PlayerHandle admin, PlayerHandle player)
         {
             var targetPosition = player.Player.Character.Position + new Vector3(0f, 2f, -1f); // I don't know why this -1f???? WTF???
-            this.playerActions.SetPlayerPos(admin, targetPosition);
+            admin.SetPlayerPos(targetPosition);
             this.chatManager.ProxDetectorColorFixed(10.0f, player, $"*Admin {admin.Account.Username} veio até {player.Account.Username}", ChatColor.COLOR_PURPLE, new[] { admin });
             this.chatManager.ProxDetectorColorFixed(10.0f, admin, $"*Admin {admin.Account.Username} foi até {player.Account.Username}", ChatColor.COLOR_PURPLE, new[] { player });
         }
@@ -38,28 +36,28 @@ namespace Server.Application.Services
         public void AdminBringPlayer(PlayerHandle admin, PlayerHandle player)
         {
             var sourcePosition = admin.Player.Character.Position + new Vector3(0f, 2f, -1f); // I don't know why this -1f???? WTF???
-            this.playerActions.SetPlayerPos(player, sourcePosition);
+            player.SetPlayerPos(sourcePosition);
             this.chatManager.ProxDetectorColorFixed(10.0f, admin, $"*Admin {admin.Account.Username} trouxe {player.Account.Username}", ChatColor.COLOR_PURPLE, new[] { admin });
             this.chatManager.ProxDetectorColorFixed(10.0f, player, $"*Admin {admin.Account.Username} levou {player.Account.Username}", ChatColor.COLOR_PURPLE, new[] { player });
         }
 
         internal void SetPlayerHealth(PlayerHandle admin, PlayerHandle targetPlayer, int value)
         {
-            this.playerActions.SetPlayerHealth(targetPlayer, value);
+            targetPlayer.SetPlayerHealth(value);
             this.chatManager.SendClientMessage(admin, ChatColor.COLOR_LIGHTBLUE, $"Você deu {value} de saúde para {targetPlayer.Account.Username}");
             this.chatManager.SendClientMessage(targetPlayer, ChatColor.COLOR_LIGHTBLUE, $"O Admin {targetPlayer.Account.Username} te deu {value} de saúde");
         }
 
         internal void SetPlayerArmour(PlayerHandle admin, PlayerHandle targetPlayer, int value)
         {
-            this.playerActions.SetPlayerArmour(targetPlayer, value);
+            targetPlayer.SetPlayerArmour(value);
             this.chatManager.SendClientMessage(admin, ChatColor.COLOR_LIGHTBLUE, $"Você deu {value} de colete para {targetPlayer.Account.Username}");
             this.chatManager.SendClientMessage(targetPlayer, ChatColor.COLOR_LIGHTBLUE, $"O Admin {targetPlayer.Account.Username} te deu {value} de colete");
         }
 
         internal void SetPlayerPos(PlayerHandle targetPlayer, Vector3 position)
         {
-            this.playerActions.SetPlayerPos(targetPlayer, position);
+            targetPlayer.SetPlayerPos(position);
         }
 
         internal void SetPlayerSelectedHouse(PlayerHandle admin, PlayerHandle targetPlayer, int houseId)
@@ -71,7 +69,7 @@ namespace Server.Application.Services
         internal void TeleportPlayerToHouse(PlayerHandle targetPlayer, int houseId)
         {
             var gfHouse = mapManager.GetGFHouseFromId(houseId);
-            this.playerActions.TeleportPlayerToPosition(targetPlayer, new Vector3(gfHouse.EntranceX, gfHouse.EntranceY, gfHouse.EntranceZ), 500);
+            targetPlayer.TeleportPlayerToPosition(new Vector3(gfHouse.EntranceX, gfHouse.EntranceY, gfHouse.EntranceZ), 500);
         }
 
         internal void SetSkin(PlayerHandle admin, PlayerHandle targetPlayer, string pedModelHash)
@@ -84,9 +82,9 @@ namespace Server.Application.Services
 
         internal void SpawnPlayer(PlayerHandle player)
         {
-            this.playerActions.SwitchInPlayer(player, player.SwitchInPosition.X, player.SwitchInPosition.Y, player.SwitchInPosition.Z);
+            player.SwitchInPlayer(player.SwitchInPosition.X, player.SwitchInPosition.Y, player.SwitchInPosition.Z);
             var fastSpawn = player.SpawnType == SpawnType.ToCoords;
-            playerActions.SpawnPlayer(player, player.Account.PedModel, player.SpawnPosition.X, player.SpawnPosition.Y, player.SpawnPosition.Z, 0, fastSpawn);
+            player.SpawnPlayer(player.Account.PedModel, player.SpawnPosition.X, player.SpawnPosition.Y, player.SpawnPosition.Z, 0, fastSpawn);
             player.SpawnType = SpawnType.Unset;
         }
     }

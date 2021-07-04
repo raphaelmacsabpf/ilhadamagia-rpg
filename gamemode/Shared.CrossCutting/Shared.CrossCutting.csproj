@@ -48,7 +48,7 @@
     <Compile Include="CommandPacket.cs" />
     <Compile Include="Dto\BlipDto.cs" />
     <Compile Include="Dto\OrgDataDto.cs" />
-    <Compile Include="Enums\ScriptEvent.cs" />
+    <Compile Include="Enums\ClientEvent.cs" />
     <Compile Include="Enums\GameWeaponHash.cs" />
     <Compile Include="Enums\GameVehicleHash.cs" />
     <Compile Include="Dto\InteractionTargetDto.cs" />
@@ -57,6 +57,7 @@
     <Compile Include="Dto\ProximityTargetDto.cs" />
     <Compile Include="Dto\VehicleDto.cs" />
     <Compile Include="Enums\InteractionTargetAction.cs" />
+    <Compile Include="Enums\ServerEvent.cs" />
     <Compile Include="MarkerColor.cs" />
     <Compile Include="MarkerColorValue.cs" />
     <Compile Include="MenuAction.cs" />

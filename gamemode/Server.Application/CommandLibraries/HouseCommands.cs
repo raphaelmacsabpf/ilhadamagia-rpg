@@ -11,13 +11,11 @@ namespace Server.Application.CommandLibraries
     public class HouseCommands : CommandLibrary
     {
         private readonly ChatManager chatManager;
-        private readonly PlayerActions playerActions;
         private readonly VehicleService vehicleService;
 
-        public HouseCommands(ChatManager chatManager, PlayerActions playerActions, VehicleService vehicleService)
+        public HouseCommands(ChatManager chatManager, VehicleService vehicleService)
         {
             this.chatManager = chatManager;
-            this.playerActions = playerActions;
             this.vehicleService = vehicleService;
         }
 
@@ -52,7 +50,7 @@ namespace Server.Application.CommandLibraries
                 };
             });
 
-            this.playerActions.OpenMenu(commandValidator.SourcePlayerHandle, MenuType.House, vehiclesAsDto);
+            commandValidator.SourcePlayerHandle.OpenMenu(MenuType.House, vehiclesAsDto);
         }
     }
 }

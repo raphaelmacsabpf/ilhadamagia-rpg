@@ -1,8 +1,12 @@
 ﻿using CitizenFX.Core;
 using GF.CrossCutting.Enums;
+using Newtonsoft.Json;
 using Server.Application.Enums;
+using Server.Application.Managers;
 using Server.Domain.Entities;
 using Server.Domain.Enums;
+using Shared.CrossCutting;
+using Shared.CrossCutting.Enums;
 using Stateless;
 using System.Collections.Generic;
 
@@ -48,9 +52,88 @@ namespace Server.Application.Entities
         public List<Account> LicenseAccounts { get; set; }
         public int OrgId { get; set; }
 
-        public void TriggerScriptEvent(ScriptEvent scriptEvent, params object[] args)
+        public void CallClientAction(ClientEvent clientEvent, params object[] args)
         {
-            Player.TriggerEvent(scriptEvent.ToString(), args);
+            Player.TriggerEvent(clientEvent.ToString(), args);
         }
+
+        public void KillPlayer()
+        {
+            CallClientAction(ClientEvent.Kill);
+        }
+
+        public void SetPlayerPos(Vector3 targetPosition)
+        {
+            CallClientAction(ClientEvent.SetPlayerPos, targetPosition);
+        }
+
+        public void TeleportPlayerToPosition(Vector3 targetPosition, int transitionDurationInMs)
+        {
+            CallClientAction(ClientEvent.TeleportPlayerToPosition, targetPosition, transitionDurationInMs);
+        }
+
+        public void SetPlayerArmour(int value)
+        {
+            CallClientAction(ClientEvent.SetPedArmour, value);
+        }
+
+        public void SetPlayerHealth(int value)
+        {
+            CallClientAction(ClientEvent.SetPedHealth, value);
+        }
+
+        public void GiveWeaponToPlayer(uint weaponHash, int ammoCount, bool isHidden, bool equipNow)
+        {
+            CallClientAction(ClientEvent.GiveWeaponToPed, weaponHash, ammoCount, isHidden, equipNow);
+        }
+
+        public void SetPlayerMoney(int money)
+        {
+            CallClientAction(ClientEvent.SetPlayerMoney, money);
+        }
+
+        public void OpenMenu(MenuType menuType, object payload)
+        {
+            var json = JsonConvert.SerializeObject(payload);
+            var compressedJson = NetworkManager.Compress(json);
+            var uncompressedLenght = json.Length;
+            CallClientAction(ClientEvent.OpenMenu, (int)menuType, compressedJson, uncompressedLenght);
+        }
+
+        public void SpawnPlayer(string skinName, float x, float y, float z, float heading, bool fastSpawn)
+        {
+            CallClientAction(ClientEvent.SpawnPlayer, skinName, x, y, z, heading, fastSpawn);
+        }
+
+        public void OpenNUIView(NUIViewType nuiViewType, bool setFocus, string compressedJsonPayload, int uncompressedLength)
+        {
+            CallClientAction(ClientEvent.OpenNUIView, (int)nuiViewType, setFocus, compressedJsonPayload, uncompressedLength);
+        }
+
+        public void CreateVehicle(Vector3 position, float heading, Domain.Entities.Vehicle vehicle)
+        {
+            CallClientAction(ClientEvent.CreateVehicle, vehicle.Hash, vehicle.PrimaryColor, vehicle.SecondaryColor, vehicle.Fuel, position.X, position.Y, position.Z, heading);
+        }
+
+        public void CloseNUIView(NUIViewType nuiViewType, bool cancelFocus)
+        {
+            CallClientAction(ClientEvent.CloseNUIView, (int)nuiViewType, cancelFocus);
+        }
+
+        public void CreatePlayerVehicle( GameVehicleHash vehicleHash)
+        {
+            CallClientAction(ClientEvent.CreatePlayerVehicle, (uint)vehicleHash);
+        }
+
+        public void SwitchOutPlayer()
+        {
+            CallClientAction(ClientEvent.SwitchOutPlayer);
+        }
+
+        public void SwitchInPlayer(float x, float y, float z)
+        {
+            CallClientAction(ClientEvent.SwitchInPlayer, x, y, z);
+        }
+
     }
 }

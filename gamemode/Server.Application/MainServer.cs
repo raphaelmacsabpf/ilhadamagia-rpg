@@ -13,19 +13,15 @@ namespace Server.Application
     public class MainServer : BaseScript
     {
         private readonly PlayerInfo playerInfo;
-        private readonly NetworkManager networkManager;
-        private readonly PlayerActions playerActions;
         private readonly ChatManager chatManager;
         private readonly StateManager stateManager;
         private readonly GameEntitiesManager gameEntitiesManager;
 
-        public MainServer(PlayerInfo playerInfo, CommandManager commandManager, MapManager mapManager, NetworkManager networkManager, PlayerActions playerActions, ChatManager chatManager, StateManager stateManager, GameEntitiesManager gameEntitiesManager)
+        public MainServer(PlayerInfo playerInfo, CommandManager commandManager, MapManager mapManager, ChatManager chatManager, StateManager stateManager, GameEntitiesManager gameEntitiesManager)
         {
             this.playerInfo = playerInfo;
             this.CommandManager = commandManager;
             this.MapManager = mapManager;
-            this.networkManager = networkManager;
-            this.playerActions = playerActions;
             this.chatManager = chatManager;
             this.stateManager = stateManager;
             this.gameEntitiesManager = gameEntitiesManager;
@@ -160,7 +156,7 @@ namespace Server.Application
 
         internal void OnPlayerMenuAction([FromSource] Player player, int menuActionInt, string compressedPayload)
         {
-            var uncompressedPayload = networkManager.Decompress(compressedPayload);
+            var uncompressedPayload = NetworkManager.Decompress(compressedPayload);
             var menuAction = (MenuAction)menuActionInt;
             var playerHandle = this.playerInfo.GetPlayerHandle(player);
 

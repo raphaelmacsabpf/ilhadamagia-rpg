@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Client.Application
 {
-    public class ClientAppBootstrap : BaseScript
+    public class ClientAppBootstrap : BaseClientScript
     {
         private bool firstTick = false;
         private MainClient mainClientHandler;
@@ -40,25 +40,25 @@ namespace Client.Application
             EventHandlers["client:Client:Info"] += new Action(mainClient.OnInfo);
 
             // GF Events
-            RegisterScriptEventHandler(ScriptEvent.SendClientMessage, new Action<int, string>(mainClient.GFSendClientMessage));
-            RegisterScriptEventHandler(ScriptEvent.SpawnPlayer, new Action<string, float, float, float, float, bool>(mainClient.GFSpawnPlayer));
-            RegisterScriptEventHandler(ScriptEvent.Kill, new Action(mainClient.GFKill));
-            RegisterScriptEventHandler(ScriptEvent.SetPlayerPos, new Action<Vector3>(mainClient.GFSetPlayerPos));
-            RegisterScriptEventHandler(ScriptEvent.TeleportPlayerToPosition, new Action<Vector3, int>(mainClient.GFTeleportPlayerToPosition));
-            RegisterScriptEventHandler(ScriptEvent.SetPedHealth, new Action<int>(mainClient.GFSetPedHealth));
-            RegisterScriptEventHandler(ScriptEvent.SetPedArmour, new Action<int>(mainClient.GFSetPedArmour));
-            RegisterScriptEventHandler(ScriptEvent.GiveWeaponToPed, new Action<uint, int, bool, bool>(mainClient.GFGiveWeaponToPed));
-            RegisterScriptEventHandler(ScriptEvent.SendPayload, new Action<int, string, int>(mainClient.OnPayloadReceive));
-            RegisterScriptEventHandler(ScriptEvent.SetPlayerMoney, new Action<int>(mainClient.GFSetPlayerMoney));
-            RegisterScriptEventHandler(ScriptEvent.CreateVehicle, new Action<uint, int, int, int, float, float, float, float>(mainClient.CreateVehicle));
-            RegisterScriptEventHandler(ScriptEvent.DeleteVehicle, new Action<int>(mainClient.DeleteVehicle));
-            RegisterScriptEventHandler(ScriptEvent.OpenMenu, new Action<int, string, int>(menuManager.OpenMenu));
-            RegisterScriptEventHandler(ScriptEvent.OpenNUIView, new Action<int, bool, string, int>(mainClient.OpenNUIView));
-            RegisterScriptEventHandler(ScriptEvent.CloseNUIView, new Action<int, bool>(mainClient.CloseNUIView)); // TODO: Mudar de close para Hide (faz mais sentido)
-            RegisterScriptEventHandler(ScriptEvent.CreatePlayerVehicle, new Action<uint>(mainClient.CreatePlayerVehicle));
-            RegisterScriptEventHandler(ScriptEvent.SwitchOutPlayer, new Action(mainClient.SwitchOutPlayer));
-            RegisterScriptEventHandler(ScriptEvent.SwitchInPlayer, new Action<float, float, float>(mainClient.SwitchInPlayer));
-            RegisterScriptEventHandler(ScriptEvent.SyncPlayerDateTime, new Action<string>(mainClient.SyncPlayerDateTime));
+            RegisterClientEventHandler(ClientEvent.SendClientMessage, new Action<int, string>(mainClient.GFSendClientMessage));
+            RegisterClientEventHandler(ClientEvent.SpawnPlayer, new Action<string, float, float, float, float, bool>(mainClient.GFSpawnPlayer));
+            RegisterClientEventHandler(ClientEvent.Kill, new Action(mainClient.GFKill));
+            RegisterClientEventHandler(ClientEvent.SetPlayerPos, new Action<Vector3>(mainClient.GFSetPlayerPos));
+            RegisterClientEventHandler(ClientEvent.TeleportPlayerToPosition, new Action<Vector3, int>(mainClient.GFTeleportPlayerToPosition));
+            RegisterClientEventHandler(ClientEvent.SetPedHealth, new Action<int>(mainClient.GFSetPedHealth));
+            RegisterClientEventHandler(ClientEvent.SetPedArmour, new Action<int>(mainClient.GFSetPedArmour));
+            RegisterClientEventHandler(ClientEvent.GiveWeaponToPed, new Action<uint, int, bool, bool>(mainClient.GFGiveWeaponToPed));
+            RegisterClientEventHandler(ClientEvent.SendPayload, new Action<int, string, int>(mainClient.OnPayloadReceive));
+            RegisterClientEventHandler(ClientEvent.SetPlayerMoney, new Action<int>(mainClient.GFSetPlayerMoney));
+            RegisterClientEventHandler(ClientEvent.CreateVehicle, new Action<uint, int, int, int, float, float, float, float>(mainClient.CreateVehicle));
+            RegisterClientEventHandler(ClientEvent.DeleteVehicle, new Action<int>(mainClient.DeleteVehicle));
+            RegisterClientEventHandler(ClientEvent.OpenMenu, new Action<int, string, int>(menuManager.OpenMenu));
+            RegisterClientEventHandler(ClientEvent.OpenNUIView, new Action<int, bool, string, int>(mainClient.OpenNUIView));
+            RegisterClientEventHandler(ClientEvent.CloseNUIView, new Action<int, bool>(mainClient.CloseNUIView)); // TODO: Mudar de close para Hide (faz mais sentido)
+            RegisterClientEventHandler(ClientEvent.CreatePlayerVehicle, new Action<uint>(mainClient.CreatePlayerVehicle));
+            RegisterClientEventHandler(ClientEvent.SwitchOutPlayer, new Action(mainClient.SwitchOutPlayer));
+            RegisterClientEventHandler(ClientEvent.SwitchInPlayer, new Action<float, float, float>(mainClient.SwitchInPlayer));
+            RegisterClientEventHandler(ClientEvent.SyncPlayerDateTime, new Action<string>(mainClient.SyncPlayerDateTime));
             mainClientHandler = mainClient;
         }
 
@@ -72,9 +72,9 @@ namespace Client.Application
             }
         }
 
-        private void RegisterScriptEventHandler(ScriptEvent scriptEvent, Delegate @delegate)
+        private void RegisterClientEventHandler(ClientEvent clientEvent, Delegate @delegate)
         {
-            EventHandlers[scriptEvent.ToString()] += @delegate;
+            EventHandlers[clientEvent.ToString()] += @delegate;
         }
     }
 }

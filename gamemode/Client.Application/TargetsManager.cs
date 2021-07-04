@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Client.Application
 {
-    public class TargetsManager : BaseScript
+    public class TargetsManager : BaseClientScript
     {
         private ProximityTargetDto currentProximityTarget;
         private DateTime? lastProximityTargetReached;
@@ -136,7 +136,7 @@ namespace Client.Application
                 case InteractionTargetAction.SERVER_CALLBACK:
                     {
                         string serverCallback = payload;
-                        TriggerServerEvent("GF:Server:OnPlayerTargetActionServerCallback", serverCallback);
+                        CallServerAction(ServerEvent.OnPlayerTargetActionServerCallback, serverCallback);
                         break;
                     }
             }

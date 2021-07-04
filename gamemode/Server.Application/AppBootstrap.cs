@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using CitizenFX.Core;
+using GF.CrossCutting.Enums;
 using Server.Application.CommandLibraries;
 using Server.Application.Managers;
 using Server.Application.Services;
@@ -54,7 +55,6 @@ namespace Server.Application
             builder.RegisterType<ChatManager>().As<ChatManager>().SingleInstance();
             builder.RegisterType<MapManager>().As<MapManager>().SingleInstance();
             builder.RegisterType<GameEntitiesManager>().As<GameEntitiesManager>().SingleInstance();
-            builder.RegisterType<PlayerActions>().As<PlayerActions>().SingleInstance();
             builder.RegisterType<PlayerInfo>().As<PlayerInfo>().SingleInstance();
             builder.RegisterType<StateManager>().As<StateManager>().SingleInstance();
             builder.RegisterType<NetworkManager>().As<NetworkManager>().SingleInstance();
@@ -78,13 +78,13 @@ namespace Server.Application
 
                 EventHandlers["playerConnecting"] += new Action<Player, string, dynamic, dynamic>(mainServer.OnPlayerConnecting);
                 EventHandlers["playerDropped"] += new Action<Player, string>(mainServer.OnPlayerDropped);
-                EventHandlers["GF:Server:OnClientReady"] += new Action<Player>(mainServer.OnClientReady);
-                EventHandlers["GF:Server:OnChatMessage"] += new Action<Player, string>(mainServer.OnChatMessage);
-                EventHandlers["GF:Server:OnClientCommand"] += new Action<Player, string, bool, string>(mainServer.OnClientCommand);
-                EventHandlers["GF:Server:OnPlayerTargetActionServerCallback"] += new Action<Player, string>(mainServer.MapManager.OnPlayerTargetActionServerCallback);
-                EventHandlers["GF:Server:OnMenuAction"] += new Action<Player, int, string>(mainServer.OnPlayerMenuAction);
-                EventHandlers["GF:Server:ResponseAccountSelect"] += new Action<Player, string>(mainServer.OnPlayerSelectAccount);
-                EventHandlers["GF:Server:TriggerStateEvent"] += new Action<Player, string>(mainServer.OnPlayerTriggerStateEvent);
+                RegisterServerEventHandler(ServerEvent.OnClientReady, new Action<Player>(mainServer.OnClientReady));
+                RegisterServerEventHandler(ServerEvent.OnChatMessage, new Action<Player, string>(mainServer.OnChatMessage));
+                RegisterServerEventHandler(ServerEvent.OnClientCommand, new Action<Player, string, bool, string>(mainServer.OnClientCommand));
+                RegisterServerEventHandler(ServerEvent.OnPlayerTargetActionServerCallback, new Action<Player, string>(mainServer.MapManager.OnPlayerTargetActionServerCallback));
+                RegisterServerEventHandler(ServerEvent.OnMenuAction, new Action<Player, int, string>(mainServer.OnPlayerMenuAction));
+                RegisterServerEventHandler(ServerEvent.ResponseAccountSelect, new Action<Player, string>(mainServer.OnPlayerSelectAccount));
+                RegisterServerEventHandler(ServerEvent.TriggerStateEvent, new Action<Player, string>(mainServer.OnPlayerTriggerStateEvent));
             }
 
             initializationStopwatch.Stop();
@@ -102,6 +102,11 @@ namespace Server.Application
                 { typeof(MiscCommands), scope.Resolve<MiscCommands>() },
                 { typeof(MoneyCommands), scope.Resolve<MoneyCommands>() },
             });
+        }
+
+        private void RegisterServerEventHandler(ServerEvent serverEvent, Delegate @delegate)
+        {
+            EventHandlers[serverEvent.ToString()] += @delegate;
         }
 
         private static IContainer Container { get; set; }

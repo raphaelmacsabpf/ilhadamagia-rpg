@@ -21,18 +21,16 @@ namespace Server.Application.Managers
         private readonly PlayerInfo playerInfo;
         private readonly NetworkManager networkManager;
         private readonly MapManager mapManager;
-        private readonly PlayerActions playerActions;
         private readonly AccountService accountService;
         private readonly OrgService orgService;
         private readonly PlayerService playerService;
 
-        public StateManager(ChatManager chatManager, PlayerInfo playerInfo, NetworkManager networkManager, MapManager mapManager, PlayerActions playerActions, AccountService accountService, OrgService orgService, PlayerService playerService)
+        public StateManager(ChatManager chatManager, PlayerInfo playerInfo, NetworkManager networkManager, MapManager mapManager, AccountService accountService, OrgService orgService, PlayerService playerService)
         {
             this.chatManager = chatManager;
             this.playerInfo = playerInfo;
             this.networkManager = networkManager;
             this.mapManager = mapManager;
-            this.playerActions = playerActions;
             this.accountService = accountService;
             this.orgService = orgService;
             this.playerService = playerService;
@@ -122,8 +120,8 @@ namespace Server.Application.Managers
                 .OnEntry(async () =>
                 {
                     var json = JsonConvert.SerializeObject(null);
-                    var compressedJson = networkManager.Compress(json);
-                    this.playerActions.OpenNUIView(playerHandle, NUIViewType.CREATE_ACCOUNT, true, compressedJson, json.Length);
+                    var compressedJson = NetworkManager.Compress(json);
+                    playerHandle.OpenNUIView(NUIViewType.CREATE_ACCOUNT, true, compressedJson, json.Length);
                 });
 
             fsm.Configure(PlayerConnectionState.LOADING_ACCOUNT)
@@ -137,8 +135,8 @@ namespace Server.Application.Managers
                         Level = element.Level
                     });
                     var json = JsonConvert.SerializeObject(accountsDto);
-                    var compressedJson = networkManager.Compress(json);
-                    this.playerActions.OpenNUIView(playerHandle, NUIViewType.SELECT_ACCOUNT, true, compressedJson, json.Length);
+                    var compressedJson = NetworkManager.Compress(json);
+                    playerHandle.OpenNUIView(NUIViewType.SELECT_ACCOUNT, true, compressedJson, json.Length);
                 });
 
             fsm.Configure(PlayerConnectionState.LOGGED)
@@ -146,7 +144,7 @@ namespace Server.Application.Managers
                 .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
                 .OnEntry(() =>
                 {
-                    this.playerActions.CloseNUIView(playerHandle, NUIViewType.SELECT_ACCOUNT, true);
+                    playerHandle.CloseNUIView(NUIViewType.SELECT_ACCOUNT, true);
                     var json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticMarkersPayload());
                     this.networkManager.SendPayloadToPlayer(playerHandle, PayloadType.TO_STATIC_MARKERS, json);
                     json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticProximityTargetsPayload());
@@ -202,7 +200,7 @@ namespace Server.Application.Managers
                             chatManager.SendClientMessage(playerHandle, ChatColor.COLOR_LIGHTBLUE, "Local de nascimento: Spawn organização");
                         }
                     }
-                    this.playerActions.SwitchOutPlayer(playerHandle);
+                    playerHandle.SwitchOutPlayer();
                 });
 
             fsm.Configure(PlayerConnectionState.SPAWNING)

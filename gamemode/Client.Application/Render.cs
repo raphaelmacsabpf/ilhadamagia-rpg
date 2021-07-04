@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Client.Application
 {
-    public class Render : BaseScript
+    public class Render : BaseClientScript
     {
         private int moneyUpdateRate;
         private bool updatingMoney;

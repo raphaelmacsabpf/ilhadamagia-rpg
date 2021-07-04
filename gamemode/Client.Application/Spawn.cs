@@ -5,7 +5,7 @@ using static CitizenFX.Core.Native.API;
 
 namespace Client.Application
 {
-    public class Spawn : BaseScript
+    public class Spawn : BaseClientScript
     {
         private static bool _spawnLock = false;
 
