@@ -57,7 +57,6 @@ namespace Server.Application
             builder.RegisterType<GameEntitiesManager>().As<GameEntitiesManager>().SingleInstance();
             builder.RegisterType<PlayerInfo>().As<PlayerInfo>().SingleInstance();
             builder.RegisterType<StateManager>().As<StateManager>().SingleInstance();
-            builder.RegisterType<NetworkManager>().As<NetworkManager>().SingleInstance();
             builder.RegisterType<CommandManager>().As<CommandManager>().SingleInstance();
             builder.RegisterType<MainServer>().As<MainServer>();
             builder.RegisterType<OrgService>().As<OrgService>();

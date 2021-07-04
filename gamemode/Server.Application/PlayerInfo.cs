@@ -16,9 +16,8 @@ namespace Server.Application
         private ConcurrentDictionary<Player, PlayerHandle> playerToPlayerHandleDictionary;
         private ConcurrentQueue<Tuple<PlayerVarsDto, PlayerHandle>> playerVarsToUpdateQueue;
         private Thread updatePlayerVarsThread;
-        private readonly NetworkManager networkManager;
 
-        public PlayerInfo(NetworkManager networkManager)
+        public PlayerInfo()
         {
             this.playerToPlayerHandleDictionary = new ConcurrentDictionary<Player, PlayerHandle>();
             this.playerVarsToUpdateQueue = new ConcurrentQueue<Tuple<PlayerVarsDto, PlayerHandle>>();
@@ -27,7 +26,6 @@ namespace Server.Application
             this.updatePlayerVarsThread.Priority = ThreadPriority.Lowest;
             this.updatePlayerVarsThread.IsBackground = true;
             this.updatePlayerVarsThread.Start();
-            this.networkManager = networkManager;
         }
 
         public void LoadPlayerHandle(PlayerHandle playerHandle)
@@ -46,7 +44,7 @@ namespace Server.Application
             playerVars.TryAdd("Money", playerHandle.Account.Money.ToString());
             playerVars.TryAdd("Username", playerHandle.Account.Username);
             var json = JsonConvert.SerializeObject(playerVars);
-            this.networkManager.SendPayloadToPlayer(playerHandle, PayloadType.TO_PLAYER_VARS, json);
+            playerHandle.SendPayloadToPlayer(PayloadType.TO_PLAYER_VARS, json);
         }
 
         public PlayerHandle GetPlayerHandle(Player player)
@@ -67,7 +65,7 @@ namespace Server.Application
                 while (playerVarsToUpdateQueue.TryDequeue(out playerVarsTuple))
                 {
                     var json = JsonConvert.SerializeObject(playerVarsTuple.Item1);
-                    this.networkManager.SendPayloadToPlayer(playerVarsTuple.Item2, PayloadType.TO_PLAYER_VARS, json);
+                    playerVarsTuple.Item2.SendPayloadToPlayer(PayloadType.TO_PLAYER_VARS, json);
                     Thread.Sleep(10);
                 }
 

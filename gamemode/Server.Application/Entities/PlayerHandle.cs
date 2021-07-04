@@ -8,6 +8,7 @@ using Server.Domain.Enums;
 using Shared.CrossCutting;
 using Shared.CrossCutting.Enums;
 using Stateless;
+using System;
 using System.Collections.Generic;
 
 namespace Server.Application.Entities
@@ -95,7 +96,7 @@ namespace Server.Application.Entities
         public void OpenMenu(MenuType menuType, object payload)
         {
             var json = JsonConvert.SerializeObject(payload);
-            var compressedJson = NetworkManager.Compress(json);
+            var compressedJson = LZ4Utils.Compress(json);
             var uncompressedLenght = json.Length;
             CallClientAction(ClientEvent.OpenMenu, (int)menuType, compressedJson, uncompressedLenght);
         }
@@ -135,5 +136,15 @@ namespace Server.Application.Entities
             CallClientAction(ClientEvent.SwitchInPlayer, x, y, z);
         }
 
+        public void SendPayloadToPlayer(PayloadType payloadType, string jsonPayload)
+        {
+            var compressedJsonPayload = LZ4Utils.Compress(jsonPayload);
+            CallClientAction(ClientEvent.SendPayload, (int)payloadType, compressedJsonPayload, jsonPayload.Length);
+        }
+
+        public void SyncPlayerDateTime()
+        {
+            CallClientAction(ClientEvent.SyncPlayerDateTime, DateTime.Now.ToString());
+        }
     }
 }

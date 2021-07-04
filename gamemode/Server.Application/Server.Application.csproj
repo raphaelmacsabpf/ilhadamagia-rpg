@@ -78,7 +78,7 @@
     <Compile Include="Managers\GameEntitiesManager.cs" />
     <Compile Include="Managers\StateManager.cs" />
     <Compile Include="Managers\MapManager.cs" />
-    <Compile Include="Managers\NetworkManager.cs" />
+    <Compile Include="LZ4Utils.cs" />
     <Compile Include="PlayerInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\OrgService.cs" />

@@ -156,7 +156,7 @@ namespace Server.Application
 
         internal void OnPlayerMenuAction([FromSource] Player player, int menuActionInt, string compressedPayload)
         {
-            var uncompressedPayload = NetworkManager.Decompress(compressedPayload);
+            var uncompressedPayload = LZ4Utils.Decompress(compressedPayload);
             var menuAction = (MenuAction)menuActionInt;
             var playerHandle = this.playerInfo.GetPlayerHandle(player);
 

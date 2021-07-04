@@ -19,17 +19,15 @@ namespace Server.Application.Managers
     {
         private readonly ChatManager chatManager;
         private readonly PlayerInfo playerInfo;
-        private readonly NetworkManager networkManager;
         private readonly MapManager mapManager;
         private readonly AccountService accountService;
         private readonly OrgService orgService;
         private readonly PlayerService playerService;
 
-        public StateManager(ChatManager chatManager, PlayerInfo playerInfo, NetworkManager networkManager, MapManager mapManager, AccountService accountService, OrgService orgService, PlayerService playerService)
+        public StateManager(ChatManager chatManager, PlayerInfo playerInfo, MapManager mapManager, AccountService accountService, OrgService orgService, PlayerService playerService)
         {
             this.chatManager = chatManager;
             this.playerInfo = playerInfo;
-            this.networkManager = networkManager;
             this.mapManager = mapManager;
             this.accountService = accountService;
             this.orgService = orgService;
@@ -98,7 +96,7 @@ namespace Server.Application.Managers
                 .Permit(PlayerConnectionTrigger.ACCOUNT_NOT_FOUND, PlayerConnectionState.NEW_ACCOUNT)
                 .OnEntry(async () =>
                 {
-                    this.networkManager.SyncPlayerDateTime(playerHandle);
+                    playerHandle.SyncPlayerDateTime();
                     var accounts = (await accountService.GetAccountListForLicense(playerHandle.License)).ToList();
                     if (accounts.Count > 0)
                     {
@@ -120,7 +118,7 @@ namespace Server.Application.Managers
                 .OnEntry(async () =>
                 {
                     var json = JsonConvert.SerializeObject(null);
-                    var compressedJson = NetworkManager.Compress(json);
+                    var compressedJson = LZ4Utils.Compress(json);
                     playerHandle.OpenNUIView(NUIViewType.CREATE_ACCOUNT, true, compressedJson, json.Length);
                 });
 
@@ -135,7 +133,7 @@ namespace Server.Application.Managers
                         Level = element.Level
                     });
                     var json = JsonConvert.SerializeObject(accountsDto);
-                    var compressedJson = NetworkManager.Compress(json);
+                    var compressedJson = LZ4Utils.Compress(json);
                     playerHandle.OpenNUIView(NUIViewType.SELECT_ACCOUNT, true, compressedJson, json.Length);
                 });
 
@@ -146,13 +144,13 @@ namespace Server.Application.Managers
                 {
                     playerHandle.CloseNUIView(NUIViewType.SELECT_ACCOUNT, true);
                     var json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticMarkersPayload());
-                    this.networkManager.SendPayloadToPlayer(playerHandle, PayloadType.TO_STATIC_MARKERS, json);
+                    playerHandle.SendPayloadToPlayer(PayloadType.TO_STATIC_MARKERS, json);
                     json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticProximityTargetsPayload());
-                    this.networkManager.SendPayloadToPlayer(playerHandle, PayloadType.TO_STATIC_PROXIMITY_TARGETS, json);
+                    playerHandle.SendPayloadToPlayer(PayloadType.TO_STATIC_PROXIMITY_TARGETS, json);
                     json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticInteractionTargetsPayload());
-                    this.networkManager.SendPayloadToPlayer(playerHandle, PayloadType.TO_STATIC_INTERACTION_TARGETS, json);
+                    playerHandle.SendPayloadToPlayer(PayloadType.TO_STATIC_INTERACTION_TARGETS, json);
                     json = JsonConvert.SerializeObject(this.mapManager.PopUpdateBlipsPayload());
-                    this.networkManager.SendPayloadToPlayer(playerHandle, PayloadType.TO_MAP_BLIPS, json);
+                    playerHandle.SendPayloadToPlayer(PayloadType.TO_MAP_BLIPS, json);
 
                     playerHandle.FSM.Fire(PlayerConnectionTrigger.SELECTING_SPAWN_POSITION);
                 });
@@ -218,7 +216,7 @@ namespace Server.Application.Managers
                 .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
                 .OnEntry(() =>
                 {
-                    this.networkManager.SyncPlayerDateTime(playerHandle);
+                    playerHandle.SyncPlayerDateTime();
                     this.playerInfo.SendUpdatedPlayerVars(playerHandle);
                 });
 
