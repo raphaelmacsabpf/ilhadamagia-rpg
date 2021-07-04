@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GF.CrossCutting.Dto
+namespace Shared.CrossCutting.Dto
 {
     public class OrgDataDto
     {

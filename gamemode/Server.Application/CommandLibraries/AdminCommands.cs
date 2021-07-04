@@ -1,6 +1,6 @@
 ﻿using CitizenFX.Core;
-using GF.CrossCutting;
-using GF.CrossCutting.Converters;
+using Shared.CrossCutting;
+using Shared.CrossCutting.Converters;
 using Server.Application.Entities;
 using Server.Application.Managers;
 using Server.Application.Services;
@@ -13,25 +13,26 @@ namespace Server.Application.CommandLibraries
 {
     public class AdminCommands : CommandLibrary
     {
-        private readonly PlayerActions playerActions;
         private readonly ChatManager chatManager;
         private readonly PlayerInfo playerInfo;
         private readonly MapManager mapManager;
-        private readonly StateManager stateManager;
-        private readonly GameEntitiesManager gameEntitiesManager;
         private readonly MoneyService moneyService;
         private readonly PlayerService playerService;
+        private readonly OrgService orgService;
 
-        public AdminCommands(PlayerActions playerActions, ChatManager chatManager, PlayerInfo playerInfo, MapManager mapManager, StateManager stateManager, GameEntitiesManager gameEntitiesManager, MoneyService moneyService, PlayerService playerService)
+        public AdminCommands(ChatManager chatManager, 
+                             PlayerInfo playerInfo, 
+                             MapManager mapManager, 
+                             MoneyService moneyService, 
+                             PlayerService playerService, 
+                             OrgService orgService)
         {
-            this.playerActions = playerActions;
             this.chatManager = chatManager;
             this.playerInfo = playerInfo;
             this.mapManager = mapManager;
-            this.stateManager = stateManager;
-            this.gameEntitiesManager = gameEntitiesManager;
             this.moneyService = moneyService;
             this.playerService = playerService;
+            this.orgService = orgService;
         }
 
         [Command("/ir")]
@@ -39,8 +40,8 @@ namespace Server.Application.CommandLibraries
         {
             if (commandValidator.WithAdminLevel(1).WithTargetPlayer("playerid").IsValid("USE: /ir [playerid]"))
             {
-                GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
-                this.playerService.AdminGoToPlayer(commandValidator.SourceGFPlayer, targetGfPlayer);
+                PlayerHandle playerHandle = commandValidator.GetTargetPlayerHandle();
+                this.playerService.AdminGoToPlayer(commandValidator.SourcePlayerHandle, playerHandle);
             }
         }
 
@@ -49,8 +50,8 @@ namespace Server.Application.CommandLibraries
         {
             if (commandValidator.WithAdminLevel(1).WithTargetPlayer("playerid").IsValid("USE: /trazer [playerid]"))
             {
-                GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
-                this.playerService.AdminBringPlayer(commandValidator.SourceGFPlayer, targetGfPlayer);
+                PlayerHandle targetPlayerHandle = commandValidator.GetTargetPlayerHandle();
+                this.playerService.AdminBringPlayer(commandValidator.SourcePlayerHandle, targetPlayerHandle);
             }
         }
 
@@ -59,8 +60,8 @@ namespace Server.Application.CommandLibraries
         {
             if (commandValidator.WithAdminLevel(1).WithVarString("label").IsValid("USE: /save [rótulo]"))
             {
-                var position = commandValidator.SourceGFPlayer.Player.Character.Position;
-                var heading = commandValidator.SourceGFPlayer.Player.Character.Heading;
+                var position = commandValidator.SourcePlayerHandle.Player.Character.Position;
+                var heading = commandValidator.SourcePlayerHandle.Player.Character.Heading;
                 Console.WriteLine($"Saved {commandValidator.GetVar<string>("label")} X,Y,Z,H::::: SetPlayerPosHeading({position.X}f, {position.Y}f, {position.Z}f, {heading}f);");
             }
         }
@@ -70,9 +71,9 @@ namespace Server.Application.CommandLibraries
         {
             if (commandValidator.WithAdminLevel(3001).WithTargetPlayer("playerid").WithVarBetween<int>(0, 3001, "level").IsValid("USE: /setadmin [playerid] [nivel(0-3001)]"))
             {
-                GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                PlayerHandle targetPlayerHandle = commandValidator.GetTargetPlayerHandle();
                 int level = commandValidator.GetVar<int>("level");
-                this.playerService.SetAsAdmin(commandValidator.SourceGFPlayer, targetGfPlayer, level);
+                this.playerService.SetAsAdmin(commandValidator.SourcePlayerHandle, targetPlayerHandle, level);
             }
         }
 
@@ -81,12 +82,10 @@ namespace Server.Application.CommandLibraries
         {
             if (commandValidator.WithAdminLevel(1).WithTargetPlayer("playerid").WithVarBetween<int>(0, 1000, "health").IsValid("USE: /setsaude [playerid] [health(0-1000)]"))
             {
-                GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                PlayerHandle targetPlayerHandle = commandValidator.GetTargetPlayerHandle();
                 int value = commandValidator.GetVar<int>("health");
 
-                this.playerActions.SetPlayerHealth(targetGfPlayer, value);
-                this.chatManager.SendClientMessage(commandValidator.SourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $"Você deu {value} de saúde para {targetGfPlayer.Account.Username}");
-                this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $"O Admin {targetGfPlayer.Account.Username} te deu {value} de saúde");
+                this.playerService.SetPlayerHealth(commandValidator.SourcePlayerHandle, targetPlayerHandle, value);
             }
         }
 
@@ -95,12 +94,10 @@ namespace Server.Application.CommandLibraries
         {
             if (commandValidator.WithAdminLevel(1).WithTargetPlayer("playerid").WithVarBetween<int>(0, 100, "armour").IsValid("USE: /setcolete [playerid] [colete(0-100)]"))
             {
-                GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                PlayerHandle targetPlayerHandle = commandValidator.GetTargetPlayerHandle();
                 int value = commandValidator.GetVar<int>("armour");
 
-                this.playerActions.SetPlayerArmour(targetGfPlayer, value);
-                this.chatManager.SendClientMessage(commandValidator.SourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $"Você deu {value} de colete para {targetGfPlayer.Account.Username}");
-                this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $"O Admin {targetGfPlayer.Account.Username} te deu {value} de colete");
+                this.playerService.SetPlayerArmour(commandValidator.SourcePlayerHandle, targetPlayerHandle, value);
             }
         }
 
@@ -111,12 +108,12 @@ namespace Server.Application.CommandLibraries
             {
                 var vectorStr = commandValidator.CommandPacket.Text.Split(new string[] { " " }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
                 var vectorPositions = vectorStr.Split(',');
-                var targetVector = new Vector3(
+                var position = new Vector3(
                     float.Parse(vectorPositions[0]),
                     float.Parse(vectorPositions[1]),
                     float.Parse(vectorPositions[2])
                 );
-                this.playerActions.SetPlayerPos(commandValidator.SourceGFPlayer, targetVector);
+                this.playerService.SetPlayerPos(commandValidator.SourcePlayerHandle, position);
             }
         }
 
@@ -125,10 +122,9 @@ namespace Server.Application.CommandLibraries
         {
             if (commandValidator.WithAdminLevel(3001).WithTargetPlayer("playerid").WithVarBetween<int>(1, mapManager.HouseCount, "house-id").IsValid($"USE: /setcasa [playerid] [id(1-{mapManager.HouseCount})]"))
             {
-                GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                PlayerHandle targetPlayerHandle = commandValidator.GetTargetPlayerHandle();
                 int houseId = commandValidator.GetVar<int>("house-id");
-                targetGfPlayer.SelectedHouse = mapManager.GetGFHouseFromId(houseId);
-                this.chatManager.SendClientMessage(commandValidator.SourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você setou a casa de {targetGfPlayer.Account.Username} para ID {houseId}.");
+                playerService.SetPlayerSelectedHouse(commandValidator.SourcePlayerHandle, targetPlayerHandle, houseId);
             }
         }
 
@@ -138,8 +134,7 @@ namespace Server.Application.CommandLibraries
             if (commandValidator.WithAdminLevel(4).WithVarBetween<int>(1, mapManager.HouseCount, "house-id").IsValid($"USE: /ircasa [id(1-{mapManager.HouseCount})]"))
             {
                 int houseId = commandValidator.GetVar<int>("house-id");
-                var gfHouse = mapManager.GetGFHouseFromId(houseId);
-                this.playerActions.TeleportPlayerToPosition(commandValidator.SourceGFPlayer, new Vector3(gfHouse.Entity.EntranceX, gfHouse.Entity.EntranceY, gfHouse.Entity.EntranceZ), 500);
+                this.playerService.TeleportPlayerToHouse(commandValidator.SourcePlayerHandle, houseId);
             }
         }
 
@@ -150,15 +145,12 @@ namespace Server.Application.CommandLibraries
                 .WithVarBetween<int>(0, PedModelsConverter.GetPedModelMaxId(), "ped-model-id")
                 .IsValid($"USE: /setskin [playerid] [id(0-{PedModelsConverter.GetPedModelMaxId()}]"))
             {
-                GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                PlayerHandle targetPlayerHandle = commandValidator.GetTargetPlayerHandle();
                 var pedId = commandValidator.GetVar<int>("ped-model-id");
                 var pedModelHash = PedModelsConverter.GetHashStringById(pedId);
                 if (pedModelHash != null)
                 {
-                    targetGfPlayer.Account.SetPedModel(pedModelHash);
-                    stateManager.RespawnPlayerInCurrentPosition(targetGfPlayer);
-                    this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" Sua skin foi alterada pelo admin {commandValidator.SourceGFPlayer.Account.Username}");
-                    this.chatManager.SendClientMessage(commandValidator.SourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você alterou a skin de {targetGfPlayer.Account.Username}");
+                    playerService.SetSkin(commandValidator.SourcePlayerHandle, targetPlayerHandle, pedModelHash);
                 }
             }
         }
@@ -168,21 +160,17 @@ namespace Server.Application.CommandLibraries
         {
             if (commandValidator.WithAdminLevel(4).WithTargetPlayer("playerid")
                 .WithVarBetween<int>(0, PedModelsConverter.GetPedModelMaxId(), "org-id")
-                .IsValid($"USE: /setorg [playerid] [org-id(0-{gameEntitiesManager.GetMaxOrgId()}]"))
+                .IsValid($"USE: /setorg [playerid] [org-id]"))
             {
-                GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                PlayerHandle targetPlayerHandle = commandValidator.GetTargetPlayerHandle();
                 var orgId = commandValidator.GetVar<int>("org-id");
-                var gfOrg = gameEntitiesManager.GetGFOrgById(orgId);
+                var gfOrg = orgService.GetOrgById(orgId);
                 if (gfOrg == null)
                 {
-                    commandValidator.SendCommandError($"org-id {orgId} inválido", $"USE: /setorg [playerid] [id(0-{gameEntitiesManager.GetMaxOrgId()}]");
+                    commandValidator.SendCommandError($"org-id {orgId} inválido", $"USE: /setorg [playerid] [org-id]");
                     return;
                 }
-                //HACK: Retirado refatoração DDD|targetGfPlayer.Account.OrgId = orgId;
-                //HACK: Retirado refatoração DDD|targetGfPlayer.Account.IsLeader = false;
-                stateManager.RespawnPlayerInCurrentPosition(targetGfPlayer);
-                this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" Sua organização foi alterada para {gfOrg.Entity.Name} pelo admin {commandValidator.SourceGFPlayer.Account.Username}");
-                this.chatManager.SendClientMessage(commandValidator.SourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você alterou a organização de {targetGfPlayer.Account.Username} para {gfOrg.Entity.Name}");
+                orgService.InvitePlayerToOrg(gfOrg, commandValidator.SourcePlayerHandle, targetPlayerHandle);
             }
         }
 
@@ -191,22 +179,17 @@ namespace Server.Application.CommandLibraries
         {
             if (commandValidator.WithAdminLevel(4).WithTargetPlayer("playerid")
                 .WithVarBetween<int>(0, PedModelsConverter.GetPedModelMaxId(), "org-id")
-                .IsValid($"USE: /setlider [playerid] [org-id(0-{gameEntitiesManager.GetMaxOrgId()}]"))
+                .IsValid($"USE: /setlider [playerid] [org-id]"))
             {
-                GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                PlayerHandle targetPlayerHandle = commandValidator.GetTargetPlayerHandle();
                 var orgId = commandValidator.GetVar<int>("org-id");
-                var gfOrg = gameEntitiesManager.GetGFOrgById(orgId);
+                var gfOrg = orgService.GetOrgById(orgId);
                 if (gfOrg == null)
                 {
-                    commandValidator.SendCommandError($"org-id {orgId} inválido", $"USE: /setorg [playerid] [id(0-{gameEntitiesManager.GetMaxOrgId()}]");
+                    commandValidator.SendCommandError($"org-id {orgId} inválido", $"USE: /setorg [playerid] [org-id]");
                     return;
                 }
-                //HACK: Retirado refatoração DDD|targetGfPlayer.Account.OrgId = orgId;
-                //HACK: Retirado refatoração DDD|targetGfPlayer.Account.IsLeader = true;
-                gfOrg.Entity.SetLeader(targetGfPlayer.Account);
-                stateManager.RespawnPlayerInCurrentPosition(targetGfPlayer);
-                this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você foi setado como lider da organização {gfOrg.Entity.Name} pelo admin {commandValidator.SourceGFPlayer.Account.Username}");
-                this.chatManager.SendClientMessage(commandValidator.SourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você setou {targetGfPlayer.Account.Username} como líder da organização {gfOrg.Entity.Name}");
+                orgService.SetOrgLeader(gfOrg, commandValidator.SourcePlayerHandle, targetPlayerHandle);
             }
         }
 
@@ -218,16 +201,16 @@ namespace Server.Application.CommandLibraries
                 .WithVarBetween<int>(0, 250, "ammo-count")
                 .IsValid($"USE: /dararma [playerid] [weapon-id(0-{WeaponConverter.GetWeaponMaxId()}] [ammo-count(0-250)]"))
             {
-                GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                PlayerHandle targetPlayerHandle = commandValidator.GetTargetPlayerHandle();
                 var weaponId = commandValidator.GetVar<int>("weapon-id");
                 var ammoCount = commandValidator.GetVar<int>("ammo-count");
 
                 var weaponModelHash = WeaponConverter.GetWeaponHashById(weaponId);
                 var weaponName = WeaponConverter.GetWeaponNameById(weaponId);
 
-                this.playerActions.GiveWeaponToPlayer(commandValidator.SourceGFPlayer, (uint)weaponModelHash, ammoCount, false, true);
-                this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" O admin {commandValidator.SourceGFPlayer.Account.Username} lhe concedeu uma {weaponName} com {ammoCount} de munição");
-                this.chatManager.SendClientMessage(commandValidator.SourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você concedeu uma {weaponName} com {ammoCount} de munição para {targetGfPlayer.Account.Username}");
+                commandValidator.SourcePlayerHandle.GiveWeaponToPlayer((uint)weaponModelHash, ammoCount, false, true);
+                this.chatManager.SendClientMessage(targetPlayerHandle, ChatColor.COLOR_LIGHTBLUE, $" O admin {commandValidator.SourcePlayerHandle.Account.Username} lhe concedeu uma {weaponName} com {ammoCount} de munição");
+                this.chatManager.SendClientMessage(commandValidator.SourcePlayerHandle, ChatColor.COLOR_LIGHTBLUE, $" Você concedeu uma {weaponName} com {ammoCount} de munição para {targetPlayerHandle.Account.Username}");
             }
         }
 
@@ -238,20 +221,20 @@ namespace Server.Application.CommandLibraries
                 .WithVarBetween<long>(0, 1000000000, "money")
                 .IsValid($"USE: /dardinheiro [playerid] [money(0-1000000000]"))
             {
-                GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                PlayerHandle targetPlayerHandle = commandValidator.GetTargetPlayerHandle();
                 var money = commandValidator.GetVar<long>("money");
 
-                var moneyTransaction = moneyService.AdminGiveMoney(commandValidator.SourceGFPlayer.Account, targetGfPlayer.Account, money);
+                var moneyTransaction = moneyService.AdminGiveMoney(commandValidator.SourcePlayerHandle.Account, targetPlayerHandle.Account, money);
 
                 if (moneyTransaction.Status == MoneyTransactionStatus.RECEIVER_AT_MAXIMUM_FUNDS)
                 {
-                    this.chatManager.SendClientMessage(commandValidator.SourceGFPlayer, ChatColor.COLOR_GRAD2, $"* {targetGfPlayer.Account.Username} não pode receber esta quantia no momento.");
+                    this.chatManager.SendClientMessage(commandValidator.SourcePlayerHandle, ChatColor.COLOR_GRAD2, $"* {targetPlayerHandle.Account.Username} não pode receber esta quantia no momento.");
                     return;
                 }
 
-                this.playerInfo.SendUpdatedPlayerVars(targetGfPlayer); // TODO: Melhorar essa atualização de variáveis (não é tão prioritário assim ainda)
-                this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" O admin {commandValidator.SourceGFPlayer.Account.Username} lhe deu ${money} de dinheiro");
-                this.chatManager.SendClientMessage(commandValidator.SourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você deu ${money} de dinheiro para {targetGfPlayer.Account.Username}");
+                this.playerInfo.SendUpdatedPlayerVars(targetPlayerHandle); // TODO: Melhorar essa atualização de variáveis (não é tão prioritário assim ainda)
+                this.chatManager.SendClientMessage(targetPlayerHandle, ChatColor.COLOR_LIGHTBLUE, $" O admin {commandValidator.SourcePlayerHandle.Account.Username} lhe deu ${money} de dinheiro");
+                this.chatManager.SendClientMessage(commandValidator.SourcePlayerHandle, ChatColor.COLOR_LIGHTBLUE, $" Você deu ${money} de dinheiro para {targetPlayerHandle.Account.Username}");
             }
         }
 
@@ -260,10 +243,10 @@ namespace Server.Application.CommandLibraries
         {
             if (commandValidator.WithAdminLevel(1).WithTargetPlayer("playerid").IsValid("USE: /kill [playerid]"))
             {
-                var targetGfPlayer = commandValidator.GetTargetGFPlayer();
-                this.playerActions.KillPlayer(targetGfPlayer);
-                this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $"*Admin {commandValidator.SourceGFPlayer.Account.Username} te matou");
-                this.chatManager.SendClientMessage(commandValidator.SourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $"*Você matou {targetGfPlayer.Account.Username}");
+                var targetPlayerHandle = commandValidator.GetTargetPlayerHandle();
+                targetPlayerHandle.KillPlayer();
+                this.chatManager.SendClientMessage(targetPlayerHandle, ChatColor.COLOR_LIGHTBLUE, $"*Admin {commandValidator.SourcePlayerHandle.Account.Username} te matou");
+                this.chatManager.SendClientMessage(commandValidator.SourcePlayerHandle, ChatColor.COLOR_LIGHTBLUE, $"*Você matou {targetPlayerHandle.Account.Username}");
             }
         }
 
@@ -274,14 +257,14 @@ namespace Server.Application.CommandLibraries
                 .WithVarBetween<int>(0, VehicleConverter.GetVehicleMaxId(), "vehicle-id")
                 .IsValid($"USE: /veh [playerid] [vehicle-id(0-{VehicleConverter.GetVehicleMaxId()}]"))
             {
-                GFPlayer targetGfPlayer = commandValidator.GetTargetGFPlayer();
+                PlayerHandle targetPlayerHandle = commandValidator.GetTargetPlayerHandle();
                 var vehicleId = commandValidator.GetVar<int>("vehicle-id");
                 var vehicleModelHash = VehicleConverter.GetVehicleHashById(vehicleId);
                 var vehicleName = VehicleConverter.GetVehicleNameById(vehicleId);
 
-                this.playerActions.CreatePlayerVehicle(targetGfPlayer, vehicleModelHash);
-                this.chatManager.SendClientMessage(targetGfPlayer, ChatColor.COLOR_LIGHTBLUE, $" O admin {commandValidator.SourceGFPlayer.Account.Username} lhe concedeu um {vehicleName}");
-                this.chatManager.SendClientMessage(commandValidator.SourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, $" Você concedeu um {vehicleName} para {targetGfPlayer.Account.Username}");
+                targetPlayerHandle.CreatePlayerVehicle(vehicleModelHash);
+                this.chatManager.SendClientMessage(targetPlayerHandle, ChatColor.COLOR_LIGHTBLUE, $" O admin {commandValidator.SourcePlayerHandle.Account.Username} lhe concedeu um {vehicleName}");
+                this.chatManager.SendClientMessage(commandValidator.SourcePlayerHandle, ChatColor.COLOR_LIGHTBLUE, $" Você concedeu um {vehicleName} para {targetPlayerHandle.Account.Username}");
             }
         }
     }

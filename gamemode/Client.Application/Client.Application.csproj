@@ -60,6 +60,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseClientScript.cs" />
     <Compile Include="ClientAppBootstrap.cs" />
     <Compile Include="ClientNetworkManager.cs" />
     <Compile Include="MainClient.cs" />

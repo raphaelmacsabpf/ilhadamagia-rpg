@@ -1,11 +1,10 @@
-﻿using CitizenFX.Core;
-using CitizenFX.Core.Native;
+﻿using CitizenFX.Core.Native;
 using CitizenFX.Core.UI;
 using System.Drawing;
 
 namespace Client.Application
 {
-    public class DrawTextAPI : BaseScript
+    public class DrawTextAPI : BaseClientScript
     {
         private SizeF resolution;
         private float height;

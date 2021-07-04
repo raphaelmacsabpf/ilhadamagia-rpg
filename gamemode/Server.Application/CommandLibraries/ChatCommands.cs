@@ -17,7 +17,7 @@ namespace Server.Application.CommandLibraries
             if (commandValidator.WithVarText("scream-text").IsValid("USE: /gritar [mensagem]"))
             {
                 var messageToScream = commandValidator.GetVar<string>("scream-text");
-                this.chatManager.PlayerScream(commandValidator.SourceGFPlayer, messageToScream);
+                this.chatManager.PlayerScream(commandValidator.SourcePlayerHandle, messageToScream);
             }
         }
     }

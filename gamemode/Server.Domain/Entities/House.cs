@@ -14,7 +14,6 @@ namespace Server.Domain.Entities
         public float EntranceX { get; set; }
         public float EntranceY { get; set; }
         public float EntranceZ { get; set; }
-        public PropertyType PropertyType { get; set; }
         public PropertySellState SellState { get; set; }
         public InteriorType Interior { get; set; }
         public float VehiclePositionX { get; set; }

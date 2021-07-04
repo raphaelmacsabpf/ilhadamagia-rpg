@@ -4,14 +4,14 @@
     {
         public int Id { get; }
         public string Name { get; }
-        public int? Leader { get; private set; }
+        public string Leader { get; private set; }
         public float SpawnX { get; }
         public float SpawnY { get; }
         public float SpawnZ { get; }
 
         public void SetLeader(Account account)
         {
-            this.Leader = account.Id;
+            this.Leader = account.Username;
         }
     }
 }

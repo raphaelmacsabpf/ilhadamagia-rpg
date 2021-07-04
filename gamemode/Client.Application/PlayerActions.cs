@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Client.Application
 {
-    public class PlayerActions : BaseScript
+    public class PlayerActions : BaseClientScript
     {
         public PlayerActions(bool ignoreFiveMInitialization)
         {
