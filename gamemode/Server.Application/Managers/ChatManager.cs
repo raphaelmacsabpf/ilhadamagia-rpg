@@ -1,4 +1,5 @@
 ﻿using CitizenFX.Core;
+using GF.CrossCutting.Enums;
 using Server.Application.Entities;
 using Shared.CrossCutting;
 using System;
@@ -27,7 +28,7 @@ namespace Server.Application.Managers
 
         public void SendClientMessage(PlayerHandle playerHandle, ChatColor chatColor, string message)
         {
-            playerHandle.Player.TriggerEvent("GF:Client:SendClientMessage", (int)chatColor, message);
+            playerHandle.TriggerScriptEvent(ScriptEvent.SendClientMessage, (int)chatColor, message);
         }
 
         public void PlayerScream(PlayerHandle playerHandle, string message)

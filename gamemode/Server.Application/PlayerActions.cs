@@ -4,56 +4,54 @@ using Shared.CrossCutting.Enums;
 using Newtonsoft.Json;
 using Server.Application.Entities;
 using Server.Application.Managers;
-using Shared.CrossCutting;
 using System;
+using GF.CrossCutting.Enums;
 
 namespace Server.Application
 {
     public class PlayerActions : BaseScript
     {
-        private readonly PlayerInfo playerInfo;
         private readonly NetworkManager networkManager;
 
-        public PlayerActions(PlayerInfo playerInfo, NetworkManager networkManager)
+        public PlayerActions(NetworkManager networkManager)
         {
             Console.WriteLine("[IM PlayerActions] Started PlayerActions");
-            this.playerInfo = playerInfo;
             this.networkManager = networkManager;
         }
 
         public void KillPlayer(PlayerHandle playerHandle)
         {
-            playerHandle.Player.TriggerEvent("GF:Client:Kill");
+            playerHandle.TriggerScriptEvent(ScriptEvent.Kill);
         }
 
         public void SetPlayerPos(PlayerHandle playerHandle, Vector3 targetPosition)
         {
-            playerHandle.Player.TriggerEvent("GF:Client:SetPlayerPos", targetPosition);
+            playerHandle.TriggerScriptEvent(ScriptEvent.SetPlayerPos, targetPosition);
         }
 
         public void TeleportPlayerToPosition(PlayerHandle playerHandle, Vector3 targetPosition, int transitionDurationInMs)
         {
-            playerHandle.Player.TriggerEvent("GF:Client:TeleportPlayerToPosition", targetPosition, transitionDurationInMs);
+            playerHandle.TriggerScriptEvent(ScriptEvent.TeleportPlayerToPosition, targetPosition, transitionDurationInMs);
         }
 
         public void SetPlayerArmour(PlayerHandle playerHandle, int value)
         {
-            playerHandle.Player.TriggerEvent("GF:Client:SetPedArmour", value);
+            playerHandle.TriggerScriptEvent(ScriptEvent.SetPedArmour, value);
         }
 
         public void SetPlayerHealth(PlayerHandle playerHandle, int value)
         {
-            playerHandle.Player.TriggerEvent("GF:Client:SetPedHealth", value);
+            playerHandle.TriggerScriptEvent(ScriptEvent.SetPedHealth, value);
         }
 
         public void GiveWeaponToPlayer(PlayerHandle playerHandle, uint weaponHash, int ammoCount, bool isHidden, bool equipNow)
         {
-            playerHandle.Player.TriggerEvent("GF:Client:GiveWeaponToPed", weaponHash, ammoCount, isHidden, equipNow);
+            playerHandle.TriggerScriptEvent(ScriptEvent.GiveWeaponToPed, weaponHash, ammoCount, isHidden, equipNow);
         }
 
         public void SetPlayerMoney(PlayerHandle playerHandle, int money)
         {
-            playerHandle.Player.TriggerEvent("GF:Client:SetPlayerMoney", money);
+            playerHandle.TriggerScriptEvent(ScriptEvent.SetPlayerMoney, money);
         }
 
         public void OpenMenu(PlayerHandle playerHandle, MenuType menuType, object payload)
@@ -61,42 +59,42 @@ namespace Server.Application
             var json = JsonConvert.SerializeObject(payload);
             var compressedJson = networkManager.Compress(json);
             var uncompressedLenght = json.Length;
-            playerHandle.Player.TriggerEvent("GF:Client:OpenMenu", (int)menuType, compressedJson, uncompressedLenght);
+            playerHandle.TriggerScriptEvent(ScriptEvent.OpenMenu, (int)menuType, compressedJson, uncompressedLenght);
         }
 
         public void SpawnPlayer(PlayerHandle playerHandle, string skinName, float x, float y, float z, float heading, bool fastSpawn)
         {
-            playerHandle.Player.TriggerEvent("GF:Client:SpawnPlayer", skinName, x, y, z, heading, fastSpawn);
+            playerHandle.TriggerScriptEvent(ScriptEvent.SpawnPlayer, skinName, x, y, z, heading, fastSpawn);
         }
 
         public void OpenNUIView(PlayerHandle playerHandle, NUIViewType nuiViewType, bool setFocus, string compressedJsonPayload, int uncompressedLength)
         {
-            playerHandle.Player.TriggerEvent("GF:Client:OpenNUIView", (int)nuiViewType, setFocus, compressedJsonPayload, uncompressedLength);
+            playerHandle.TriggerScriptEvent(ScriptEvent.OpenNUIView, (int)nuiViewType, setFocus, compressedJsonPayload, uncompressedLength);
         }
 
         public void CreateVehicle(PlayerHandle playerHandle, Vector3 position, float heading, Domain.Entities.Vehicle vehicle)
         {
-            playerHandle.Player.TriggerEvent("GF:Client:CreateVehicle", vehicle.Hash, vehicle.PrimaryColor, vehicle.SecondaryColor, vehicle.Fuel, position.X, position.Y, position.Z, heading);
+            playerHandle.TriggerScriptEvent(ScriptEvent.CreateVehicle, vehicle.Hash, vehicle.PrimaryColor, vehicle.SecondaryColor, vehicle.Fuel, position.X, position.Y, position.Z, heading);
         }
 
         public void CloseNUIView(PlayerHandle playerHandle, NUIViewType nuiViewType, bool cancelFocus)
         {
-            playerHandle.Player.TriggerEvent("GF:Client:CloseNUIView", (int)nuiViewType, cancelFocus);
+            playerHandle.TriggerScriptEvent(ScriptEvent.CloseNUIView, (int)nuiViewType, cancelFocus);
         }
 
         public void CreatePlayerVehicle(PlayerHandle playerHandle, GameVehicleHash vehicleHash)
         {
-            playerHandle.Player.TriggerEvent("GF:Client:CreatePlayerVehicle", (uint)vehicleHash);
+            playerHandle.TriggerScriptEvent(ScriptEvent.CreatePlayerVehicle, (uint)vehicleHash);
         }
 
         public void SwitchOutPlayer(PlayerHandle playerHandle)
         {
-            playerHandle.Player.TriggerEvent("GF:Client:SwitchOutPlayer");
+            playerHandle.TriggerScriptEvent(ScriptEvent.SwitchOutPlayer);
         }
 
         public void SwitchInPlayer(PlayerHandle playerHandle, float x, float y, float z)
         {
-            playerHandle.Player.TriggerEvent("GF:Client:SwitchInPlayer", x, y, z);
+            playerHandle.TriggerScriptEvent(ScriptEvent.SwitchInPlayer, x, y, z);
         }
     }
 }

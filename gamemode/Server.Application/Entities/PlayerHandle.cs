@@ -1,4 +1,5 @@
 ﻿using CitizenFX.Core;
+using GF.CrossCutting.Enums;
 using Server.Application.Enums;
 using Server.Domain.Entities;
 using Server.Domain.Enums;
@@ -46,5 +47,10 @@ namespace Server.Application.Entities
         public House CurrentHouseInside { get; set; }
         public List<Account> LicenseAccounts { get; set; }
         public int OrgId { get; set; }
+
+        public void TriggerScriptEvent(ScriptEvent scriptEvent, params object[] args)
+        {
+            Player.TriggerEvent(scriptEvent.ToString(), args);
+        }
     }
 }

@@ -46,7 +46,7 @@ namespace Server.Application
             playerVars.TryAdd("Money", playerHandle.Account.Money.ToString());
             playerVars.TryAdd("Username", playerHandle.Account.Username);
             var json = JsonConvert.SerializeObject(playerVars);
-            this.networkManager.SendPayloadToPlayer(playerHandle.Player, PayloadType.TO_PLAYER_VARS, json);
+            this.networkManager.SendPayloadToPlayer(playerHandle, PayloadType.TO_PLAYER_VARS, json);
         }
 
         public PlayerHandle GetPlayerHandle(Player player)
@@ -67,7 +67,7 @@ namespace Server.Application
                 while (playerVarsToUpdateQueue.TryDequeue(out playerVarsTuple))
                 {
                     var json = JsonConvert.SerializeObject(playerVarsTuple.Item1);
-                    this.networkManager.SendPayloadToPlayer(playerVarsTuple.Item2.Player, PayloadType.TO_PLAYER_VARS, json);
+                    this.networkManager.SendPayloadToPlayer(playerVarsTuple.Item2, PayloadType.TO_PLAYER_VARS, json);
                     Thread.Sleep(10);
                 }
 

@@ -172,7 +172,7 @@ namespace Client.Application
             }
         }
 
-        public void OnClienText(string textInput)
+        public void OnClientText(string textInput)
         {
             bool cancelEvent = true;
             if (textInput[0] == '/')

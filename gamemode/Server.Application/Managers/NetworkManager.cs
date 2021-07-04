@@ -1,4 +1,4 @@
-﻿using CitizenFX.Core;
+﻿using GF.CrossCutting.Enums;
 using LZ4;
 using Server.Application.Entities;
 using Shared.CrossCutting;
@@ -13,10 +13,10 @@ namespace Server.Application.Managers
         {
         }
 
-        public void SendPayloadToPlayer(Player player, PayloadType payloadType, string jsonPayload)
+        public void SendPayloadToPlayer(PlayerHandle playerHandle, PayloadType payloadType, string jsonPayload)
         {
             var compressedJsonPayload = Compress(jsonPayload);
-            player.TriggerEvent("GF:Client:SendPayload", (int)payloadType, compressedJsonPayload, jsonPayload.Length);
+            playerHandle.TriggerScriptEvent(ScriptEvent.SendPayload, (int)payloadType, compressedJsonPayload, jsonPayload.Length);
         }
 
         public string Compress(string text)
@@ -33,7 +33,7 @@ namespace Server.Application.Managers
 
         public void SyncPlayerDateTime(PlayerHandle playerHandle)
         {
-            playerHandle.Player.TriggerEvent("GF:Client:SyncPlayerDateTime", DateTime.Now.ToString());
+            playerHandle.TriggerScriptEvent(ScriptEvent.SyncPlayerDateTime, DateTime.Now.ToString());
         }
     }
 }

@@ -148,13 +148,13 @@ namespace Server.Application.Managers
                 {
                     this.playerActions.CloseNUIView(playerHandle, NUIViewType.SELECT_ACCOUNT, true);
                     var json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticMarkersPayload());
-                    this.networkManager.SendPayloadToPlayer(playerHandle.Player, PayloadType.TO_STATIC_MARKERS, json);
+                    this.networkManager.SendPayloadToPlayer(playerHandle, PayloadType.TO_STATIC_MARKERS, json);
                     json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticProximityTargetsPayload());
-                    this.networkManager.SendPayloadToPlayer(playerHandle.Player, PayloadType.TO_STATIC_PROXIMITY_TARGETS, json);
+                    this.networkManager.SendPayloadToPlayer(playerHandle, PayloadType.TO_STATIC_PROXIMITY_TARGETS, json);
                     json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticInteractionTargetsPayload());
-                    this.networkManager.SendPayloadToPlayer(playerHandle.Player, PayloadType.TO_STATIC_INTERACTION_TARGETS, json);
+                    this.networkManager.SendPayloadToPlayer(playerHandle, PayloadType.TO_STATIC_INTERACTION_TARGETS, json);
                     json = JsonConvert.SerializeObject(this.mapManager.PopUpdateBlipsPayload());
-                    this.networkManager.SendPayloadToPlayer(playerHandle.Player, PayloadType.TO_MAP_BLIPS, json);
+                    this.networkManager.SendPayloadToPlayer(playerHandle, PayloadType.TO_MAP_BLIPS, json);
 
                     playerHandle.FSM.Fire(PlayerConnectionTrigger.SELECTING_SPAWN_POSITION);
                 });
