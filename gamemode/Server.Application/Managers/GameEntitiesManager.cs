@@ -1,6 +1,4 @@
-﻿using CitizenFX.Core;
-using Server.Application.Entities;
-using Server.Application.Services;
+﻿using Server.Application.Services;
 using Server.Domain.Entities;
 using System;
 using System.Collections.Generic;

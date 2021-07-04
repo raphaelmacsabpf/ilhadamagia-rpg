@@ -17,18 +17,22 @@ namespace Server.Application.CommandLibraries
         private readonly ChatManager chatManager;
         private readonly PlayerInfo playerInfo;
         private readonly MapManager mapManager;
-        private readonly GameEntitiesManager gameEntitiesManager;
         private readonly MoneyService moneyService;
         private readonly PlayerService playerService;
         private readonly OrgService orgService;
 
-        public AdminCommands(PlayerActions playerActions, ChatManager chatManager, PlayerInfo playerInfo, MapManager mapManager, GameEntitiesManager gameEntitiesManager, MoneyService moneyService, PlayerService playerService, OrgService orgService)
+        public AdminCommands(PlayerActions playerActions, 
+                             ChatManager chatManager, 
+                             PlayerInfo playerInfo, 
+                             MapManager mapManager, 
+                             MoneyService moneyService, 
+                             PlayerService playerService, 
+                             OrgService orgService)
         {
             this.playerActions = playerActions;
             this.chatManager = chatManager;
             this.playerInfo = playerInfo;
             this.mapManager = mapManager;
-            this.gameEntitiesManager = gameEntitiesManager;
             this.moneyService = moneyService;
             this.playerService = playerService;
             this.orgService = orgService;
@@ -159,14 +163,14 @@ namespace Server.Application.CommandLibraries
         {
             if (commandValidator.WithAdminLevel(4).WithTargetPlayer("playerid")
                 .WithVarBetween<int>(0, PedModelsConverter.GetPedModelMaxId(), "org-id")
-                .IsValid($"USE: /setorg [playerid] [org-id(0-{gameEntitiesManager.GetMaxOrgId()}]"))
+                .IsValid($"USE: /setorg [playerid] [org-id]"))
             {
                 PlayerHandle targetPlayerHandle = commandValidator.GetTargetPlayerHandle();
                 var orgId = commandValidator.GetVar<int>("org-id");
-                var gfOrg = gameEntitiesManager.GetGFOrgById(orgId);
+                var gfOrg = orgService.GetOrgById(orgId);
                 if (gfOrg == null)
                 {
-                    commandValidator.SendCommandError($"org-id {orgId} inválido", $"USE: /setorg [playerid] [id(0-{gameEntitiesManager.GetMaxOrgId()}]");
+                    commandValidator.SendCommandError($"org-id {orgId} inválido", $"USE: /setorg [playerid] [org-id]");
                     return;
                 }
                 orgService.InvitePlayerToOrg(gfOrg, commandValidator.SourcePlayerHandle, targetPlayerHandle);
@@ -178,14 +182,14 @@ namespace Server.Application.CommandLibraries
         {
             if (commandValidator.WithAdminLevel(4).WithTargetPlayer("playerid")
                 .WithVarBetween<int>(0, PedModelsConverter.GetPedModelMaxId(), "org-id")
-                .IsValid($"USE: /setlider [playerid] [org-id(0-{gameEntitiesManager.GetMaxOrgId()}]"))
+                .IsValid($"USE: /setlider [playerid] [org-id]"))
             {
                 PlayerHandle targetPlayerHandle = commandValidator.GetTargetPlayerHandle();
                 var orgId = commandValidator.GetVar<int>("org-id");
-                var gfOrg = gameEntitiesManager.GetGFOrgById(orgId);
+                var gfOrg = orgService.GetOrgById(orgId);
                 if (gfOrg == null)
                 {
-                    commandValidator.SendCommandError($"org-id {orgId} inválido", $"USE: /setorg [playerid] [id(0-{gameEntitiesManager.GetMaxOrgId()}]");
+                    commandValidator.SendCommandError($"org-id {orgId} inválido", $"USE: /setorg [playerid] [org-id]");
                     return;
                 }
                 orgService.SetOrgLeader(gfOrg, commandValidator.SourcePlayerHandle, targetPlayerHandle);

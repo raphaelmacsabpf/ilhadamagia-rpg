@@ -29,6 +29,11 @@ namespace Server.Application.Services
             return orgRepository.GetOrgFromUsername(account.Username);
         }
 
+        public Org GetOrgById(int orgId)
+        {
+            return orgRepository.GetOrgById(orgId);
+        }
+
         public void InvitePlayerToOrg(Org org, PlayerHandle admin, PlayerHandle targetPlayer)
         {
             targetPlayer.FSM.Fire(PlayerConnectionTrigger.SET_TO_SPAWN);

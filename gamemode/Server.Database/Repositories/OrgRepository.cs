@@ -39,6 +39,11 @@ WHERE Id = @Id";
             return this.mySqlConnection.Query<string>(""); // TODO: Implement GetOrgMembers query
         }
 
+        public Org GetOrgById(int orgId)
+        {
+            return this.mySqlConnection.Query<Org>("SELECT * FROM imtb_org WHERE Id = @OrgId", new { OrgId = orgId }).FirstOrDefault();
+        }
+
         public Org GetOrgFromUsername(string username)
         {
             return this.mySqlConnection.Query<Org>("SELECT * FROM imtb_org o JOIN imtb_player_orgs po ON o.Id = po.OrgId WHERE po.Username = @Username LIMIT 1", new { Username = username }).FirstOrDefault();

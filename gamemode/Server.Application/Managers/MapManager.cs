@@ -7,10 +7,10 @@ using Server.Domain.Enums;
 using Server.Domain.Interfaces;
 using Server.Domain.Services;
 using Shared.CrossCutting;
-using Shared.CrossCutting.Dto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GF.CrossCutting.Enums;
 
 namespace Server.Application.Managers
 {
@@ -197,12 +197,12 @@ namespace Server.Application.Managers
 
         private void AddProximityNotificationTarget(float x, float y, float z, string message)
         {
-            this.staticProximityTargets.Add(new ProximityTargetDto(x, y, z, 1.5f, 0, "INFO_TO_PLAYER", message, ""));
+            this.staticProximityTargets.Add(new ProximityTargetDto(x, y, z, 1.5f, 0, InteractionTargetAction.INFO_TO_PLAYER, message, ""));
         }
 
         private void AddInteractionNotificationTarget(float x, float y, float z, string message)
         {
-            this.staticInteractionTargets.Add(new InteractionTargetDto(x, y, z, "INFO_TO_PLAYER", message));
+            this.staticInteractionTargets.Add(new InteractionTargetDto(x, y, z, InteractionTargetAction.INFO_TO_PLAYER, message));
         }
 
         private void AddInteractionToServerCallbackTarget(float x, float y, float z, Action<PlayerHandle, Player> serverCallback)
@@ -210,7 +210,7 @@ namespace Server.Application.Managers
             var random = new Random();
             var callbackId = $"{random.Next()}.{random.Next()}.{random.Next()}.{serverCallback.GetHashCode()}";
             interactionTargetsCallbacks.Add(callbackId, serverCallback);
-            this.staticInteractionTargets.Add(new InteractionTargetDto(x, y, z, "SERVER_CALLBACK", callbackId));
+            this.staticInteractionTargets.Add(new InteractionTargetDto(x, y, z, InteractionTargetAction.SERVER_CALLBACK, callbackId));
         }
 
         private void AddDefaultMarker(float x, float y, float z, MarkerColor color)
