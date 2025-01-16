@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GF.CrossCutting.Enums;
+using Server.Application.Services;
+using GF.CrossCutting.Dto;
 
 namespace Server.Application.Managers
 {
@@ -26,15 +28,15 @@ namespace Server.Application.Managers
 
         private readonly PlayerInfo playerInfo;
         private readonly ChatManager chatManager;
-        private readonly IHouseRepository houseRepository;
         private readonly VehicleService vehicleService;
+        private readonly OrgService orgService;
 
-        public MapManager(PlayerInfo playerInfo, ChatManager chatManager, IHouseRepository houseRepository, VehicleService vehicleService)
+        public MapManager(PlayerInfo playerInfo, ChatManager chatManager, IHouseRepository houseRepository, VehicleService vehicleService, OrgService orgService)
         {
             this.playerInfo = playerInfo;
             this.chatManager = chatManager;
-            this.houseRepository = houseRepository;
             this.vehicleService = vehicleService;
+            this.orgService = orgService;
             this.staticMarkers = new List<MarkerDto>();
             this.staticProximityTargets = new List<ProximityTargetDto>();
             this.staticInteractionTargets = new List<InteractionTargetDto>();
@@ -216,13 +218,9 @@ namespace Server.Application.Managers
             this.staticMarkers.Add(new MarkerDto(2, x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 180.0f, 0.0f, 0.7f, 0.7f, 0.7f, color, false, true, 2, true, null, null, false));
         }
 
-        private bool IsValidHouseId(int houseId)
+        public void CreateOrgsSpawn()
         {
-            return this.houses.Any((house) => house.Id == houseId);
-        }
-
-        public void CreateOrgsSpawn(IEnumerable<Org> orgs)
-        {
+            var orgs = orgService.GetAllOrgs();
             foreach (var org in orgs)
             {
                 if (org.Id > 0)
@@ -243,11 +241,17 @@ namespace Server.Application.Managers
 
         private void OnPlayerInteractWithOrg(PlayerHandle playerHandle, Org org)
         {
+            var orgMembers = orgService.GetOrgMembers(org).Select(o => new OrgMembershipDto() {
+                Username = o.Username, 
+                OrgId = o.OrgId, 
+                Role = o.Role 
+            }).ToList();
+
             var orgDataDto = new OrgDataDto()
             {
                 Name = org.Name,
                 Leader = "Leader_Name", // TODO: Load org leader name properly
-                Members = new List<string>() // TODO: Load org members from repository in the right place
+                Members = orgMembers // TODO: Load org members from repository in the right place
             };
 
             playerHandle.OpenMenu(MenuType.Org, orgDataDto);

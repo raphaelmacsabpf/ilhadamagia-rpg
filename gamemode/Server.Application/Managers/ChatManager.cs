@@ -1,5 +1,4 @@
-﻿using CitizenFX.Core;
-using GF.CrossCutting.Enums;
+﻿using GF.CrossCutting.Enums;
 using Server.Application.Entities;
 using Shared.CrossCutting;
 using System;

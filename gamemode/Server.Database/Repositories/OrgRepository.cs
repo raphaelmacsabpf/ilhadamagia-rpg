@@ -34,9 +34,9 @@ WHERE Id = @Id";
             return this.mySqlConnection.ExecuteAsync(sqlStatement, org);
         }
 
-        public IEnumerable<string> GetOrgMembersById(int orgId)
+        public IEnumerable<OrgMembership> GetOrgMembers(Org org)
         {
-            return this.mySqlConnection.Query<string>(""); // TODO: Implement GetOrgMembers query
+            return this.mySqlConnection.Query<OrgMembership>("SELECT * FROM imtb_player_orgs WHERE Id = @OrgId", new { OrgId = org.Id });
         }
 
         public Org GetOrgById(int orgId)

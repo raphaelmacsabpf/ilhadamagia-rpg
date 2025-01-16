@@ -7,6 +7,8 @@ using Newtonsoft.Json;
 using Shared.CrossCutting;
 using System.Collections.Generic;
 using GF.CrossCutting.Enums;
+using static MenuAPI.Menu;
+using GF.CrossCutting.Dto.MenuActions;
 
 namespace Client.Application
 {
@@ -57,7 +59,7 @@ namespace Client.Application
                 var vehicleHash = (GameVehicleHash)vehicle.Hash;
                 var vehicleName = VehicleConverter.GetVehicleName(vehicleHash);
                 var menuItem = new MenuItem($"#{index} {vehicleName}", $"Combustível: {vehicle.Fuel}%, Conservação: {vehicle.EngineHealth}%");
-                menuItem.ItemData = vehicle.Guid;
+                menuItem.ItemData = new CallHouseVehicleDto(vehicle.Guid);
                 vehicleListMenu.AddMenuItem(menuItem);
             }
             MenuController.AddSubmenu(menu, vehicleListMenu);
@@ -73,7 +75,35 @@ namespace Client.Application
             var orgData = JsonConvert.DeserializeObject<OrgDataDto>(jsonPayload);
             Menu menu = new Menu("Organização", orgData.Name);
             MenuController.AddMenu(menu);
+
+            var membersMenuItem = new MenuItem("Membros");
+            menu.AddMenuItem(membersMenuItem);
+
+            var equipMenuItem = new MenuItem("Equipar");
+            menu.AddMenuItem(equipMenuItem);
+            menu.OnItemSelect += new ItemSelectEvent((_menu, _menuItem, _index) =>
+            {
+                if(_menuItem == equipMenuItem)
+                {
+                    TriggerMenuAction(MenuAction.ORG_EQUIP, null);
+                }
+            });
+
+            var membersMenu = new Menu("Membros");
+            foreach (var member in orgData.Members)
+            {
+                membersMenu.AddMenuItem(new MenuItem(member.Username, $"Cargo: {member.Role}") { ItemData = new object[] { member }, LeftIcon = MenuItem.Icon.INFO});
+            }
+
+            MenuController.AddSubmenu(menu, membersMenu);
+            MenuController.BindMenuItem(menu, membersMenu, membersMenuItem);
+
             menu.OpenMenu();
+        }
+
+        private void Menu_OnItemSelect(Menu menu, MenuItem menuItem, int itemIndex)
+        {
+            throw new System.NotImplementedException();
         }
 
         private void OpenAmmunationMenu(string jsonPayload)

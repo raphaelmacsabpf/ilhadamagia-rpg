@@ -8,7 +8,7 @@ namespace Server.Domain.Interfaces
     {
         IEnumerable<Org> GetAll();
 
-        IEnumerable<string> GetOrgMembersById(int orgId);
+        IEnumerable<OrgMembership> GetOrgMembers(Org org);
 
         Org GetOrgById(int orgId);
 

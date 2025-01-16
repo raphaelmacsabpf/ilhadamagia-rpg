@@ -1,5 +1,6 @@
 ﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using GF.CrossCutting.Dto.MenuActions;
 using Newtonsoft.Json;
 using Server.Application.Entities;
 using Server.Application.Enums;
@@ -43,10 +44,7 @@ namespace Server.Application
                 }
             }), true);
 
-            gameEntitiesManager.OnOrgsLoad += (sender, orgs) =>
-            {
-                mapManager.CreateOrgsSpawn(orgs);
-            };
+            mapManager.CreateOrgsSpawn();
 
             gameEntitiesManager.OnAmmunationsLoad += (sender, ammunations) =>
             {
@@ -163,8 +161,11 @@ namespace Server.Application
             switch (menuAction)
             {
                 case MenuAction.CALL_HOUSE_VEHICLE:
-                    var vehicleGuid = JsonConvert.DeserializeObject<string>(uncompressedPayload);
-                    MapManager.PlayerHandleCallPropertyVehicle(playerHandle, vehicleGuid);
+                    var dto = JsonConvert.DeserializeObject<CallHouseVehicleDto>(uncompressedPayload);
+                    MapManager.PlayerHandleCallPropertyVehicle(playerHandle, dto.VehicleGuid);
+                    break;
+                case MenuAction.ORG_EQUIP:
+                    playerHandle.OrgEquip();
                     break;
             }
         }

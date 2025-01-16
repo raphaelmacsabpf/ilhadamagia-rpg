@@ -146,5 +146,10 @@ namespace Server.Application.Entities
         {
             CallClientAction(ClientEvent.SyncPlayerDateTime, DateTime.Now.ToString());
         }
+
+        internal void OrgEquip()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

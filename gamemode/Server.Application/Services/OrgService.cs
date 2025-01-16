@@ -33,6 +33,11 @@ namespace Server.Application.Services
         {
             return orgRepository.GetOrgById(orgId);
         }
+        
+        public IEnumerable<OrgMembership> GetOrgMembers(Org org)
+        {
+            return orgRepository.GetOrgMembers(org);
+        }
 
         public void InvitePlayerToOrg(Org org, PlayerHandle admin, PlayerHandle targetPlayer)
         {

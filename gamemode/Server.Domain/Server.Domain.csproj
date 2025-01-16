@@ -50,6 +50,7 @@
     <Compile Include="Entities\House.cs" />
     <Compile Include="Entities\MoneyTransaction.cs" />
     <Compile Include="Entities\Org.cs" />
+    <Compile Include="Entities\OrgMembership.cs" />
     <Compile Include="Entities\PoliceDepartment.cs" />
     <Compile Include="Entities\The247Store.cs" />
     <Compile Include="Entities\Vehicle.cs" />

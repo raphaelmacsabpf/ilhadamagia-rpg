@@ -2,14 +2,11 @@
 using Server.Domain.Entities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Server.Application.Managers
 {
     public class GameEntitiesManager
     {
-        public event EventHandler<IEnumerable<Org>> OnOrgsLoad;
-
         public event EventHandler<List<Ammunation>> OnAmmunationsLoad;
 
         public event EventHandler<List<GasStation>> OnGasStationsLoad;
@@ -24,9 +21,6 @@ namespace Server.Application.Managers
 
         public event EventHandler<List<The247Store>> On247StoresLoad;
 
-        private readonly int maxOrgId;
-        private readonly OrgService orgService;
-        private readonly IEnumerable<Org> orgs;
         private readonly List<Ammunation> ammunations;
         private readonly List<GasStation> gasStations;
         private readonly List<ATM> atmList;
@@ -35,9 +29,8 @@ namespace Server.Application.Managers
         private readonly List<PoliceDepartment> policeDepartments;
         private readonly List<The247Store> store247List;
 
-        public GameEntitiesManager(OrgService orgService)
+        public GameEntitiesManager()
         {
-            this.orgService = orgService;
             this.ammunations = GetAmmunationsList();
             this.gasStations = GetGasStationsList();
             this.atmList = GetATMList();
@@ -45,14 +38,10 @@ namespace Server.Application.Managers
             this.hospitals = GetHospitalList();
             this.policeDepartments = GetPoliceDepartmentList();
             this.store247List = Get247StoreList();
-
-            this.orgs = this.orgService.GetAllOrgs();
-            maxOrgId = this.orgs.Max(j => j.Id);
         }
 
         public void InvokeInitialEvents()
         {
-            OnOrgsLoad?.Invoke(this, this.orgs);
             OnAmmunationsLoad?.Invoke(this, this.ammunations);
             OnGasStationsLoad?.Invoke(this, this.gasStations);
             OnATMListLoad?.Invoke(this, this.atmList);
@@ -60,16 +49,6 @@ namespace Server.Application.Managers
             OnHospitalsLoad?.Invoke(this, this.hospitals);
             OnPoliceDepartmentsLoad?.Invoke(this, this.policeDepartments);
             On247StoresLoad?.Invoke(this, this.store247List);
-        }
-
-        public int GetMaxOrgId()
-        {
-            return this.maxOrgId;
-        }
-
-        public Org GetGFOrgById(int orgId)
-        {
-            return this.orgs.FirstOrDefault(x => x.Id == orgId);
         }
 
         private static List<Ammunation> GetAmmunationsList()
