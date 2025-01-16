@@ -236,6 +236,7 @@ namespace Client.Application
             var vehicleHash = (VehicleHash)vehicleHashUInt;
             var model = new Model(vehicleHash);
             var vehicle = await World.CreateVehicle(model, Game.PlayerPed.Position, Game.PlayerPed.Heading);
+            API.SetVehicleFuelLevel(vehicle.Handle, 64);
             Game.PlayerPed.SetIntoVehicle(vehicle, VehicleSeat.Driver);
         }
 
@@ -305,6 +306,8 @@ namespace Client.Application
 
             // Hide police blips
             API.SetPoliceRadarBlips(false);
+
+            ProcessFuelConsumption();
         }
 
         public async void SwitchOutPlayer()
@@ -381,6 +384,54 @@ namespace Client.Application
             {
                 await Delay(1000);
             }
+        }
+
+        private void ProcessFuelConsumption()
+        {
+            if (Game.PlayerPed.CurrentVehicle != null)
+            {
+                var vehicle = Game.PlayerPed.CurrentVehicle;
+
+                float fuelLevel = Function.Call<float>(Hash.GET_VEHICLE_FUEL_LEVEL, vehicle.Handle);
+
+                if (fuelLevel > 0)
+                {
+                    float acceleration = Function.Call<float>(Hash.GET_VEHICLE_CURRENT_ACCELERATION, vehicle.Handle);
+                    var rpm = API.GetVehicleCurrentRpm(vehicle.Handle);
+
+                    float baseConsumption = GetVehicleBaseConsumption(vehicle);
+                    float absoluteAcceleration = Math.Abs(acceleration);
+
+                    // Fix reverse engine
+                    if (absoluteAcceleration == 0 && rpm == 1)
+                    {
+                        absoluteAcceleration = 1;
+                    }
+
+                    float consumption = baseConsumption + (absoluteAcceleration * 1.5f);
+                    fuelLevel -= consumption * 0.01f;
+                    Function.Call(Hash.SET_VEHICLE_FUEL_LEVEL, vehicle.Handle, fuelLevel);
+                }
+                else
+                {
+                    Function.Call(Hash.SET_VEHICLE_ENGINE_ON, vehicle.Handle, false, true, true);
+                    Debug.WriteLine("O veículo está sem combustível!");
+                }
+            }
+        }
+
+        private float GetVehicleBaseConsumption(Vehicle vehicle)
+        {
+            if (vehicle.ClassType == VehicleClass.Super)
+                return 1.5f;
+            if (vehicle.ClassType == VehicleClass.SUVs || vehicle.ClassType == VehicleClass.OffRoad)
+                return 1.8f;
+            if (vehicle.ClassType == VehicleClass.Motorcycles)
+                return 0.8f;
+            if (vehicle.ClassType == VehicleClass.Utility || vehicle.ClassType == VehicleClass.Industrial)
+                return 2.5f;
+
+            return 1.0f;
         }
     }
 }
