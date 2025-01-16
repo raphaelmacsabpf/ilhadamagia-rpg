@@ -2,7 +2,7 @@
 {
     public class Org
     {
-        public int Id { get; }
+        public string Id { get; }
         public string Name { get; }
         public string Leader { get; private set; }
         public float SpawnX { get; }

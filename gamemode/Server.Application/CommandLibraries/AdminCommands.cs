@@ -158,12 +158,11 @@ namespace Server.Application.CommandLibraries
         [Command("/setorg")]
         public void SetOrg(CommandValidator commandValidator)
         {
-            if (commandValidator.WithAdminLevel(4).WithTargetPlayer("playerid")
-                .WithVarBetween<int>(0, PedModelsConverter.GetPedModelMaxId(), "org-id")
+            if (commandValidator.WithAdminLevel(4).WithTargetPlayer("playerid").WithVarString("org-id")
                 .IsValid($"USE: /setorg [playerid] [org-id]"))
             {
                 PlayerHandle targetPlayerHandle = commandValidator.GetTargetPlayerHandle();
-                var orgId = commandValidator.GetVar<int>("org-id");
+                var orgId = commandValidator.GetVar<string>("org-id");
                 var gfOrg = orgService.GetOrgById(orgId);
                 if (gfOrg == null)
                 {
@@ -178,11 +177,11 @@ namespace Server.Application.CommandLibraries
         public void SetAsLeader(CommandValidator commandValidator)
         {
             if (commandValidator.WithAdminLevel(4).WithTargetPlayer("playerid")
-                .WithVarBetween<int>(0, PedModelsConverter.GetPedModelMaxId(), "org-id")
+                .WithVarString("org-id")
                 .IsValid($"USE: /setlider [playerid] [org-id]"))
             {
                 PlayerHandle targetPlayerHandle = commandValidator.GetTargetPlayerHandle();
-                var orgId = commandValidator.GetVar<int>("org-id");
+                var orgId = commandValidator.GetVar<string>("org-id");
                 var gfOrg = orgService.GetOrgById(orgId);
                 if (gfOrg == null)
                 {

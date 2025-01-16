@@ -29,18 +29,19 @@ namespace Server.Application.Services
             return orgRepository.GetOrgFromUsername(account.Username);
         }
 
-        public Org GetOrgById(int orgId)
+        public Org GetOrgById(string orgId)
         {
             return orgRepository.GetOrgById(orgId);
         }
         
         public IEnumerable<OrgMembership> GetOrgMembers(Org org)
         {
-            return orgRepository.GetOrgMembers(org);
+            return orgRepository.GetOrgMembers(org.Id);
         }
 
         public void InvitePlayerToOrg(Org org, PlayerHandle admin, PlayerHandle targetPlayer)
         {
+            this.orgRepository.SetPlayerOrg(targetPlayer.Account.Username, org.Id, 1);
             targetPlayer.FSM.Fire(PlayerConnectionTrigger.SET_TO_SPAWN);
             this.chatManager.SendClientMessage(targetPlayer, ChatColor.COLOR_LIGHTBLUE, $" Sua organização foi alterada para {org.Name} pelo admin {admin.Account.Username}");
             this.chatManager.SendClientMessage(admin, ChatColor.COLOR_LIGHTBLUE, $" Você alterou a organização de {targetPlayer.Account.Username} para {org.Name}");

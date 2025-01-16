@@ -223,10 +223,7 @@ namespace Server.Application.Managers
             var orgs = orgService.GetAllOrgs();
             foreach (var org in orgs)
             {
-                if (org.Id > 0)
-                {
-                    this.AddInterationMarkerWithNotification(org.SpawnX, org.SpawnY, org.SpawnZ, MarkerColor.COLOR_YELLOW, $"{org.Name}, aperte ~o~E~s~ para interagir", ((playerHandle, player) => OnPlayerInteractWithOrg(playerHandle, org)));
-                }
+                this.AddInterationMarkerWithNotification(org.SpawnX, org.SpawnY, org.SpawnZ, MarkerColor.COLOR_YELLOW, $"{org.Name}, aperte ~o~E~s~ para interagir", ((playerHandle, player) => OnPlayerInteractWithOrg(playerHandle, org)));
             }
         }
 

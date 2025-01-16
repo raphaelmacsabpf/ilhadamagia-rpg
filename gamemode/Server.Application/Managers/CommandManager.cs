@@ -63,8 +63,13 @@ namespace Server.Application.Managers
 
             if (this.registeredCommands.ContainsKey(commandPacket.Command))
             {
-                var registeredCommand = this.registeredCommands[commandPacket.Command];
-                registeredCommand.MethodInfo.Invoke(registeredCommand.CommandLibraryInstance, new object[] { commandValidator });
+                try {
+                    var registeredCommand = this.registeredCommands[commandPacket.Command];
+                    registeredCommand.MethodInfo.Invoke(registeredCommand.CommandLibraryInstance, new object[] { commandValidator });
+                }
+                catch(Exception ex) {
+                    Console.WriteLine("Exception in command execution", ex);
+                }
             }
             else
             {
