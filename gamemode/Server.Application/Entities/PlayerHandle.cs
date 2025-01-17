@@ -24,6 +24,7 @@ namespace Server.Application.Entities
             this.LicenseAccounts = new List<Account>();
             this.SpawnType = SpawnType.Unset;
             this.IsFirstSpawn = true;
+            this.SessionVars = new Dictionary<string, dynamic>();
         }
 
         public string License { get; }
@@ -51,6 +52,7 @@ namespace Server.Application.Entities
         public bool IsFirstSpawn { get; set; }
         public House CurrentHouseInside { get; set; }
         public List<Account> LicenseAccounts { get; set; }
+        public Dictionary<string, dynamic> SessionVars { get; set; }
         public int OrgId { get; set; }
 
         public void CallClientAction(ClientEvent clientEvent, params object[] args)

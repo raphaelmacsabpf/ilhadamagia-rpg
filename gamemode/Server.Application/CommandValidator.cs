@@ -1,8 +1,10 @@
 ﻿using Server.Application.Entities;
 using Server.Application.Managers;
 using Shared.CrossCutting;
+using Shared.CrossCutting.Enums;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Server.Application
 {
@@ -68,6 +70,23 @@ namespace Server.Application
             else
             {
                 this.errorMessages.Add($"Informe um {varName} válido");
+            }
+
+            return this;
+        }
+
+        public CommandValidator WithVarVehicle(string varName)
+        {
+            try
+            {
+                var textValue = commandPacket.Text.Split(new string[] { " " }, this.nextArgPosition + 1, StringSplitOptions.RemoveEmptyEntries)[this.nextArgPosition];
+                var gameVehicleHash = GetVehicleHashByName(textValue);
+                this.commandVariables.Add(varName, gameVehicleHash);
+
+            }
+            catch (Exception)
+            {
+                this.errorMessages.Add("Informe um nome de veículo válido");
             }
 
             return this;
@@ -205,7 +224,7 @@ namespace Server.Application
 
         private PlayerHandle GetPlayerByIdOrName(string playerStr)
         {
-            bool parseSucceed = Int32.TryParse(playerStr, out var parsedId);
+            bool parseSucceed = int.TryParse(playerStr, out var parsedId);
             var playerHandleList = this.playerInfo.GetPlayerHandleList();
             if (parseSucceed)
             {
@@ -231,6 +250,24 @@ namespace Server.Application
             }
 
             return null;
+        }
+
+        private GameVehicleHash GetVehicleHashByName(string vehicleStr)
+        {
+            var vehicleList = Enum.GetValues(typeof(GameVehicleHash)).Cast<GameVehicleHash>().ToList();
+            var loweredVehicleStr = vehicleStr.ToLower();
+
+            foreach (var vehicle in vehicleList)
+            {
+                var vehicleName = vehicle.ToString().ToLower();
+
+                if (vehicleName.StartsWith(loweredVehicleStr) || vehicleName == loweredVehicleStr)
+                {
+                    return vehicle;
+                }
+            }
+
+            throw new Exception("Vehicle not found");
         }
     }
 }

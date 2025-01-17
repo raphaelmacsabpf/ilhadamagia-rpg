@@ -6,8 +6,10 @@ using Server.Application.Managers;
 using Server.Application.Services;
 using Server.Domain.Enums;
 using Server.Domain.Services;
-using Shared.CrossCutting;
 using System;
+using Shared.CrossCutting.Enums;
+using System.Dynamic;
+using Server.Domain.Entities;
 
 namespace Server.Application.CommandLibraries
 {
@@ -19,13 +21,15 @@ namespace Server.Application.CommandLibraries
         private readonly MoneyService moneyService;
         private readonly PlayerService playerService;
         private readonly OrgService orgService;
+        private readonly HouseService houseService;
 
         public AdminCommands(ChatManager chatManager, 
                              PlayerInfo playerInfo, 
                              MapManager mapManager, 
                              MoneyService moneyService, 
                              PlayerService playerService, 
-                             OrgService orgService)
+                             OrgService orgService,
+                             HouseService houseService)
         {
             this.chatManager = chatManager;
             this.playerInfo = playerInfo;
@@ -33,6 +37,7 @@ namespace Server.Application.CommandLibraries
             this.moneyService = moneyService;
             this.playerService = playerService;
             this.orgService = orgService;
+            this.houseService = houseService;
         }
 
         [Command("/ir")]
@@ -55,14 +60,59 @@ namespace Server.Application.CommandLibraries
             }
         }
 
-        [Command("/save")]
-        public void Save(CommandValidator commandValidator)
+        [Command("/criarcasa")]
+        public void CreateHouse(CommandValidator commandValidator)
         {
-            if (commandValidator.WithAdminLevel(1).WithVarString("label").IsValid("USE: /save [rótulo]"))
+            if (commandValidator.WithAdminLevel(1).IsValid("USE: /criarcasa"))
             {
-                var position = commandValidator.SourcePlayerHandle.Player.Character.Position;
-                var heading = commandValidator.SourcePlayerHandle.Player.Character.Heading;
-                Console.WriteLine($"Saved {commandValidator.GetVar<string>("label")} X,Y,Z,H::::: SetPlayerPosHeading({position.X}f, {position.Y}f, {position.Z}f, {heading}f);");
+                var playerHandle = commandValidator.SourcePlayerHandle;
+                var position = playerHandle.Player.Character.Position;
+                var heading = playerHandle.Player.Character.Heading;
+
+                dynamic createHouseSession;
+                if (!playerHandle.SessionVars.TryGetValue("create-house", out createHouseSession)) {
+                    createHouseSession = new ExpandoObject();
+                    createHouseSession.step = "start";
+                }
+                if (createHouseSession.step == "start")
+                {
+                    createHouseSession.step = "entrance";
+                    playerHandle.SessionVars["create-house"] = createHouseSession;
+                    chatManager.SendClientMessage(playerHandle, ChatColor.COLOR_LIGHTBLUE, "Comando de multi passos, digite novamente em frente a entrada da casa");
+                } 
+                else if (createHouseSession.step == "entrance")
+                {
+                    createHouseSession.step = "vehicle";
+                    createHouseSession.entranceX = position.X;
+                    createHouseSession.entranceY = position.Y;
+                    createHouseSession.entranceZ = position.Z;
+                    playerHandle.SessionVars["create-house"] = createHouseSession;
+                    chatManager.SendClientMessage(playerHandle, ChatColor.COLOR_LIGHTBLUE, "Comando de multi passos, digite novamente no lugar do carro");
+                }
+                else if (createHouseSession.step == "vehicle")
+                {
+                    createHouseSession.vehicleX = position.X;
+                    createHouseSession.vehicleY = position.Y;
+                    createHouseSession.vehicleZ = position.Z;
+                    createHouseSession.vehicleHeading = heading;
+
+                    var house = new House();
+                    house.Owner = playerHandle.Account.Username;
+                    house.EntranceX = createHouseSession.entranceX;
+                    house.EntranceY = createHouseSession.entranceY;
+                    house.EntranceZ = createHouseSession.entranceZ;
+                    house.VehiclePositionX = createHouseSession.vehicleX;
+                    house.VehiclePositionY = createHouseSession.vehicleY;
+                    house.VehiclePositionZ = createHouseSession.vehicleZ;
+                    house.VehicleHeading = createHouseSession.vehicleHeading;
+                    house.Interior = InteriorType.LOW_END_APARTMENT;
+                    house.PropertyType = PropertyType.House;
+                    house.SellState = PropertySellState.SOLD;
+
+                    this.houseService.Create(house);
+                    playerHandle.SessionVars.Remove("create-house");
+                    chatManager.SendClientMessage(playerHandle, ChatColor.COLOR_LIGHTBLUE, "Casa criada com sucesso");
+                }
             }
         }
 
@@ -253,15 +303,14 @@ namespace Server.Application.CommandLibraries
         public void CreateVehicle(CommandValidator commandValidator)
         {
             if (commandValidator.WithAdminLevel(4).WithTargetPlayer("playerid")
-                .WithVarBetween<int>(0, VehicleConverter.GetVehicleMaxId(), "vehicle-id")
-                .IsValid($"USE: /veh [playerid] [vehicle-id(0-{VehicleConverter.GetVehicleMaxId()}]"))
+                .WithVarVehicle("vehicle")
+                .IsValid($"USE: /veh [playerid] [vehicle]"))
             {
                 PlayerHandle targetPlayerHandle = commandValidator.GetTargetPlayerHandle();
-                var vehicleId = commandValidator.GetVar<int>("vehicle-id");
-                var vehicleModelHash = VehicleConverter.GetVehicleHashById(vehicleId);
-                var vehicleName = VehicleConverter.GetVehicleNameById(vehicleId);
+                var vehicleHash = commandValidator.GetVar<GameVehicleHash>("vehicle");
+                var vehicleName = VehicleConverter.GetVehicleName(vehicleHash);
 
-                targetPlayerHandle.CreatePlayerVehicle(vehicleModelHash);
+                targetPlayerHandle.CreatePlayerVehicle(vehicleHash);
                 this.chatManager.SendClientMessage(targetPlayerHandle, ChatColor.COLOR_LIGHTBLUE, $" O admin {commandValidator.SourcePlayerHandle.Account.Username} lhe concedeu um {vehicleName}");
                 this.chatManager.SendClientMessage(commandValidator.SourcePlayerHandle, ChatColor.COLOR_LIGHTBLUE, $" Você concedeu um {vehicleName} para {targetPlayerHandle.Account.Username}");
             }

@@ -31,7 +31,7 @@ namespace Server.Application.Managers
         private readonly VehicleService vehicleService;
         private readonly OrgService orgService;
 
-        public MapManager(PlayerInfo playerInfo, ChatManager chatManager, IHouseRepository houseRepository, VehicleService vehicleService, OrgService orgService)
+        public MapManager(PlayerInfo playerInfo, ChatManager chatManager, HouseService houseService, VehicleService vehicleService, OrgService orgService)
         {
             this.playerInfo = playerInfo;
             this.chatManager = chatManager;
@@ -41,7 +41,7 @@ namespace Server.Application.Managers
             this.staticProximityTargets = new List<ProximityTargetDto>();
             this.staticInteractionTargets = new List<InteractionTargetDto>();
             this.interactionTargetsCallbacks = new Dictionary<string, Action<PlayerHandle, Player>>();
-            this.houses = houseRepository.GetAll();
+            this.houses = houseService.GetAll();
             this.interiorPositions = new Dictionary<InteriorType, Vector3>();
             this.blips = new List<BlipDto>();
 

@@ -50,7 +50,7 @@ namespace Shared.CrossCutting.Converters
 
         public static int GetVehicleMaxId()
         {
-            return Enum.GetValues(typeof(GameVehicleHash)).Length - 1; // TODO: avaliar se esse menos 1 é valido
+            return Enum.GetValues(typeof(GameVehicleHash)).Length - 1;
         }
     }
 }

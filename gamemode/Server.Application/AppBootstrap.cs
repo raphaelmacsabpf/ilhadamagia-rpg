@@ -60,6 +60,7 @@ namespace Server.Application
             builder.RegisterType<CommandManager>().As<CommandManager>().SingleInstance();
             builder.RegisterType<MainServer>().As<MainServer>();
             builder.RegisterType<OrgService>().As<OrgService>();
+            builder.RegisterType<HouseService>().As<HouseService>();
             builder.RegisterType<MoneyService>().As<MoneyService>();
 
             var module = new DebugResolveModule();
