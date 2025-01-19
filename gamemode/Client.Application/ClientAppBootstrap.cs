@@ -58,7 +58,7 @@ namespace Client.Application
             RegisterClientEventHandler(ClientEvent.CreatePlayerVehicle, new Action<uint>(mainClient.CreatePlayerVehicle));
             RegisterClientEventHandler(ClientEvent.SwitchOutPlayer, new Action(mainClient.SwitchOutPlayer));
             RegisterClientEventHandler(ClientEvent.SwitchInPlayer, new Action<float, float, float>(mainClient.SwitchInPlayer));
-            RegisterClientEventHandler(ClientEvent.SyncPlayerDateTime, new Action<string>(mainClient.SyncPlayerDateTime));
+            RegisterClientEventHandler(ClientEvent.SyncPlayerDateTime, new Action<string, int>(mainClient.SyncPlayerDateTime));
             mainClientHandler = mainClient;
         }
 

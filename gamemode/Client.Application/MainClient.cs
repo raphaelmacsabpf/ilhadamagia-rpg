@@ -348,11 +348,11 @@ namespace Client.Application
             CallServerAction(ServerEvent.TriggerStateEvent, "switched-in");
         }
 
-        public void SyncPlayerDateTime(string serverDateTimeAsString)
+        public void SyncPlayerDateTime(string clockStr, int millisecondsPerMinutes)
         {
-            var server = DateTime.Parse(serverDateTimeAsString);
-            API.NetworkOverrideClockTime(server.Hour, server.Minute, server.Second);
-            API.SetMillisecondsPerGameMinute(60000);
+            var clock = TimeSpan.Parse(clockStr);
+            API.NetworkOverrideClockTime(clock.Hours, clock.Minutes, 0);
+            API.SetMillisecondsPerGameMinute(millisecondsPerMinutes);
         }
 
         public async Task PlayerStateTickHandler()

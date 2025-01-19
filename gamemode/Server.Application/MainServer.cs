@@ -8,6 +8,7 @@ using Server.Application.Managers;
 using Shared.CrossCutting;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Server.Application
 {
@@ -20,6 +21,7 @@ namespace Server.Application
 
         public MainServer(PlayerInfo playerInfo, CommandManager commandManager, MapManager mapManager, ChatManager chatManager, StateManager stateManager, GameEntitiesManager gameEntitiesManager)
         {
+            RegisterScript(this);
             this.playerInfo = playerInfo;
             this.CommandManager = commandManager;
             this.MapManager = mapManager;
@@ -81,6 +83,8 @@ namespace Server.Application
                 mapManager.Create247Stores(store247List);
             };
 
+            Tick += GlobalTimer1Second;
+
             gameEntitiesManager.InvokeInitialEvents();
             Console.WriteLine("[IM MainServer] Started MainServer");
         }
@@ -89,6 +93,12 @@ namespace Server.Application
 
         internal MapManager MapManager { get; }
 
+
+        private async Task GlobalTimer1Second()
+        {
+            this.MapManager.UpdateWorldClock();
+            await Delay(1000);
+        }
         internal async void OnClientReady([FromSource] Player player)
         {
             this.PrepareFSMForPlayer(player);

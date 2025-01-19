@@ -242,7 +242,16 @@ namespace Server.Application
                 foreach (var playerHandle in playerHandleList)
                 {
                     var loweredUsername = playerHandle.Account.Username.ToLower();
-                    if (loweredUsername.StartsWith(loweredPlayerStr) || loweredUsername == loweredPlayerStr)
+                    if (loweredUsername == loweredPlayerStr)
+                    {
+                        return playerHandle;
+                    }
+                }
+
+                foreach (var playerHandle in playerHandleList)
+                {
+                    var loweredUsername = playerHandle.Account.Username.ToLower();
+                    if (loweredUsername.StartsWith(loweredPlayerStr))
                     {
                         return playerHandle;
                     }
@@ -261,7 +270,17 @@ namespace Server.Application
             {
                 var vehicleName = vehicle.ToString().ToLower();
 
-                if (vehicleName.StartsWith(loweredVehicleStr) || vehicleName == loweredVehicleStr)
+                if (vehicleName == loweredVehicleStr)
+                {
+                    return vehicle;
+                }
+            }
+
+            foreach (var vehicle in vehicleList)
+            {
+                var vehicleName = vehicle.ToString().ToLower();
+
+                if (vehicleName.StartsWith(loweredVehicleStr))
                 {
                     return vehicle;
                 }

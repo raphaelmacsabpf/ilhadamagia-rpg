@@ -119,11 +119,34 @@ namespace Server.Application.CommandLibraries
         [Command("/setadmin")]
         public void SetAdmin(CommandValidator commandValidator)
         {
-            if (commandValidator.WithAdminLevel(3001).WithTargetPlayer("playerid").WithVarBetween<int>(0, 3001, "level").IsValid("USE: /setadmin [playerid] [nivel(0-3001)]"))
+            if (commandValidator.WithTargetPlayer("playerid").WithVarBetween<int>(0, 3001, "level").IsValid("USE: /setadmin [playerid] [nivel(0-3001)]"))
             {
                 PlayerHandle targetPlayerHandle = commandValidator.GetTargetPlayerHandle();
                 int level = commandValidator.GetVar<int>("level");
+
+                if (level > commandValidator.SourcePlayerHandle.Account.MaxAdminLevel)
+                {
+                    commandValidator.SendCommandError($"Você não pode colocar um nivel de admin maior do que seu nível máximo de admin");
+                    return;
+                }
+
                 this.playerService.SetAsAdmin(commandValidator.SourcePlayerHandle, targetPlayerHandle, level);
+
+                if (targetPlayerHandle.Account.MaxAdminLevel < level)
+                {
+                    this.playerService.SetMaxAdmin(commandValidator.SourcePlayerHandle, targetPlayerHandle, level);
+                }
+            }
+        }
+
+        [Command("/setmaxadmin")]
+        public void SetMaxAdmin(CommandValidator commandValidator)
+        {
+            if (commandValidator.WithAdminLevel(3001).WithTargetPlayer("playerid").WithVarBetween<int>(0, 3001, "level").IsValid("USE: /setmaxadmin [playerid] [nivel(0-3001)]"))
+            {
+                PlayerHandle targetPlayerHandle = commandValidator.GetTargetPlayerHandle();
+                int level = commandValidator.GetVar<int>("level");
+                this.playerService.SetMaxAdmin(commandValidator.SourcePlayerHandle, targetPlayerHandle, level);
             }
         }
 
@@ -148,6 +171,18 @@ namespace Server.Application.CommandLibraries
                 int value = commandValidator.GetVar<int>("armour");
 
                 this.playerService.SetPlayerArmour(commandValidator.SourcePlayerHandle, targetPlayerHandle, value);
+            }
+        }
+
+        [Command("/setdimensao")]
+        public void Test(CommandValidator commandValidator)
+        {
+            if (commandValidator.WithAdminLevel(1).WithTargetPlayer("target").WithVarBetween<int>(0, 999, "dimension").IsValid("USE: /setdimensao [playerid] [dimensao(0-999)]"))
+            {
+                var targetPlayer = commandValidator.GetTargetPlayerHandle();
+                var dimension = commandValidator.GetVar<int>("dimension");
+                this.playerService.SetPlayerDimension(targetPlayer, dimension);
+                this.chatManager.SendClientMessage(commandValidator.SourcePlayerHandle, ChatColor.COLOR_LIGHTBLUE, "Teste executado com sucesso");
             }
         }
 
@@ -247,8 +282,8 @@ namespace Server.Application.CommandLibraries
         {
             if (commandValidator.WithAdminLevel(4).WithTargetPlayer("playerid")
                 .WithVarBetween<int>(0, WeaponConverter.GetWeaponMaxId(), "weapon-id")
-                .WithVarBetween<int>(0, 250, "ammo-count")
-                .IsValid($"USE: /dararma [playerid] [weapon-id(0-{WeaponConverter.GetWeaponMaxId()}] [ammo-count(0-250)]"))
+                .WithVarBetween<int>(0, 9999, "ammo-count")
+                .IsValid($"USE: /dararma [playerid] [weapon-id(0-{WeaponConverter.GetWeaponMaxId()}] [ammo-count(0-9999)]"))
             {
                 PlayerHandle targetPlayerHandle = commandValidator.GetTargetPlayerHandle();
                 var weaponId = commandValidator.GetVar<int>("weapon-id");
@@ -313,6 +348,20 @@ namespace Server.Application.CommandLibraries
                 targetPlayerHandle.CreatePlayerVehicle(vehicleHash);
                 this.chatManager.SendClientMessage(targetPlayerHandle, ChatColor.COLOR_LIGHTBLUE, $" O admin {commandValidator.SourcePlayerHandle.Account.Username} lhe concedeu um {vehicleName}");
                 this.chatManager.SendClientMessage(commandValidator.SourcePlayerHandle, ChatColor.COLOR_LIGHTBLUE, $" Você concedeu um {vehicleName} para {targetPlayerHandle.Account.Username}");
+            }
+        }
+
+        [Command("/settempo")]
+        public void SetTOD(CommandValidator commandValidator)
+        {
+            if (commandValidator.WithAdminLevel(4).WithVarBetween<int>(0, 23, "hours").WithVarBetween<int>(0, 59, "minutes").WithVarBetween<int>(10, 60000, "ms-per-minute").IsValid($"USE: /settempo [horas(0-23)] [minutos(0-59)] [ms-por-minuto(10-60000)]"))
+            {
+                var hours = commandValidator.GetVar<int>("hours");
+                var minutes = commandValidator.GetVar<int>("minutes");
+                var msPerMinute = commandValidator.GetVar<int>("ms-per-minute");
+                var timeSpan = new TimeSpan(hours, minutes, 0);
+                this.mapManager.SetWorldClockSettings(timeSpan, msPerMinute);
+                this.chatManager.SendClientMessageToAll(ChatColor.COLOR_LIGHTBLUE, $" O admin {commandValidator.SourcePlayerHandle.Account.Username} atualizou as configurações de hora para {timeSpan.ToString(@"hh\:mm")} e {msPerMinute} milisegundos por minuto");
             }
         }
     }

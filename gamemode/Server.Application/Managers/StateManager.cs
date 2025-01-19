@@ -7,7 +7,6 @@ using Server.Application.Services;
 using Server.Domain.Entities;
 using Server.Domain.Enums;
 using Server.Domain.Services;
-using Shared.CrossCutting;
 using Stateless;
 using Stateless.Graph;
 using System;
@@ -96,7 +95,7 @@ namespace Server.Application.Managers
                 .Permit(PlayerConnectionTrigger.ACCOUNT_NOT_FOUND, PlayerConnectionState.NEW_ACCOUNT)
                 .OnEntry(async () =>
                 {
-                    playerHandle.SyncPlayerDateTime();
+                    playerHandle.SyncPlayerDateTime(mapManager.GetWorldClock(), mapManager.GetMillisecondsPerMinuteWorldClock());
                     var accounts = (await accountService.GetAccountListForLicense(playerHandle.License)).ToList();
                     if (accounts.Count > 0)
                     {
@@ -162,35 +161,26 @@ namespace Server.Application.Managers
                 {
                     if (playerHandle.SpawnType == SpawnType.Unset)
                     {
-                        if (playerHandle.IsFirstSpawn)
+                        if (DateTime.Now - playerHandle.Account.UpdatedAt < TimeSpan.FromSeconds(600))
                         {
-                            if (DateTime.Now - playerHandle.Account.UpdatedAt < TimeSpan.FromSeconds(600))
+                            var spawnPosition = new Vector3(playerHandle.Account.LastX, playerHandle.Account.LastY, playerHandle.Account.LastZ);
+                            playerHandle.SpawnPosition = spawnPosition;
+                            playerHandle.SwitchInPosition = spawnPosition;
+                            var accountLastHouseInside = playerHandle.Account.LastHouseInside;
+                            if (accountLastHouseInside != null)
                             {
-                                var spawnPosition = new Vector3(playerHandle.Account.LastX, playerHandle.Account.LastY, playerHandle.Account.LastZ);
-                                playerHandle.SpawnPosition = spawnPosition;
-                                playerHandle.SwitchInPosition = spawnPosition;
-                                var accountLastHouseInside = playerHandle.Account.LastHouseInside;
-                                if (accountLastHouseInside != null)
-                                {
-                                    var lastHouseInt = Convert.ToInt32(accountLastHouseInside);
-                                    playerHandle.CurrentHouseInside = mapManager.GetGFHouseFromId(lastHouseInt);
-                                }
-                                chatManager.SendClientMessage(playerHandle, ChatColor.COLOR_LIGHTBLUE, "Local de nascimento: Última posição");
+                                var lastHouseInt = Convert.ToInt32(accountLastHouseInside);
+                                playerHandle.CurrentHouseInside = mapManager.GetGFHouseFromId(lastHouseInt);
                             }
-                            else if (playerHandle.SelectedHouse != null)
-                            {
-                                var houseEntity = playerHandle.SelectedHouse;
-                                playerHandle.CurrentHouseInside = playerHandle.SelectedHouse;
-                                playerHandle.SpawnPosition = mapManager.GetHouseInteriorPosition(playerHandle.SelectedHouse);
-                                playerHandle.SwitchInPosition = new Vector3(houseEntity.EntranceX, houseEntity.EntranceY, houseEntity.EntranceZ);
-                                chatManager.SendClientMessage(playerHandle, ChatColor.COLOR_LIGHTBLUE, "Local de nascimento: Interior da casa");
-                            }
-                            else
-                            {
-                                SetSpawnToOrganization(playerHandle);
-                                chatManager.SendClientMessage(playerHandle, ChatColor.COLOR_LIGHTBLUE, "Local de nascimento: Spawn organização");
-                            }
-                            playerHandle.IsFirstSpawn = false;
+                            chatManager.SendClientMessage(playerHandle, ChatColor.COLOR_LIGHTBLUE, "Local de nascimento: Última posição");
+                        }
+                        else if (playerHandle.SelectedHouse != null)
+                        {
+                            var houseEntity = playerHandle.SelectedHouse;
+                            playerHandle.CurrentHouseInside = playerHandle.SelectedHouse;
+                            playerHandle.SpawnPosition = mapManager.GetHouseInteriorPosition(playerHandle.SelectedHouse);
+                            playerHandle.SwitchInPosition = new Vector3(houseEntity.EntranceX, houseEntity.EntranceY, houseEntity.EntranceZ);
+                            chatManager.SendClientMessage(playerHandle, ChatColor.COLOR_LIGHTBLUE, "Local de nascimento: Interior da casa");
                         }
                         else
                         {
@@ -216,7 +206,7 @@ namespace Server.Application.Managers
                 .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
                 .OnEntry(() =>
                 {
-                    playerHandle.SyncPlayerDateTime();
+                    playerHandle.SyncPlayerDateTime(this.mapManager.GetWorldClock(), this.mapManager.GetMillisecondsPerMinuteWorldClock());
                     this.playerInfo.SendUpdatedPlayerVars(playerHandle);
                 });
 
@@ -251,6 +241,7 @@ namespace Server.Application.Managers
 
             playerHandle.SpawnPosition = spawnPosition;
             playerHandle.SwitchInPosition = spawnPosition;
+            playerHandle.SpawnDimension = 1;
         }
     }
 }

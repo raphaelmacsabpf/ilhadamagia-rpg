@@ -1,4 +1,5 @@
 ﻿using CitizenFX.Core;
+using CitizenFX.Core.Native;
 using Server.Application.Entities;
 using Server.Application.Enums;
 using Server.Application.Managers;
@@ -18,11 +19,31 @@ namespace Server.Application.Services
             this.mapManager = mapManager;
         }
 
+        public void SetPlayerDimension(PlayerHandle playerHandle, int dimension)
+        {
+            var SET_PLAYER_ROUTING_BUCKET = (Hash)0x6504EB38;
+            Function.Call(SET_PLAYER_ROUTING_BUCKET, playerHandle.Player.Handle.ToString(), dimension);
+        }
+
+        public int GetPlayerDimension(PlayerHandle playerHandle)
+        {
+            var GET_PLAYER_ROUTING_BUCKET = (Hash)0x52441C34;
+            var dimension = Function.Call<int>(GET_PLAYER_ROUTING_BUCKET, playerHandle.Player.Handle.ToString());
+            return dimension;
+        }
+
         public void SetAsAdmin(PlayerHandle admin, PlayerHandle player, int level)
         {
             player.Account.SetAdminLevel(level);
             this.chatManager.SendClientMessage(player, ChatColor.COLOR_LIGHTBLUE, $"  Você foi promovido a nivel {level} de admin, pelo admin {admin.Account.Username}");
             this.chatManager.SendClientMessage(admin, ChatColor.COLOR_LIGHTBLUE, $" Você promoveu {player.Account.Username} para nivel {level} de admin.");
+        }
+
+        public void SetMaxAdmin(PlayerHandle admin, PlayerHandle player, int level)
+        {
+            player.Account.SetMaxAdminLevel(level);
+            this.chatManager.SendClientMessage(player, ChatColor.COLOR_LIGHTBLUE, $"  Seu nível de admin máximo foi ajustado, pelo admin {admin.Account.Username}");
+            this.chatManager.SendClientMessage(admin, ChatColor.COLOR_LIGHTBLUE, $" Você ajustou o nível de admin máximo de {player.Account.Username} para nivel {level}.");
         }
 
         public void AdminGoToPlayer(PlayerHandle admin, PlayerHandle player)
@@ -86,6 +107,7 @@ namespace Server.Application.Services
             var fastSpawn = player.SpawnType == SpawnType.ToCoords;
             player.SpawnPlayer(player.Account.PedModel, player.SpawnPosition.X, player.SpawnPosition.Y, player.SpawnPosition.Z, 0, fastSpawn);
             player.SpawnType = SpawnType.Unset;
+            this.SetPlayerDimension(player, player.SpawnDimension);
         }
     }
 }

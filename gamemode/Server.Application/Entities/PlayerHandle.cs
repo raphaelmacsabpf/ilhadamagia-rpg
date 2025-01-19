@@ -23,7 +23,7 @@ namespace Server.Application.Entities
             this.License = player.Identifiers["license"];
             this.LicenseAccounts = new List<Account>();
             this.SpawnType = SpawnType.Unset;
-            this.IsFirstSpawn = true;
+            this.SpawnDimension = 1; // Default dimension is 1
             this.SessionVars = new Dictionary<string, dynamic>();
         }
 
@@ -48,8 +48,8 @@ namespace Server.Application.Entities
 
         public SpawnType SpawnType { get; set; }
         public Vector3 SpawnPosition { get; set; }
+        public int SpawnDimension { get; set; }
         public Vector3 SwitchInPosition { get; set; }
-        public bool IsFirstSpawn { get; set; }
         public House CurrentHouseInside { get; set; }
         public List<Account> LicenseAccounts { get; set; }
         public Dictionary<string, dynamic> SessionVars { get; set; }
@@ -144,9 +144,9 @@ namespace Server.Application.Entities
             CallClientAction(ClientEvent.SendPayload, (int)payloadType, compressedJsonPayload, jsonPayload.Length);
         }
 
-        public void SyncPlayerDateTime()
+        public void SyncPlayerDateTime(TimeSpan clock, int millisecondsPerMinute)
         {
-            CallClientAction(ClientEvent.SyncPlayerDateTime, DateTime.Now.ToString());
+            CallClientAction(ClientEvent.SyncPlayerDateTime, clock.ToString(), millisecondsPerMinute);
         }
 
         internal void OrgEquip()

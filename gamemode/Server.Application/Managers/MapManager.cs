@@ -30,6 +30,8 @@ namespace Server.Application.Managers
         private readonly ChatManager chatManager;
         private readonly VehicleService vehicleService;
         private readonly OrgService orgService;
+        private TimeSpan worldClock;
+        private int millisecondsPerMinuteWorldClock;
 
         public MapManager(PlayerInfo playerInfo, ChatManager chatManager, HouseService houseService, VehicleService vehicleService, OrgService orgService)
         {
@@ -44,6 +46,8 @@ namespace Server.Application.Managers
             this.houses = houseService.GetAll();
             this.interiorPositions = new Dictionary<InteriorType, Vector3>();
             this.blips = new List<BlipDto>();
+            this.worldClock = new TimeSpan(6, 0, 0);
+            this.millisecondsPerMinuteWorldClock = 2000;
 
             // Destroy all vehicles
             var currentVehicles = API.GetAllVehicles() as List<object>;
@@ -72,6 +76,32 @@ namespace Server.Application.Managers
             if (vehicle == null) return;
             var gfHouse = GetClosestHouseInRadius(playerHandle, 3.0f);
             playerHandle.CreateVehicle(new Vector3(gfHouse.VehiclePositionX, gfHouse.VehiclePositionY, gfHouse.VehiclePositionZ), gfHouse.VehicleHeading, vehicle);
+        }
+
+        public void UpdateWorldClock()
+        {
+            var calculatedTime = this.worldClock.Add(TimeSpan.FromMilliseconds((60000 / this.millisecondsPerMinuteWorldClock) * 1000));
+            this.worldClock = new TimeSpan(calculatedTime.Hours, calculatedTime.Minutes, calculatedTime.Seconds);
+        }
+
+        public TimeSpan GetWorldClock()
+        {
+            return new TimeSpan(this.worldClock.Hours, this.worldClock.Minutes, 0);
+        }
+
+        public void SetWorldClockSettings(TimeSpan time, int msPerMinute)
+        {
+            this.worldClock = time;
+            this.millisecondsPerMinuteWorldClock = msPerMinute;
+            foreach (PlayerHandle playerHandle in playerInfo.GetPlayerHandleList())
+            {
+                playerHandle.SyncPlayerDateTime(this.worldClock, this.millisecondsPerMinuteWorldClock);
+            }
+        }
+
+        public int GetMillisecondsPerMinuteWorldClock()
+        {
+            return this.millisecondsPerMinuteWorldClock;
         }
 
         public List<MarkerDto> PopUpdatedStaticMarkersPayload()
