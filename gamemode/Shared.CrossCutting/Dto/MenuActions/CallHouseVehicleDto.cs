@@ -2,11 +2,11 @@
 {
     public class CallHouseVehicleDto
     {
-        public CallHouseVehicleDto(string vehicleGuid)
+        public CallHouseVehicleDto(int vehicleId)
         {
-            VehicleGuid = vehicleGuid;
+            VehicleId = vehicleId;
         }
 
-        public string VehicleGuid { get; set; }
+        public int VehicleId { get; set; }
     }
 }

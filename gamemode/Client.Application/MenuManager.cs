@@ -59,7 +59,7 @@ namespace Client.Application
                 var vehicleHash = (GameVehicleHash)vehicle.Hash;
                 var vehicleName = VehicleConverter.GetVehicleName(vehicleHash);
                 var menuItem = new MenuItem($"#{index} {vehicleName}", $"Combustível: {vehicle.Fuel}%, Conservação: {vehicle.EngineHealth}%");
-                menuItem.ItemData = new CallHouseVehicleDto(vehicle.Guid);
+                menuItem.ItemData = new CallHouseVehicleDto(vehicle.Id);
                 vehicleListMenu.AddMenuItem(menuItem);
             }
             MenuController.AddSubmenu(menu, vehicleListMenu);

@@ -41,6 +41,7 @@ namespace Server.Application.CommandLibraries
             {
                 return new VehicleDto()
                 {
+                    Id = vehicleEntity.Id,
                     Guid = vehicleEntity.Guid,
                     Hash = vehicleEntity.Hash,
                     PrimaryColor = vehicleEntity.PrimaryColor,

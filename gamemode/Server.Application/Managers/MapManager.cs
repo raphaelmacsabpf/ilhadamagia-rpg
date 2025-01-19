@@ -69,10 +69,10 @@ namespace Server.Application.Managers
             return this.houses.Where((house) => house.Owner == ownerUsername);
         }
 
-        public void PlayerHandleCallPropertyVehicle(PlayerHandle playerHandle, string vehicleGuid)
+        public void PlayerHandleCallPropertyVehicle(PlayerHandle playerHandle, int vehicleId)
         {
             var playerVehicles = vehicleService.GetAccountVehicles(playerHandle.Account);
-            var vehicle = playerVehicles.FirstOrDefault((_) => _.Guid == vehicleGuid);
+            var vehicle = playerVehicles.FirstOrDefault((_) => _.Id == vehicleId);
             if (vehicle == null) return;
             var gfHouse = GetClosestHouseInRadius(playerHandle, 3.0f);
             playerHandle.CreateVehicle(new Vector3(gfHouse.VehiclePositionX, gfHouse.VehiclePositionY, gfHouse.VehiclePositionZ), gfHouse.VehicleHeading, vehicle);
@@ -262,7 +262,7 @@ namespace Server.Application.Managers
             foreach (var ammunation in ammunations)
             {
                 this.blips.Add(new BlipDto("Loja de Armas", 110, 45, ammunation.PositionX, ammunation.PositionY, ammunation.PositionZ, 0.9f));
-                this.AddInterationMarkerWithNotification(ammunation.PositionX, ammunation.PositionX, ammunation.PositionZ, MarkerColor.COLOR_GREEN, $"Ammunation {ammunation.Name}, aperte ~o~E~s~ para interagir", ((playerHandle, player) => OnPlayerInteractWithAmmunation(playerHandle, ammunation)));
+                this.AddInterationMarkerWithNotification(ammunation.PositionX, ammunation.PositionY, ammunation.PositionZ, MarkerColor.COLOR_GREEN, $"Ammunation {ammunation.Name}, aperte ~o~E~s~ para interagir", ((playerHandle, player) => OnPlayerInteractWithAmmunation(playerHandle, ammunation)));
             }
         }
 

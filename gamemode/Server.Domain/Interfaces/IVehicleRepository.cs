@@ -1,5 +1,6 @@
 ﻿using Server.Domain.Entities;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Server.Domain.Interfaces
 {
@@ -8,5 +9,7 @@ namespace Server.Domain.Interfaces
         IEnumerable<Vehicle> GetAccountVehicles(Account owner);
 
         IEnumerable<Vehicle> GetAll();
+
+        Task Create(Vehicle vehicle);
     }
 }

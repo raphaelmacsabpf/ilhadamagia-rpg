@@ -79,7 +79,7 @@ namespace Server.Application
         {
             try
             {
-                var textValue = commandPacket.Text.Split(new string[] { " " }, this.nextArgPosition + 1, StringSplitOptions.RemoveEmptyEntries)[this.nextArgPosition];
+                var textValue = GetNextArgumentValue(varName);
                 var gameVehicleHash = GetVehicleHashByName(textValue);
                 this.commandVariables.Add(varName, gameVehicleHash);
 
@@ -87,6 +87,23 @@ namespace Server.Application
             catch (Exception)
             {
                 this.errorMessages.Add("Informe um nome de veículo válido");
+            }
+
+            return this;
+        }
+
+        public CommandValidator WithVarWeapon(string varName)
+        {
+            try
+            {
+                var textValue = GetNextArgumentValue(varName);
+                var gameWeaponHash = GetWeaponHashByName(textValue);
+                this.commandVariables.Add(varName, gameWeaponHash);
+
+            }
+            catch (Exception)
+            {
+                this.errorMessages.Add("Informe um nome de arma válido");
             }
 
             return this;
@@ -287,6 +304,34 @@ namespace Server.Application
             }
 
             throw new Exception("Vehicle not found");
+        }
+
+        private GameWeaponHash GetWeaponHashByName(string weaponStr)
+        {
+            var weaponList = Enum.GetValues(typeof(GameWeaponHash)).Cast<GameWeaponHash>().ToList();
+            var loweredWeaponStr = weaponStr.ToLower();
+
+            foreach (var weapon in weaponList)
+            {
+                var weaponName = weapon.ToString().ToLower();
+
+                if (weaponName == loweredWeaponStr)
+                {
+                    return weapon;
+                }
+            }
+
+            foreach (var weapon in weaponList)
+            {
+                var vehicleName = weapon.ToString().ToLower();
+
+                if (vehicleName.StartsWith(loweredWeaponStr))
+                {
+                    return weapon;
+                }
+            }
+
+            throw new Exception("Weapon not found");
         }
     }
 }

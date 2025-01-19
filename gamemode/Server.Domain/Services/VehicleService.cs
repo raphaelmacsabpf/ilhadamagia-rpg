@@ -17,5 +17,10 @@ namespace Server.Domain.Services
         {
             return this.vehicleRepository.GetAccountVehicles(account);
         }
+
+        public void Create(Vehicle vehicle)
+        {
+            this.vehicleRepository.Create(vehicle);
+        }
     }
 }

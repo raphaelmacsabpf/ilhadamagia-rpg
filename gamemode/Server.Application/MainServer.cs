@@ -172,7 +172,7 @@ namespace Server.Application
             {
                 case MenuAction.CALL_HOUSE_VEHICLE:
                     var dto = JsonConvert.DeserializeObject<CallHouseVehicleDto>(uncompressedPayload);
-                    MapManager.PlayerHandleCallPropertyVehicle(playerHandle, dto.VehicleGuid);
+                    MapManager.PlayerHandleCallPropertyVehicle(playerHandle, dto.VehicleId);
                     break;
                 case MenuAction.ORG_EQUIP:
                     playerHandle.OrgEquip();
