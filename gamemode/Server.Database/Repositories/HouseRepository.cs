@@ -22,12 +22,12 @@ namespace Server.Database.Repositories
             return this.mySqlConnection.Query<House>("SELECT * FROM imtb_house;");
         }
 
-        public Task<IEnumerable<House>> GetAllFromAccount(Account account)
+        public IEnumerable<House> GetAllFromAccount(Account account)
         {
             var sqlStatement = @"
 SELECT * FROM imtb_house
 WHERE Owner=@Owner;";
-            return this.mySqlConnection.QueryAsync<House>(sqlStatement, new { Owner = account.Username });
+            return this.mySqlConnection.Query<House>(sqlStatement, new { Owner = account.Username });
         }
 
         public Task Create(string Owner, float EntranceX, float EntranceY, float EntranceZ, PropertyType PropertyType, PropertySellState SellState, InteriorType InteriorType, float VehiclePositionX, float VehiclePositionY, float VehiclePositionZ, float VehicleHeading)

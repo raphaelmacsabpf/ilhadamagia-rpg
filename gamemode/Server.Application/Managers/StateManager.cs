@@ -150,6 +150,8 @@ namespace Server.Application.Managers
                     playerHandle.SendPayloadToPlayer(PayloadType.TO_STATIC_INTERACTION_TARGETS, json);
                     json = JsonConvert.SerializeObject(this.mapManager.PopUpdateBlipsPayload());
                     playerHandle.SendPayloadToPlayer(PayloadType.TO_MAP_BLIPS, json);
+                    json = JsonConvert.SerializeObject(this.mapManager.GetPlayerPrivateBlips(playerHandle));
+                    playerHandle.SendPayloadToPlayer(PayloadType.TO_MAP_BLIPS, json);
 
                     playerHandle.FSM.Fire(PlayerConnectionTrigger.SELECTING_SPAWN_POSITION);
                 });

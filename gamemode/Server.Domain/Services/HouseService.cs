@@ -22,5 +22,10 @@ namespace Server.Domain.Services
         {
             this.houseRepository.Create(house.Owner, house.EntranceX, house.EntranceY, house.EntranceZ, house.PropertyType, house.SellState, house.Interior, house.VehiclePositionX, house.VehiclePositionY, house.VehiclePositionZ, house.VehicleHeading);
         }
+
+        public IEnumerable<House> GetAllFromAccount(Account account)
+        {
+            return this.houseRepository.GetAllFromAccount(account);
+        }
     }
 }

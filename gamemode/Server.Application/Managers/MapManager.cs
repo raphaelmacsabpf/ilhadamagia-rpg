@@ -30,6 +30,7 @@ namespace Server.Application.Managers
         private readonly ChatManager chatManager;
         private readonly VehicleService vehicleService;
         private readonly OrgService orgService;
+        private readonly HouseService houseService;
         private TimeSpan worldClock;
         private int millisecondsPerMinuteWorldClock;
 
@@ -43,7 +44,8 @@ namespace Server.Application.Managers
             this.staticProximityTargets = new List<ProximityTargetDto>();
             this.staticInteractionTargets = new List<InteractionTargetDto>();
             this.interactionTargetsCallbacks = new Dictionary<string, Action<PlayerHandle, Player>>();
-            this.houses = houseService.GetAll();
+            this.houseService = houseService;
+            this.houses = this.houseService.GetAll();
             this.interiorPositions = new Dictionary<InteriorType, Vector3>();
             this.blips = new List<BlipDto>();
             this.worldClock = new TimeSpan(6, 0, 0);
@@ -122,6 +124,18 @@ namespace Server.Application.Managers
         public List<BlipDto> PopUpdateBlipsPayload()
         {
             return this.blips;
+        }
+
+        public List<BlipDto> GetPlayerPrivateBlips(PlayerHandle playerHandle)
+        {
+            var playerHouses = houseService.GetAllFromAccount(playerHandle.Account);
+            var privateBlips = new List<BlipDto>();
+            foreach (var house in playerHouses)
+            {
+                privateBlips.Add(new BlipDto("Sua Casa", 40, 27, house.EntranceX, house.EntranceY, house.EntranceZ, 0.9f)); //TODO: Create blip colors and blip icons enums
+            }
+
+            return privateBlips;
         }
 
         public void OnPlayerTargetActionServerCallback([FromSource] Player player, string callbackId)
@@ -312,7 +326,7 @@ namespace Server.Application.Managers
         {
             foreach (var atm in atmList)
             {
-                this.blips.Add(new BlipDto("Caixa Eletrônico", 276, 2, atm.PositionX, atm.PositionY, atm.PositionZ, 1f));
+                this.blips.Add(new BlipDto("Caixa Eletrônico", 276, 2, atm.PositionX, atm.PositionY, atm.PositionZ, 0.5f));
                 this.AddInterationMarkerWithNotification(atm.PositionX, atm.PositionY, atm.PositionZ, MarkerColor.COLOR_GREEN, $"Caixa eletrônico, aperte ~o~E~s~ para interagir", ((playerHandle, player) => OnPlayerInteractWithATM(playerHandle, atm)));
             }
         }

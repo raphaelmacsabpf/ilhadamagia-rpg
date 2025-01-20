@@ -406,5 +406,16 @@ namespace Server.Application.CommandLibraries
                 this.chatManager.SendClientMessageToAll(ChatColor.COLOR_LIGHTBLUE, $" O admin {commandValidator.SourcePlayerHandle.Account.Username} atualizou as configurações de hora para {timeSpan.ToString(@"hh\:mm")} e {msPerMinute} milisegundos por minuto");
             }
         }
+
+        [Command("/av")]
+        public void Scream(CommandValidator commandValidator)
+        {
+            if (commandValidator.WithAdminLevel(1).WithVarText("scream-text").IsValid("USE: /av [mensagem]"))
+            {
+                var message = commandValidator.GetVar<string>("scream-text");
+                this.chatManager.SendClientMessageToAll(ChatColor.COLOR_WHITE, "|___________ Admin Avisa ___________|");
+                this.chatManager.SendClientMessageToAll(ChatColor.COLOR_DBLUE, $"Admin {commandValidator.SourcePlayerHandle.Account.Username}: {message}");
+            }
+        }
     }
 }
