@@ -29,11 +29,11 @@ namespace Client.Application
         {
             var playerPosition = Game.PlayerPed.Position;
             InteractionTargetDto bestTarget = null;
-            float closestDistance = float.MaxValue;
+            double closestDistance = double.MaxValue;
 
             foreach (var target in InteractionTargets)
             {
-                var distanceToClosest = playerPosition.DistanceToSquared(new Vector3(target.X, target.Y, target.Z));
+                var distanceToClosest = Math.Sqrt(playerPosition.DistanceToSquared(new Vector3(target.X, target.Y, target.Z)));
                 if (distanceToClosest < closestDistance)
                 {
                     bestTarget = target;
@@ -43,7 +43,7 @@ namespace Client.Application
 
             if (bestTarget != null)
             {
-                if (closestDistance < 2)
+                if (closestDistance < bestTarget.Radius)
                 {
                     OnTargetAction(bestTarget.InteractionTargetAction, bestTarget.OnInteractionPayload);
                 }

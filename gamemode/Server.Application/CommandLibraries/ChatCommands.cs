@@ -20,5 +20,18 @@ namespace Server.Application.CommandLibraries
                 this.chatManager.PlayerScream(commandValidator.SourcePlayerHandle, messageToScream);
             }
         }
+
+        [Command("/dm")] //TODO: Restrict as /par in BPF
+        public void DirectMessage(CommandValidator commandValidator)
+        {
+            if (commandValidator.WithTargetPlayer("target").WithVarText("text").IsValid("USE: /dm [playerid] [mensagem]"))
+            {
+                var target = commandValidator.GetTargetPlayerHandle();
+                var source = commandValidator.SourcePlayerHandle;
+                var message = commandValidator.GetVar<string>("text");
+                this.chatManager.SendClientMessage(target, Shared.CrossCutting.ChatColor.COLOR_YELLOW, $"{source.Account.Username}(ID: {source.Player.Handle}) DM: {message}");
+                this.chatManager.SendClientMessage(source, Shared.CrossCutting.ChatColor.COLOR_YELLOW, $"Sua DM foi enviada para {source.Account.Username}(ID: {source.Player.Handle})");
+            }
+        }
     }
 }

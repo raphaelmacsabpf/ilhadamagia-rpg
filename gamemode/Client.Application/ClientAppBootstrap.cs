@@ -69,7 +69,7 @@ namespace Client.Application
                 firstTick = true;
                 API.RegisterNuiCallbackType("NUI_ENDPOINT");
                 EventHandlers["__cfx_nui:NUI_ENDPOINT"] += new Action<IDictionary<string, object>, CallbackDelegate>(mainClientHandler.OnNuiEndpointCall);
-            }            
+            }
         }
 
         private void RegisterClientEventHandler(ClientEvent clientEvent, Delegate @delegate)
