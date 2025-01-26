@@ -1,4 +1,4 @@
-﻿namespace GF.CrossCutting.Dto
+﻿namespace Shared.CrossCutting.Dto
 {
     public class BlipDto
     {

@@ -14,6 +14,7 @@ namespace Server.Domain.Entities
         public string Username { get; }
         public string Password { get; }
         public int AdminLevel { get; private set; }
+        public int MaxAdminLevel { get; private set; }
         public int DonateRank { get; }
         public int Level { get; }
         public int Respect { get; }
@@ -55,6 +56,11 @@ namespace Server.Domain.Entities
         public void SetAdminLevel(int adminLevel)
         {
             this.AdminLevel = adminLevel;
+        }
+
+        public void SetMaxAdminLevel(int adminLevel)
+        {
+            this.MaxAdminLevel = adminLevel;
         }
 
         public void SetPedModel(string pedModel)

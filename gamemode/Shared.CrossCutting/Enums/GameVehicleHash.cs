@@ -1,4 +1,4 @@
-﻿namespace GF.CrossCutting.Enums
+﻿namespace Shared.CrossCutting.Enums
 {
     public enum GameVehicleHash : uint
     {
@@ -522,6 +522,7 @@
         HalfTrack = 4262731174,
         Bison = 4278019151,
         Regina = 4280472072,
-        Exemplar = 4289813342
+        Exemplar = 4289813342,
+        Pariah = 867799010
     }
 }

@@ -2,6 +2,7 @@
 {
     public enum MenuAction
     {
-        CALL_HOUSE_VEHICLE
+        CALL_HOUSE_VEHICLE,
+        ORG_EQUIP
     }
 }

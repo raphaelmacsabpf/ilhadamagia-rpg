@@ -66,17 +66,7 @@
     <Compile Include="CommandLibraries\MiscCommands.cs" />
     <Compile Include="CommandLibraries\MoneyCommands.cs" />
     <Compile Include="CommandValidator.cs" />
-    <Compile Include="Entities\GF247Store.cs" />
-    <Compile Include="Entities\GFAmmunation.cs" />
-    <Compile Include="Entities\GFATM.cs" />
-    <Compile Include="Entities\GFClothingStore.cs" />
-    <Compile Include="Entities\GFGasStation.cs" />
-    <Compile Include="Entities\GFHospital.cs" />
-    <Compile Include="Entities\GFHouse.cs" />
-    <Compile Include="Entities\GFOrg.cs" />
-    <Compile Include="Entities\GFPlayer.cs" />
-    <Compile Include="Entities\GFPoliceDepartment.cs" />
-    <Compile Include="Entities\GFVehicle.cs" />
+    <Compile Include="Entities\PlayerHandle.cs" />
     <Compile Include="Enums\PlayerConnectionState.cs" />
     <Compile Include="Enums\PlayerConnectionTrigger.cs" />
     <Compile Include="CommandLibraries\CommandLibrary.cs" />
@@ -88,11 +78,10 @@
     <Compile Include="Managers\GameEntitiesManager.cs" />
     <Compile Include="Managers\StateManager.cs" />
     <Compile Include="Managers\MapManager.cs" />
-    <Compile Include="Managers\NetworkManager.cs" />
-    <Compile Include="Managers\MenuManager.cs" />
+    <Compile Include="LZ4Utils.cs" />
     <Compile Include="PlayerInfo.cs" />
-    <Compile Include="PlayerActions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\OrgService.cs" />
     <Compile Include="Services\PlayerService.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -120,12 +109,12 @@
   <PropertyGroup>
     <PostBuildEvent>cd ..\..\scripts\
 REM icecon.exe -c "stop ilhadamagiarpg" 127.0.0.1:30120 PQPMELANCIAAZEDA
-move ..\.build\server\fxmanifest.lua ..\.build\
+
 mkdir ..\.build\client\nui\html
 xcopy /S /Y ..\Client.Application\nui\html ..\.build\client\nui\html
 del /S ..\.build\server\*.pdb
 del /s ..\.build\server\*.xml
-xcopy /S /Y ..\.build G:\dev\fivem\server\server-data\resources\ilhadamagiarpg
+xcopy /S /Y ..\.build E:\dev\fivem\server\server-data\resources\ilhadamagiarpg
 REM icecon.exe -c "ensure ilhadamagiarpg" 127.0.0.1:30120 PQPMELANCIAAZEDA</PostBuildEvent>
   </PropertyGroup>
 </Project>

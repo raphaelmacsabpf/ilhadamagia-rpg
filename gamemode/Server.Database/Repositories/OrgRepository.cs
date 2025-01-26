@@ -3,6 +3,7 @@ using MySqlConnector;
 using Server.Domain.Entities;
 using Server.Domain.Interfaces;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Server.Database.Repositories
@@ -33,9 +34,25 @@ WHERE Id = @Id";
             return this.mySqlConnection.ExecuteAsync(sqlStatement, org);
         }
 
-        public IEnumerable<string> GetOrgMembersById(int orgId)
+        public IEnumerable<OrgMembership> GetOrgMembers(string orgId)
         {
-            return this.mySqlConnection.Query<string>(""); // TODO: Implement GetOrgMembers query
+            return this.mySqlConnection.Query<OrgMembership>("SELECT * FROM imtb_player_orgs WHERE OrgId = @OrgId", new { OrgId = orgId });
+        }
+
+        public Org GetOrgById(string orgId)
+        {
+            return this.mySqlConnection.Query<Org>("SELECT * FROM imtb_org WHERE Id = @OrgId", new { OrgId = orgId }).FirstOrDefault();
+        }
+
+        public Org GetOrgFromUsername(string username)
+        {
+            return this.mySqlConnection.Query<Org>("SELECT * FROM imtb_org o JOIN imtb_player_orgs po ON o.Id = po.OrgId WHERE po.Username = @Username LIMIT 1", new { Username = username }).FirstOrDefault();
+        }
+
+        public void SetPlayerOrg(string username, string orgId, int role)
+        {
+            this.mySqlConnection.Execute("DELETE FROM imtb_player_orgs WHERE username = @Username;", new { Username =  username });
+            this.mySqlConnection.Execute("INSERT INTO imtb_player_orgs (Username, OrgId, Role) VALUES (@Username, @OrgId, @Role)", new { Username =  username, OrgId = orgId, Role = role });
         }
     }
 }

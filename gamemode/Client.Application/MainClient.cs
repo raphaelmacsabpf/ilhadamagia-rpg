@@ -1,18 +1,17 @@
 ﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using CitizenFX.Core.UI;
-using GF.CrossCutting;
-using GF.CrossCutting.Dto;
-using Newtonsoft.Json;
 using Shared.CrossCutting;
 using Shared.CrossCutting.Dto;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GF.CrossCutting.Enums;
 
 namespace Client.Application
 {
-    public class MainClient : BaseScript
+    public class MainClient : BaseClientScript
     {
         private readonly PlayerInfo playerInfo;
         private readonly MarkersManager markersManager;
@@ -78,7 +77,7 @@ namespace Client.Application
             }
             API.ShutdownLoadingScreen();
             await Delay(1000);
-            TriggerServerEvent("GF:Server:OnClientReady");
+            CallServerAction(ServerEvent.OnClientReady);
         }
 
         public void OpenNUIView(int nuiViewTypeInt, bool setFocus, string compressedJsonPayload, int uncompressedLength)
@@ -172,7 +171,7 @@ namespace Client.Application
             }
         }
 
-        public void OnClienText(string textInput)
+        public void OnClientText(string textInput)
         {
             bool cancelEvent = true;
             if (textInput[0] == '/')
@@ -187,7 +186,7 @@ namespace Client.Application
                 else
                 {
                     var commandPacket = new CommandPacket(textInput);
-                    TriggerServerEvent("GF:Server:OnClientCommand", commandPacket.Command, commandPacket.HasArgs, commandPacket.Text);
+                    CallServerAction(ServerEvent.OnClientCommand, commandPacket.Command, commandPacket.HasArgs, commandPacket.Text);
                 }
                 if (cancelEvent)
                 {
@@ -195,7 +194,7 @@ namespace Client.Application
                 }
             }
             else
-                TriggerServerEvent("GF:Server:OnChatMessage", textInput);
+                CallServerAction(ServerEvent.OnChatMessage, textInput);
         }
 
         public async void OnDie(int killerType, dynamic deathCoords)
@@ -227,7 +226,7 @@ namespace Client.Application
             if (responseType == "RESPONSE_ACCOUNT_SELECTED")
             {
                 var account = data["account"].ToString();
-                TriggerServerEvent("GF:Server:ResponseAccountSelect", account);
+                CallServerAction(ServerEvent.ResponseAccountSelect, account);
             }
             callbackResponse("200");
         }
@@ -237,6 +236,7 @@ namespace Client.Application
             var vehicleHash = (VehicleHash)vehicleHashUInt;
             var model = new Model(vehicleHash);
             var vehicle = await World.CreateVehicle(model, Game.PlayerPed.Position, Game.PlayerPed.Heading);
+            API.SetVehicleFuelLevel(vehicle.Handle, 64);
             Game.PlayerPed.SetIntoVehicle(vehicle, VehicleSeat.Driver);
         }
 
@@ -306,6 +306,8 @@ namespace Client.Application
 
             // Hide police blips
             API.SetPoliceRadarBlips(false);
+
+            ProcessFuelConsumption();
         }
 
         public async void SwitchOutPlayer()
@@ -323,7 +325,7 @@ namespace Client.Application
             {
                 await Delay(1);
             }
-            TriggerServerEvent("GF:Server:TriggerStateEvent", "switched-out");
+            CallServerAction(ServerEvent.TriggerStateEvent, "switched-out");
         }
 
         public async void SwitchInPlayer(float x, float y, float z)
@@ -343,14 +345,14 @@ namespace Client.Application
             {
                 await Delay(1);
             }
-            TriggerServerEvent("GF:Server:TriggerStateEvent", "switched-in");
+            CallServerAction(ServerEvent.TriggerStateEvent, "switched-in");
         }
 
-        public void SyncPlayerDateTime(string serverDateTimeAsString)
+        public void SyncPlayerDateTime(string clockStr, int millisecondsPerMinutes)
         {
-            var server = DateTime.Parse(serverDateTimeAsString);
-            API.NetworkOverrideClockTime(server.Hour, server.Minute, server.Second);
-            API.SetMillisecondsPerGameMinute(60000);
+            var clock = TimeSpan.Parse(clockStr);
+            API.NetworkOverrideClockTime(clock.Hours, clock.Minutes, 0);
+            API.SetMillisecondsPerGameMinute(millisecondsPerMinutes);
         }
 
         public async Task PlayerStateTickHandler()
@@ -374,7 +376,7 @@ namespace Client.Application
                     }
                     await Delay(1000);
                     API.StopAllScreenEffects();
-                    TriggerServerEvent("GF:Server:TriggerStateEvent", "die");
+                    CallServerAction(ServerEvent.TriggerStateEvent, "die");
                     await Delay(3000);
                 }
             }
@@ -382,6 +384,54 @@ namespace Client.Application
             {
                 await Delay(1000);
             }
+        }
+
+        private void ProcessFuelConsumption()
+        {
+            if (Game.PlayerPed.CurrentVehicle != null)
+            {
+                var vehicle = Game.PlayerPed.CurrentVehicle;
+
+                float fuelLevel = Function.Call<float>(Hash.GET_VEHICLE_FUEL_LEVEL, vehicle.Handle);
+
+                if (fuelLevel > 0)
+                {
+                    float acceleration = Function.Call<float>(Hash.GET_VEHICLE_CURRENT_ACCELERATION, vehicle.Handle);
+                    var rpm = API.GetVehicleCurrentRpm(vehicle.Handle);
+
+                    float baseConsumption = GetVehicleBaseConsumption(vehicle);
+                    float absoluteAcceleration = Math.Abs(acceleration);
+
+                    // Fix reverse engine
+                    if (absoluteAcceleration == 0 && rpm == 1)
+                    {
+                        absoluteAcceleration = 1;
+                    }
+
+                    float consumption = baseConsumption + (absoluteAcceleration * 1.5f);
+                    fuelLevel -= consumption * 0.01f;
+                    Function.Call(Hash.SET_VEHICLE_FUEL_LEVEL, vehicle.Handle, fuelLevel);
+                }
+                else
+                {
+                    Function.Call(Hash.SET_VEHICLE_ENGINE_ON, vehicle.Handle, false, true, true);
+                    Debug.WriteLine("O veículo está sem combustível!");
+                }
+            }
+        }
+
+        private float GetVehicleBaseConsumption(Vehicle vehicle)
+        {
+            if (vehicle.ClassType == VehicleClass.Super)
+                return 1.5f;
+            if (vehicle.ClassType == VehicleClass.SUVs || vehicle.ClassType == VehicleClass.OffRoad)
+                return 1.8f;
+            if (vehicle.ClassType == VehicleClass.Motorcycles)
+                return 0.8f;
+            if (vehicle.ClassType == VehicleClass.Utility || vehicle.ClassType == VehicleClass.Industrial)
+                return 2.5f;
+
+            return 1.0f;
         }
     }
 }

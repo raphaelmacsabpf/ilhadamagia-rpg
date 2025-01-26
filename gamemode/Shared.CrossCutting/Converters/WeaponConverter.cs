@@ -1,8 +1,8 @@
-﻿using GF.CrossCutting.Enums;
+﻿using Shared.CrossCutting.Enums;
 using System;
 using System.Collections.Generic;
 
-namespace GF.CrossCutting.Converters
+namespace Shared.CrossCutting.Converters
 {
     public static class WeaponConverter
     {
@@ -23,23 +23,15 @@ namespace GF.CrossCutting.Converters
             return weaponHash;
         }
 
-        public static string GetWeaponNameById(int id)
+        public static string GetWeaponName(GameWeaponHash weaponHash)
         {
-            Array values = Enum.GetValues(typeof(GameWeaponHash));
-            var weaponHash = (GameWeaponHash)values.GetValue(id);
-
-            if (weaponCustomNames.TryGetValue(weaponHash, out var customWeaponName))
+            if (weaponCustomNames.TryGetValue(weaponHash, out var customVehicleName))
             {
-                return customWeaponName;
+                return customVehicleName;
             }
 
             var defaultWeaponName = weaponHash.ToString();
             return defaultWeaponName;
-        }
-
-        public static int GetWeaponMaxId()
-        {
-            return Enum.GetValues(typeof(GameWeaponHash)).Length - 1; // TODO: avaliar se esse menos 1 é valido
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Client.Application
 {
-    public class PlayerActions : BaseScript
+    public class PlayerActions : BaseClientScript
     {
         public PlayerActions(bool ignoreFiveMInitialization)
         {
@@ -46,14 +46,14 @@ namespace Client.Application
         public async void TeleportPlayerToPosition(Vector3 targetPosition, int transitionDurationInMs = 500)
         {
             API.SetPlayerControl(API.PlayerId(), false, 0);
-            API.DoScreenFadeOut(1000);
+            API.DoScreenFadeOut(100);
             while (API.IsScreenFadingOut())
             {
                 await Delay(16);
             }
             Game.PlayerPed.Position = targetPosition;
             await Delay(transitionDurationInMs);
-            API.DoScreenFadeIn(1000);
+            API.DoScreenFadeIn(100);
             API.SetPlayerControl(API.PlayerId(), true, 0);
         }
 

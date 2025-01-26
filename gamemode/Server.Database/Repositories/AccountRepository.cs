@@ -43,6 +43,7 @@ SELECT LAST_INSERT_ID();";
 UPDATE imtb_account SET
 UpdatedAt = @UpdatedAt,
 AdminLevel = @AdminLevel,
+MaxAdminLevel = @MaxAdminLevel,
 DonateRank = @DonateRank,
 Level = @Level,
 Respect = @Respect,

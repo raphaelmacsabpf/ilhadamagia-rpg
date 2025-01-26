@@ -1,5 +1,5 @@
 ﻿using CitizenFX.Core;
-using GF.CrossCutting.Dto;
+using Shared.CrossCutting.Dto;
 using Server.Application.Managers;
 using Server.Domain.Services;
 using Shared.CrossCutting;
@@ -11,38 +11,37 @@ namespace Server.Application.CommandLibraries
     public class HouseCommands : CommandLibrary
     {
         private readonly ChatManager chatManager;
-        private readonly PlayerActions playerActions;
         private readonly VehicleService vehicleService;
 
-        public HouseCommands(ChatManager chatManager, PlayerActions playerActions, VehicleService vehicleService)
+        public HouseCommands(ChatManager chatManager, VehicleService vehicleService)
         {
             this.chatManager = chatManager;
-            this.playerActions = playerActions;
             this.vehicleService = vehicleService;
         }
 
         [Command("/casa")]
         public void MyHouse(CommandValidator commandValidator)
         {
-            var playerHouse = commandValidator.SourceGFPlayer.SelectedHouse;
+            var playerHouse = commandValidator.SourcePlayerHandle.SelectedHouse;
             if (playerHouse == null)
             {
-                this.chatManager.SendClientMessage(commandValidator.SourceGFPlayer, ChatColor.COLOR_GRAD1, "Você não possui uma casa válida");
+                this.chatManager.SendClientMessage(commandValidator.SourcePlayerHandle, ChatColor.COLOR_GRAD1, "Você não possui uma casa válida");
                 return;
             }
 
-            var distanceFromPlayerToHerHouse = commandValidator.SourceGFPlayer.Player.Character.Position.DistanceToSquared(new Vector3(playerHouse.Entity.EntranceX, playerHouse.Entity.EntranceY, playerHouse.Entity.EntranceZ));
+            var distanceFromPlayerToHerHouse = commandValidator.SourcePlayerHandle.Player.Character.Position.DistanceToSquared(new Vector3(playerHouse.EntranceX, playerHouse.EntranceY, playerHouse.EntranceZ));
             Console.WriteLine($"Distance is: {distanceFromPlayerToHerHouse}"); // TODO: Remover este LOG quando entender os problemas de sincronia
             if (distanceFromPlayerToHerHouse > Math.Pow(1.5f, 2))
             {
-                this.chatManager.SendClientMessage(commandValidator.SourceGFPlayer, ChatColor.COLOR_GRAD1, "Você está muito longe da sua casa");
+                this.chatManager.SendClientMessage(commandValidator.SourcePlayerHandle, ChatColor.COLOR_GRAD1, "Você está muito longe da sua casa");
                 return;
             }
-            var vehicleList = vehicleService.GetAccountVehicles(commandValidator.SourceGFPlayer.Account);
+            var vehicleList = vehicleService.GetAccountVehicles(commandValidator.SourcePlayerHandle.Account);
             var vehiclesAsDto = vehicleList.Select((vehicleEntity) =>
             {
                 return new VehicleDto()
                 {
+                    Id = vehicleEntity.Id,
                     Guid = vehicleEntity.Guid,
                     Hash = vehicleEntity.Hash,
                     PrimaryColor = vehicleEntity.PrimaryColor,
@@ -52,7 +51,7 @@ namespace Server.Application.CommandLibraries
                 };
             });
 
-            this.playerActions.OpenMenu(commandValidator.SourceGFPlayer, MenuType.House, vehiclesAsDto);
+            commandValidator.SourcePlayerHandle.OpenMenu(MenuType.House, vehiclesAsDto);
         }
     }
 }

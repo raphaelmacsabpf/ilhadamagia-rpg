@@ -1,53 +1,52 @@
 ﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using GF.CrossCutting.Dto.MenuActions;
+using Newtonsoft.Json;
+using Server.Application.Entities;
 using Server.Application.Enums;
 using Server.Application.Managers;
+using Shared.CrossCutting;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Server.Application
 {
     public class MainServer : BaseScript
     {
         private readonly PlayerInfo playerInfo;
-        private readonly NetworkManager networkManager;
-        private readonly PlayerActions playerActions;
         private readonly ChatManager chatManager;
         private readonly StateManager stateManager;
         private readonly GameEntitiesManager gameEntitiesManager;
 
-        public MainServer(PlayerInfo playerInfo, CommandManager commandManager, MapManager mapManager, NetworkManager networkManager, PlayerActions playerActions, ChatManager chatManager, StateManager stateManager, GameEntitiesManager gameEntitiesManager)
+        public MainServer(PlayerInfo playerInfo, CommandManager commandManager, MapManager mapManager, ChatManager chatManager, StateManager stateManager, GameEntitiesManager gameEntitiesManager)
         {
+            RegisterScript(this);
             this.playerInfo = playerInfo;
             this.CommandManager = commandManager;
             this.MapManager = mapManager;
-            this.networkManager = networkManager;
-            this.playerActions = playerActions;
             this.chatManager = chatManager;
             this.stateManager = stateManager;
             this.gameEntitiesManager = gameEntitiesManager;
             foreach (var player in this.Players)
             {
-                stateManager.PrepareFSMForPlayer(player);
-                var gfPlayer = playerInfo.GetGFPlayer(player);
-                gfPlayer.FSM.Fire(PlayerConnectionTrigger.GAMEMODE_LOAD);
+                this.PrepareFSMForPlayer(player);
+                var playerHandle = playerInfo.GetPlayerHandle(player);
+                playerHandle.FSM.Fire(PlayerConnectionTrigger.GAMEMODE_LOAD);
             }
 
             API.RegisterCommand("gmx", new Action<int, List<object>, string>((source, args, rawCommand) =>
             {
                 if (source <= 0)
                 {
-                    foreach (var targetPlayer in playerInfo.GetGFPlayerList())
+                    foreach (var targetPlayer in playerInfo.GetPlayerHandleList())
                     {
                         targetPlayer.FSM.Fire(PlayerConnectionTrigger.PLAYER_DROPPED);
                     }
                 }
             }), true);
 
-            gameEntitiesManager.OnOrgsLoad += (sender, orgs) =>
-            {
-                mapManager.CreateOrgsSpawn(orgs);
-            };
+            mapManager.CreateOrgsSpawn();
 
             gameEntitiesManager.OnAmmunationsLoad += (sender, ammunations) =>
             {
@@ -84,6 +83,8 @@ namespace Server.Application
                 mapManager.Create247Stores(store247List);
             };
 
+            Tick += GlobalTimer1Second;
+
             gameEntitiesManager.InvokeInitialEvents();
             Console.WriteLine("[IM MainServer] Started MainServer");
         }
@@ -92,17 +93,23 @@ namespace Server.Application
 
         internal MapManager MapManager { get; }
 
+
+        private async Task GlobalTimer1Second()
+        {
+            this.MapManager.UpdateWorldClock();
+            await Delay(1000);
+        }
         internal async void OnClientReady([FromSource] Player player)
         {
-            stateManager.PrepareFSMForPlayer(player);
-            var gfPlayer = playerInfo.GetGFPlayer(player);
-            gfPlayer.FSM.Fire(PlayerConnectionTrigger.CLIENT_READY);
+            this.PrepareFSMForPlayer(player);
+            var playerHandle = playerInfo.GetPlayerHandle(player);
+            playerHandle.FSM.Fire(PlayerConnectionTrigger.CLIENT_READY);
         }
 
         internal void OnPlayerDropped([FromSource] Player player, string reason)
         {
-            var gfPlayer = this.playerInfo.GetGFPlayer(player);
-            gfPlayer.FSM.Fire(PlayerConnectionTrigger.PLAYER_DROPPED);
+            var playerHandle = this.playerInfo.GetPlayerHandle(player);
+            playerHandle.FSM.Fire(PlayerConnectionTrigger.PLAYER_DROPPED);
         }
 
         internal async void OnPlayerConnecting([FromSource] Player player, string playerName, dynamic setKickReason, dynamic deferrals)
@@ -125,34 +132,90 @@ namespace Server.Application
 
         internal void OnPlayerSelectAccount([FromSource] Player player, string accountName)
         {
-            var gfPlayer = playerInfo.GetGFPlayer(player);
-            stateManager.SelectAccountForPlayer(gfPlayer, accountName);
+            var playerHandle = playerInfo.GetPlayerHandle(player);
+            stateManager.SelectAccountForPlayer(playerHandle, accountName);
         }
 
         internal void OnPlayerTriggerStateEvent([FromSource] Player player, string eventTriggered)
         {
-            var gfPlayer = playerInfo.GetGFPlayer(player);
+            var playerHandle = playerInfo.GetPlayerHandle(player);
             switch (eventTriggered)
             {
                 case "die":
                     {
-                        if (gfPlayer.FSM.CanFire(PlayerConnectionTrigger.PLAYER_DIED))
+                        if (playerHandle.FSM.CanFire(PlayerConnectionTrigger.PLAYER_DIED))
                         {
-                            gfPlayer.FSM.Fire(PlayerConnectionTrigger.PLAYER_DIED);
+                            playerHandle.FSM.Fire(PlayerConnectionTrigger.PLAYER_DIED);
                         }
                         return;
                     }
                 case "switched-out":
                     {
-                        gfPlayer.FSM.Fire(PlayerConnectionTrigger.SWITCHED_OUT);
+                        playerHandle.FSM.Fire(PlayerConnectionTrigger.SWITCHED_OUT);
                         return;
                     }
                 case "switched-in":
                     {
-                        gfPlayer.FSM.Fire(PlayerConnectionTrigger.SWITCHED_IN);
+                        playerHandle.FSM.Fire(PlayerConnectionTrigger.SWITCHED_IN);
                         return;
                     }
             }
         }
+
+        internal void OnPlayerMenuAction([FromSource] Player player, int menuActionInt, string compressedPayload)
+        {
+            var uncompressedPayload = LZ4Utils.Decompress(compressedPayload);
+            var menuAction = (MenuAction)menuActionInt;
+            var playerHandle = this.playerInfo.GetPlayerHandle(player);
+
+            switch (menuAction)
+            {
+                case MenuAction.CALL_HOUSE_VEHICLE:
+                    var dto = JsonConvert.DeserializeObject<CallHouseVehicleDto>(uncompressedPayload);
+                    MapManager.PlayerHandleCallPropertyVehicle(playerHandle, dto.VehicleId);
+                    break;
+                case MenuAction.ORG_EQUIP:
+                    playerHandle.OrgEquip();
+                    break;
+            }
+        }
+
+        private void PrepareFSMForPlayer(Player player)
+        {
+            var playerHandle = new PlayerHandle(player);
+            var fsm = stateManager.CreatePlayerConnectionFSM(playerHandle);
+            playerHandle.FSM = fsm;
+            playerInfo.LoadPlayerHandle(playerHandle);
+        }
+
+        internal void OnChatMessage([FromSource] Player player, string message) // TODO: PROTEGER OnChatMessage
+        {
+            var wholeMessageCharsIsUppercase = message.CompareTo(message.ToUpper()) == 0;
+            var playerHandle = playerInfo.GetPlayerHandle(player);
+            if (wholeMessageCharsIsUppercase)
+            {
+                chatManager.PlayerScream(playerHandle, message);
+            }
+            else
+            {
+                var messageToChat = $"[ID: {player.Handle}] {playerHandle.Account.Username} diz: {message}";
+                chatManager.PlayerChat(playerHandle, messageToChat);
+            }
+        }
+        internal void OnClientCommand([FromSource] Player sourcePlayer, string command, bool hasArgs, string text)
+        {
+            var sourcePlayerHandle = playerInfo.GetPlayerHandle(sourcePlayer);
+            try
+            {
+                CommandManager.ProcessCommandForPlayer(sourcePlayerHandle, command, hasArgs, text);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("[IM CommandManager] Unhandled command exception: " + ex.Message); // TODO: Inserir informações do player
+                this.chatManager.SendClientMessage(sourcePlayerHandle, ChatColor.COLOR_LIGHTRED, "Comando não reconhecido, use /ajuda para ver alguns comandos!");
+                this.chatManager.SendClientMessage(sourcePlayerHandle, ChatColor.COLOR_LIGHTBLUE, "Peça ajuda também a um Administrador, use /relatorio."); // This '.' DOT at the end is the trick
+            }
+        }
+
     }
 }

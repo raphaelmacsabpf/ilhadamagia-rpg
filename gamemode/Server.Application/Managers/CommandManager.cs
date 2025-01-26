@@ -1,5 +1,4 @@
-﻿using CitizenFX.Core;
-using Server.Application.CommandLibraries;
+﻿using Server.Application.CommandLibraries;
 using Server.Application.Entities;
 using Shared.CrossCutting;
 using System;
@@ -7,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Server.Application.Managers
 {
-    public class CommandManager : BaseScript
+    public class CommandManager
     {
         private readonly ChatManager chatManager;
         private readonly PlayerInfo playerInfo;
@@ -21,21 +20,6 @@ namespace Server.Application.Managers
             this.commandLibraryFactory = commandLibraryFactory;
             BuildCommandLoader();
             Console.WriteLine("[IM CommandManager] Started CommandManager");
-        }
-
-        internal void OnClientCommand([FromSource] Player sourcePlayer, string command, bool hasArgs, string text)
-        {
-            var sourceGFPlayer = playerInfo.GetGFPlayer(sourcePlayer);
-            try
-            {
-                ProcessCommandForPlayer(sourceGFPlayer, command, hasArgs, text);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("[IM CommandManager] Unhandled command exception: " + ex.Message); // TODO: Inserir informações do player
-                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTRED, "Comando não reconhecido, use /ajuda para ver alguns comandos!");
-                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, "Peça ajuda também a um Administrador, use /relatorio."); // This '.' DOT at the end is the trick
-            }
         }
 
         private void BuildCommandLoader()
@@ -69,23 +53,30 @@ namespace Server.Application.Managers
             }
         }
 
-        private void ProcessCommandForPlayer(GFPlayer sourceGFPlayer, string command, bool hasArgs, string text)
+        internal void ProcessCommandForPlayer(PlayerHandle sourcePlayerHandle, string command, bool hasArgs, string text)
         {
             CommandPacket commandPacket = new CommandPacket(text);
             commandPacket.Command = command;
             commandPacket.HasArgs = hasArgs;
             commandPacket.Text = text;
-            var commandValidator = new CommandValidator(this.playerInfo, this.chatManager, sourceGFPlayer, commandPacket);
+            var commandValidator = new CommandValidator(this.playerInfo, this.chatManager, sourcePlayerHandle, commandPacket);
 
             if (this.registeredCommands.ContainsKey(commandPacket.Command))
             {
-                var registeredCommand = this.registeredCommands[commandPacket.Command];
-                registeredCommand.MethodInfo.Invoke(registeredCommand.CommandLibraryInstance, new object[] { commandValidator });
+                try
+                {
+                    var registeredCommand = this.registeredCommands[commandPacket.Command];
+                    registeredCommand.MethodInfo.Invoke(registeredCommand.CommandLibraryInstance, new object[] { commandValidator });
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine($"Exception in command execution: { ex.Message }");
+                }
             }
             else
             {
-                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTRED, "Comando não reconhecido, use /ajuda para ver alguns comandos!");
-                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_LIGHTBLUE, "Peça ajuda também a um Administrador, use /relatorio");
+                this.chatManager.SendClientMessage(sourcePlayerHandle, ChatColor.COLOR_LIGHTRED, "Comando não reconhecido, use /ajuda para ver alguns comandos!");
+                this.chatManager.SendClientMessage(sourcePlayerHandle, ChatColor.COLOR_LIGHTBLUE, "Peça ajuda também a um Administrador, use /relatorio");
             }
         }
     }

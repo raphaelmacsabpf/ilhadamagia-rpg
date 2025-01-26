@@ -1,11 +1,12 @@
 ﻿using CitizenFX.Core;
-using GF.CrossCutting;
+using Shared.CrossCutting;
 using Newtonsoft.Json;
 using Server.Application.Entities;
 using Server.Application.Enums;
+using Server.Application.Services;
+using Server.Domain.Entities;
 using Server.Domain.Enums;
 using Server.Domain.Services;
-using Shared.CrossCutting;
 using Stateless;
 using Stateless.Graph;
 using System;
@@ -17,67 +18,50 @@ namespace Server.Application.Managers
     {
         private readonly ChatManager chatManager;
         private readonly PlayerInfo playerInfo;
-        private readonly NetworkManager networkManager;
         private readonly MapManager mapManager;
-        private readonly PlayerActions playerActions;
         private readonly AccountService accountService;
+        private readonly OrgService orgService;
+        private readonly PlayerService playerService;
 
-        public StateManager(ChatManager chatManager, PlayerInfo playerInfo, NetworkManager networkManager, MapManager mapManager, PlayerActions playerActions, AccountService accountService)
+        public StateManager(ChatManager chatManager, PlayerInfo playerInfo, MapManager mapManager, AccountService accountService, OrgService orgService, PlayerService playerService)
         {
             this.chatManager = chatManager;
             this.playerInfo = playerInfo;
-            this.networkManager = networkManager;
             this.mapManager = mapManager;
-            this.playerActions = playerActions;
             this.accountService = accountService;
+            this.orgService = orgService;
+            this.playerService = playerService;
         }
 
-        public void PrepareFSMForPlayer(Player player)
+        public void SelectAccountForPlayer(PlayerHandle playerHandle, string accountName)
         {
-            var gfPlayer = new GFPlayer(player);
-            var fsm = CreatePlayerConnectionFSM(gfPlayer);
-            gfPlayer.FSM = fsm;
-            playerInfo.LoadGFPlayer(gfPlayer);
-        }
-
-        public void SelectAccountForPlayer(GFPlayer gfPlayer, string accountName)
-        {
-            var account = gfPlayer.LicenseAccounts.FirstOrDefault((element) => element.Username == accountName);
+            var account = playerHandle.LicenseAccounts.FirstOrDefault((element) => element.Username == accountName);
             if (account == null) return;
-            gfPlayer.Account = account;
+            playerHandle.Account = account;
             if (account.SelectedHouse != null)
             {
-                var houses = mapManager.GetAllHousesFromOwner(account.Username).ToList();
-                gfPlayer.SelectedHouse = houses.FirstOrDefault((gfHouse) => gfHouse.Entity != null && gfHouse.Entity.Id == account.SelectedHouse);
+                var houses = mapManager.GetAllHousesFromOwner(account.Username);
+                playerHandle.SelectedHouse = houses.FirstOrDefault((gfHouse) => gfHouse != null && gfHouse.Id == account.SelectedHouse);
             }
-            gfPlayer.FSM.Fire(PlayerConnectionTrigger.ACCOUNT_SELECTED);
+            playerHandle.FSM.Fire(PlayerConnectionTrigger.ACCOUNT_SELECTED);
         }
 
-        public void RespawnPlayerInCurrentPosition(GFPlayer gfPlayer)
-        {
-            var position = gfPlayer.Player.Character.Position;
-            gfPlayer.SpawnType = SpawnType.ToCoords;
-            gfPlayer.SpawnPosition = position;
-            gfPlayer.SwitchInPosition = position;
-            gfPlayer.FSM.Fire(PlayerConnectionTrigger.SET_TO_SPAWN);
-        }
-
-        private StateMachine<PlayerConnectionState, PlayerConnectionTrigger> CreatePlayerConnectionFSM(GFPlayer gfPlayer)
+        public StateMachine<PlayerConnectionState, PlayerConnectionTrigger> CreatePlayerConnectionFSM(PlayerHandle playerHandle)
         {
             var fsm = new StateMachine<PlayerConnectionState, PlayerConnectionTrigger>(PlayerConnectionState.INITIAL);
 
             fsm.OnTransitioned((transition) =>
             {
-                Console.WriteLine(gfPlayer.Account != null
-                    ? $"Player connection state change #{gfPlayer.Player.Handle} Name: {gfPlayer.Player.Name}, Username: {gfPlayer.Account.Username}, Transition: {transition.Source}[{transition.Trigger}] -> {transition.Destination}"
-                    : $"Player connection state change #{gfPlayer.Player.Handle} Name: {gfPlayer.Player.Name}, Transition: {transition.Source}[{transition.Trigger}] -> {transition.Destination}");
+                Console.WriteLine(playerHandle.Account != null
+                    ? $"Player connection state change #{playerHandle.Player.Handle} Name: {playerHandle.Player.Name}, Username: {playerHandle.Account.Username}, Transition: {transition.Source}[{transition.Trigger}] -> {transition.Destination}"
+                    : $"Player connection state change #{playerHandle.Player.Handle} Name: {playerHandle.Player.Name}, Transition: {transition.Source}[{transition.Trigger}] -> {transition.Destination}");
             });
 
             fsm.OnUnhandledTrigger((state, trigger) =>
             {
-                Console.WriteLine(gfPlayer.Account != null
-                    ? $"ERROR: State trigger error  #{gfPlayer.Player.Handle} Name: {gfPlayer.Player.Name}, Username: {gfPlayer.Account.Username}, State: {state}, Trigger: {trigger}"
-                    : $"ERROR: State trigger error  #{gfPlayer.Player.Handle} Name: {gfPlayer.Player.Name}, State: {state}, Trigger: {trigger}");
+                Console.WriteLine(playerHandle.Account != null
+                    ? $"ERROR: State trigger error  #{playerHandle.Player.Handle} Name: {playerHandle.Player.Name}, Username: {playerHandle.Account.Username}, State: {state}, Trigger: {trigger}"
+                    : $"ERROR: State trigger error  #{playerHandle.Player.Handle} Name: {playerHandle.Player.Name}, State: {state}, Trigger: {trigger}");
             });
 
             fsm.Configure(PlayerConnectionState.INITIAL)
@@ -88,16 +72,16 @@ namespace Server.Application.Managers
             fsm.Configure(PlayerConnectionState.DROPPED)
                 .OnEntry(() =>
                 {
-                    if (gfPlayer.Account != null)
+                    if (playerHandle.Account != null)
                     {
-                        var playerPosition = gfPlayer.Player.Character.Position;
-                        accountService.EndSession(gfPlayer.Account, playerPosition.X, playerPosition.Y, playerPosition.Z, gfPlayer.CurrentHouseInside?.Entity);
-                        Console.WriteLine($"Player dropped #{gfPlayer.Player.Handle} Name: {gfPlayer.Player.Name}, Username: {gfPlayer.Account.Username}");
-                        this.playerInfo.UnloadGFPlayer(gfPlayer);
+                        var playerPosition = playerHandle.Player.Character.Position;
+                        accountService.EndSession(playerHandle.Account, playerPosition.X, playerPosition.Y, playerPosition.Z, playerHandle.CurrentHouseInside);
+                        Console.WriteLine($"Player dropped #{playerHandle.Player.Handle} Name: {playerHandle.Player.Name}, Username: {playerHandle.Account.Username}");
+                        this.playerInfo.UnloadPlayerHandle(playerHandle);
                     }
                     else
                     {
-                        Console.WriteLine($"Player dropped #{gfPlayer.Player.Handle} Name: {gfPlayer.Player.Name}");
+                        Console.WriteLine($"Player dropped #{playerHandle.Player.Handle} Name: {playerHandle.Player.Name}");
                     }
                 });
 
@@ -111,13 +95,13 @@ namespace Server.Application.Managers
                 .Permit(PlayerConnectionTrigger.ACCOUNT_NOT_FOUND, PlayerConnectionState.NEW_ACCOUNT)
                 .OnEntry(async () =>
                 {
-                    this.networkManager.SyncPlayerDateTime(gfPlayer);
-                    var accounts = (await accountService.GetAccountListForLicense(gfPlayer.License)).ToList();
+                    playerHandle.SyncPlayerDateTime(mapManager.GetWorldClock(), mapManager.GetMillisecondsPerMinuteWorldClock());
+                    var accounts = (await accountService.GetAccountListForLicense(playerHandle.License)).ToList();
                     if (accounts.Count > 0)
                     {
                         foreach (var account in accounts)
                         {
-                            gfPlayer.LicenseAccounts.Add(account);
+                            playerHandle.LicenseAccounts.Add(account);
                             Console.WriteLine($"Encontrada conta #{account.Id} para username: {account.Username}");
                         }
                         fsm.Fire(PlayerConnectionTrigger.ACCOUNT_FOUND);
@@ -133,8 +117,8 @@ namespace Server.Application.Managers
                 .OnEntry(async () =>
                 {
                     var json = JsonConvert.SerializeObject(null);
-                    var compressedJson = networkManager.Compress(json);
-                    this.playerActions.OpenNUIView(gfPlayer, NUIViewType.CREATE_ACCOUNT, true, compressedJson, json.Length);
+                    var compressedJson = LZ4Utils.Compress(json);
+                    playerHandle.OpenNUIView(NUIViewType.CREATE_ACCOUNT, true, compressedJson, json.Length);
                 });
 
             fsm.Configure(PlayerConnectionState.LOADING_ACCOUNT)
@@ -142,14 +126,14 @@ namespace Server.Application.Managers
                 .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
                 .OnEntry(() =>
                 {
-                    var accountsDto = gfPlayer.LicenseAccounts.Select((element) => new
+                    var accountsDto = playerHandle.LicenseAccounts.Select((element) => new
                     {
                         Username = element.Username,
                         Level = element.Level
                     });
                     var json = JsonConvert.SerializeObject(accountsDto);
-                    var compressedJson = networkManager.Compress(json);
-                    this.playerActions.OpenNUIView(gfPlayer, NUIViewType.SELECT_ACCOUNT, true, compressedJson, json.Length);
+                    var compressedJson = LZ4Utils.Compress(json);
+                    playerHandle.OpenNUIView(NUIViewType.SELECT_ACCOUNT, true, compressedJson, json.Length);
                 });
 
             fsm.Configure(PlayerConnectionState.LOGGED)
@@ -157,17 +141,19 @@ namespace Server.Application.Managers
                 .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
                 .OnEntry(() =>
                 {
-                    this.playerActions.CloseNUIView(gfPlayer, NUIViewType.SELECT_ACCOUNT, true);
+                    playerHandle.CloseNUIView(NUIViewType.SELECT_ACCOUNT, true);
                     var json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticMarkersPayload());
-                    this.networkManager.SendPayloadToPlayer(gfPlayer.Player, PayloadType.TO_STATIC_MARKERS, json);
+                    playerHandle.SendPayloadToPlayer(PayloadType.TO_STATIC_MARKERS, json);
                     json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticProximityTargetsPayload());
-                    this.networkManager.SendPayloadToPlayer(gfPlayer.Player, PayloadType.TO_STATIC_PROXIMITY_TARGETS, json);
+                    playerHandle.SendPayloadToPlayer(PayloadType.TO_STATIC_PROXIMITY_TARGETS, json);
                     json = JsonConvert.SerializeObject(this.mapManager.PopUpdatedStaticInteractionTargetsPayload());
-                    this.networkManager.SendPayloadToPlayer(gfPlayer.Player, PayloadType.TO_STATIC_INTERACTION_TARGETS, json);
+                    playerHandle.SendPayloadToPlayer(PayloadType.TO_STATIC_INTERACTION_TARGETS, json);
                     json = JsonConvert.SerializeObject(this.mapManager.PopUpdateBlipsPayload());
-                    this.networkManager.SendPayloadToPlayer(gfPlayer.Player, PayloadType.TO_MAP_BLIPS, json);
+                    playerHandle.SendPayloadToPlayer(PayloadType.TO_MAP_BLIPS, json);
+                    json = JsonConvert.SerializeObject(this.mapManager.GetPlayerPrivateBlips(playerHandle));
+                    playerHandle.SendPayloadToPlayer(PayloadType.TO_MAP_BLIPS, json);
 
-                    gfPlayer.FSM.Fire(PlayerConnectionTrigger.SELECTING_SPAWN_POSITION);
+                    playerHandle.FSM.Fire(PlayerConnectionTrigger.SELECTING_SPAWN_POSITION);
                 });
 
             fsm.Configure(PlayerConnectionState.SELECT_SPAWN_POSITION)
@@ -175,41 +161,36 @@ namespace Server.Application.Managers
                 .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
                 .OnEntry((transition) =>
                 {
-                    if (gfPlayer.SpawnType == SpawnType.Unset)
+                    if (playerHandle.SpawnType == SpawnType.Unset)
                     {
-                        if (gfPlayer.IsFirstSpawn)
+                        if (DateTime.Now - playerHandle.Account.UpdatedAt < TimeSpan.FromSeconds(600))
                         {
-                            if (DateTime.Now - gfPlayer.Account.UpdatedAt < TimeSpan.FromSeconds(600))
+                            var spawnPosition = new Vector3(playerHandle.Account.LastX, playerHandle.Account.LastY, playerHandle.Account.LastZ);
+                            playerHandle.SpawnPosition = spawnPosition;
+                            playerHandle.SwitchInPosition = spawnPosition;
+                            var accountLastHouseInside = playerHandle.Account.LastHouseInside;
+                            if (accountLastHouseInside != null)
                             {
-                                var spawnPosition = new Vector3(gfPlayer.Account.LastX, gfPlayer.Account.LastY, gfPlayer.Account.LastZ);
-                                gfPlayer.SpawnPosition = spawnPosition;
-                                gfPlayer.SwitchInPosition = spawnPosition;
-                                var accountLastHouseInside = gfPlayer.Account.LastHouseInside;
-                                if (accountLastHouseInside != null)
-                                {
-                                    var lastHouseInt = Convert.ToInt32(accountLastHouseInside);
-                                    gfPlayer.CurrentHouseInside = mapManager.GetGFHouseFromId(lastHouseInt);
-                                }
+                                var lastHouseInt = Convert.ToInt32(accountLastHouseInside);
+                                playerHandle.CurrentHouseInside = mapManager.GetGFHouseFromId(lastHouseInt);
                             }
-                            else if (gfPlayer.SelectedHouse != null)
-                            {
-                                var houseEntity = gfPlayer.SelectedHouse.Entity;
-                                gfPlayer.CurrentHouseInside = gfPlayer.SelectedHouse;
-                                gfPlayer.SpawnPosition = mapManager.GetHouseInteriorPosition(gfPlayer.SelectedHouse);
-                                gfPlayer.SwitchInPosition = new Vector3(houseEntity.EntranceX, houseEntity.EntranceY, houseEntity.EntranceZ);
-                            }
-                            else
-                            {
-                                SetSpawnToOrganization(gfPlayer);
-                            }
-                            gfPlayer.IsFirstSpawn = false;
+                            chatManager.SendClientMessage(playerHandle, ChatColor.COLOR_LIGHTBLUE, "Local de nascimento: Última posição");
+                        }
+                        else if (playerHandle.SelectedHouse != null)
+                        {
+                            var houseEntity = playerHandle.SelectedHouse;
+                            playerHandle.CurrentHouseInside = playerHandle.SelectedHouse;
+                            playerHandle.SpawnPosition = mapManager.GetHouseInteriorPosition(playerHandle.SelectedHouse);
+                            playerHandle.SwitchInPosition = new Vector3(houseEntity.EntranceX, houseEntity.EntranceY, houseEntity.EntranceZ);
+                            chatManager.SendClientMessage(playerHandle, ChatColor.COLOR_LIGHTBLUE, "Local de nascimento: Interior da casa");
                         }
                         else
                         {
-                            SetSpawnToOrganization(gfPlayer);
+                            SetSpawnToOrganization(playerHandle);
+                            chatManager.SendClientMessage(playerHandle, ChatColor.COLOR_LIGHTBLUE, "Local de nascimento: Spawn organização");
                         }
                     }
-                    this.playerActions.SwitchOutPlayer(gfPlayer);
+                    playerHandle.SwitchOutPlayer();
                 });
 
             fsm.Configure(PlayerConnectionState.SPAWNING)
@@ -218,19 +199,17 @@ namespace Server.Application.Managers
                 .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
                 .OnEntry(() =>
                 {
-                    this.playerActions.SwitchInPlayer(gfPlayer, gfPlayer.SwitchInPosition.X, gfPlayer.SwitchInPosition.Y, gfPlayer.SwitchInPosition.Z);
-                    var fastSpawn = gfPlayer.SpawnType == SpawnType.ToCoords;
-                    playerActions.SpawnPlayer(gfPlayer, gfPlayer.Account.PedModel, gfPlayer.SpawnPosition.X, gfPlayer.SpawnPosition.Y, gfPlayer.SpawnPosition.Z, 0, fastSpawn);
-                    gfPlayer.SpawnType = SpawnType.Unset;
+                    this.playerService.SpawnPlayer(playerHandle);
                 });
 
             fsm.Configure(PlayerConnectionState.SPAWNED)
+                .Permit(PlayerConnectionTrigger.SET_TO_SPAWN, PlayerConnectionState.SELECT_SPAWN_POSITION)
                 .Permit(PlayerConnectionTrigger.PLAYER_DIED, PlayerConnectionState.DIED)
                 .Permit(PlayerConnectionTrigger.PLAYER_DROPPED, PlayerConnectionState.DROPPED)
                 .OnEntry(() =>
                 {
-                    this.networkManager.SyncPlayerDateTime(gfPlayer);
-                    this.playerInfo.SendUpdatedPlayerVars(gfPlayer);
+                    playerHandle.SyncPlayerDateTime(this.mapManager.GetWorldClock(), this.mapManager.GetMillisecondsPerMinuteWorldClock());
+                    this.playerInfo.SendUpdatedPlayerVars(playerHandle);
                 });
 
             fsm.Configure(PlayerConnectionState.DIED)
@@ -249,9 +228,9 @@ namespace Server.Application.Managers
             return fsm;
         }
 
-        private void SetSpawnToOrganization(GFPlayer gfPlayer)
+        private void SetSpawnToOrganization(PlayerHandle playerHandle)
         {
-            GFOrg playerOrg = null; // HACK: load player org properly
+            Org playerOrg = orgService.GetAccountOrg(playerHandle.Account);
             Vector3 spawnPosition;
             if (playerOrg == null)
             {
@@ -259,11 +238,12 @@ namespace Server.Application.Managers
             }
             else
             {
-                spawnPosition = new Vector3(playerOrg.Entity.SpawnX, playerOrg.Entity.SpawnY, playerOrg.Entity.SpawnZ);
+                spawnPosition = new Vector3(playerOrg.SpawnX, playerOrg.SpawnY, playerOrg.SpawnZ);
             }
 
-            gfPlayer.SpawnPosition = spawnPosition;
-            gfPlayer.SwitchInPosition = spawnPosition;
+            playerHandle.SpawnPosition = spawnPosition;
+            playerHandle.SwitchInPosition = spawnPosition;
+            playerHandle.SpawnDimension = 1;
         }
     }
 }

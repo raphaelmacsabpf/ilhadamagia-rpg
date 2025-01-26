@@ -8,8 +8,14 @@ namespace Server.Domain.Interfaces
     {
         IEnumerable<Org> GetAll();
 
-        IEnumerable<string> GetOrgMembersById(int orgId);
+        IEnumerable<OrgMembership> GetOrgMembers(string orgId);
+
+        Org GetOrgById(string orgId);
 
         Task Update(Org org);
+
+        Org GetOrgFromUsername(string username);
+
+        void SetPlayerOrg(string username, string orgId, int role);
     }
 }

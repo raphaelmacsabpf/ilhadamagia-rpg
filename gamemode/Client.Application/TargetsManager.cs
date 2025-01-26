@@ -1,5 +1,6 @@
 ﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using GF.CrossCutting.Enums;
 using Shared.CrossCutting.Dto;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Client.Application
 {
-    public class TargetsManager : BaseScript
+    public class TargetsManager : BaseClientScript
     {
         private ProximityTargetDto currentProximityTarget;
         private DateTime? lastProximityTargetReached;
@@ -28,11 +29,11 @@ namespace Client.Application
         {
             var playerPosition = Game.PlayerPed.Position;
             InteractionTargetDto bestTarget = null;
-            float closestDistance = float.MaxValue;
+            double closestDistance = double.MaxValue;
 
             foreach (var target in InteractionTargets)
             {
-                var distanceToClosest = playerPosition.DistanceToSquared(new Vector3(target.X, target.Y, target.Z));
+                var distanceToClosest = Math.Sqrt(playerPosition.DistanceToSquared(new Vector3(target.X, target.Y, target.Z)));
                 if (distanceToClosest < closestDistance)
                 {
                     bestTarget = target;
@@ -42,9 +43,9 @@ namespace Client.Application
 
             if (bestTarget != null)
             {
-                if (closestDistance < 2)
+                if (closestDistance < bestTarget.Radius)
                 {
-                    OnTargetAction(bestTarget.ActionName, bestTarget.OnInteractionPayload);
+                    OnTargetAction(bestTarget.InteractionTargetAction, bestTarget.OnInteractionPayload);
                 }
             }
         }
@@ -79,7 +80,7 @@ namespace Client.Application
                         {
                             if (currentProximityTarget.OnEnterActionPayload.Length > 0)
                             {
-                                OnTargetAction(currentProximityTarget.ActionName, currentProximityTarget.OnEnterActionPayload);
+                                OnTargetAction(currentProximityTarget.InteractionTargetAction, currentProximityTarget.OnEnterActionPayload);
                             }
                         }
                         else if (bestTarget.PeriodInMs > 0 && this.lastProximityTargetReached == null)
@@ -100,7 +101,7 @@ namespace Client.Application
                     this.playerReachedProximityTarget = false;
                     if (currentProximityTarget.OnExitActionPayload.Length > 0)
                     {
-                        OnTargetAction(currentProximityTarget.ActionName, currentProximityTarget.OnExitActionPayload);
+                        OnTargetAction(currentProximityTarget.InteractionTargetAction, currentProximityTarget.OnExitActionPayload);
                     }
                     this.currentProximityTarget = null;
                 }
@@ -111,7 +112,7 @@ namespace Client.Application
                         playerReachedProximityTarget = true;
                         if (currentProximityTarget.OnEnterActionPayload.Length > 0)
                         {
-                            OnTargetAction(currentProximityTarget.ActionName, currentProximityTarget.OnEnterActionPayload);
+                            OnTargetAction(currentProximityTarget.InteractionTargetAction, currentProximityTarget.OnEnterActionPayload);
                         }
                     }
                 }
@@ -120,11 +121,11 @@ namespace Client.Application
             await Delay(100);
         }
 
-        public async void OnTargetAction(string actionName, string payload)
+        public async void OnTargetAction(InteractionTargetAction interactionTargetAction, string payload)
         {
-            switch (actionName)
+            switch (interactionTargetAction)
             {
-                case "INFO_TO_PLAYER":
+                case InteractionTargetAction.INFO_TO_PLAYER:
                     {
                         string message = payload;
                         this.playerActions.PushNotification(message, 2000);
@@ -132,10 +133,10 @@ namespace Client.Application
                         break;
                     }
 
-                case "SERVER_CALLBACK":
+                case InteractionTargetAction.SERVER_CALLBACK:
                     {
                         string serverCallback = payload;
-                        TriggerServerEvent("GF:Server:OnPlayerTargetActionServerCallback", serverCallback);
+                        CallServerAction(ServerEvent.OnPlayerTargetActionServerCallback, serverCallback);
                         break;
                     }
             }

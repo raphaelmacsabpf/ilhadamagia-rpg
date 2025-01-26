@@ -1,8 +1,10 @@
 ﻿using Server.Application.Entities;
 using Server.Application.Managers;
 using Shared.CrossCutting;
+using Shared.CrossCutting.Enums;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Server.Application
 {
@@ -10,20 +12,20 @@ namespace Server.Application
     {
         private readonly PlayerInfo playerInfo;
         private readonly ChatManager chatManager;
-        private readonly GFPlayer sourceGFPlayer;
+        private readonly PlayerHandle sourcePlayerHandle;
         private readonly CommandPacket commandPacket;
-        private GFPlayer targetGFPlayer;
+        private PlayerHandle targetPlayerHandle;
         private readonly string[] commandArgs;
         private readonly List<string> variableNames;
         private int nextArgPosition;
         private readonly List<string> errorMessages;
         private readonly Dictionary<string, object> commandVariables;
 
-        public CommandValidator(PlayerInfo playerInfo, ChatManager chatManager, GFPlayer gfPlayer, CommandPacket commandPacket)
+        public CommandValidator(PlayerInfo playerInfo, ChatManager chatManager, PlayerHandle playerHandle, CommandPacket commandPacket)
         {
             this.playerInfo = playerInfo;
             this.chatManager = chatManager;
-            this.sourceGFPlayer = gfPlayer;
+            this.sourcePlayerHandle = playerHandle;
             this.commandPacket = commandPacket;
             this.commandArgs = new string[0];
             this.variableNames = new List<string>();
@@ -42,12 +44,12 @@ namespace Server.Application
             this.commandVariables = new Dictionary<string, object>();
         }
 
-        public GFPlayer SourceGFPlayer { get => this.sourceGFPlayer; }
+        public PlayerHandle SourcePlayerHandle { get => this.sourcePlayerHandle; }
         public CommandPacket CommandPacket { get => this.commandPacket; }
 
         public CommandValidator WithAdminLevel(int minAdminLevel)
         {
-            if (this.sourceGFPlayer.Account.AdminLevel < minAdminLevel)
+            if (this.sourcePlayerHandle.Account.AdminLevel < minAdminLevel)
             {
                 this.errorMessages.Add("Você não está autorizado a utilizar este comando");
             }
@@ -59,8 +61,8 @@ namespace Server.Application
             string nextArgumentValue = GetNextArgumentValue(varName);
             if (nextArgumentValue != null)
             {
-                this.targetGFPlayer = GetPlayerByIdOrName(nextArgumentValue);
-                if (this.targetGFPlayer == null)
+                this.targetPlayerHandle = GetPlayerByIdOrName(nextArgumentValue);
+                if (this.targetPlayerHandle == null)
                 {
                     this.errorMessages.Add($"{nextArgumentValue} não é um {varName} válido");
                 }
@@ -68,6 +70,40 @@ namespace Server.Application
             else
             {
                 this.errorMessages.Add($"Informe um {varName} válido");
+            }
+
+            return this;
+        }
+
+        public CommandValidator WithVarVehicle(string varName)
+        {
+            try
+            {
+                var textValue = GetNextArgumentValue(varName);
+                var gameVehicleHash = GetVehicleHashByName(textValue);
+                this.commandVariables.Add(varName, gameVehicleHash);
+
+            }
+            catch (Exception)
+            {
+                this.errorMessages.Add("Informe um nome de veículo válido");
+            }
+
+            return this;
+        }
+
+        public CommandValidator WithVarWeapon(string varName)
+        {
+            try
+            {
+                var textValue = GetNextArgumentValue(varName);
+                var gameWeaponHash = GetWeaponHashByName(textValue);
+                this.commandVariables.Add(varName, gameWeaponHash);
+
+            }
+            catch (Exception)
+            {
+                this.errorMessages.Add("Informe um nome de arma válido");
             }
 
             return this;
@@ -150,10 +186,10 @@ namespace Server.Application
 
         public void SendCommandError(string errorMessage, string commandSyntax = null)
         {
-            this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, $"*ARG: {errorMessage}");
+            this.chatManager.SendClientMessage(sourcePlayerHandle, ChatColor.COLOR_GRAD2, $"*ARG: {errorMessage}");
             if (commandSyntax != null)
             {
-                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_WHITE, commandSyntax);
+                this.chatManager.SendClientMessage(sourcePlayerHandle, ChatColor.COLOR_WHITE, commandSyntax);
             }
         }
 
@@ -162,24 +198,24 @@ namespace Server.Application
             for (var i = 0; i < this.errorMessages.Count; i++)
             {
                 var errorMessage = this.errorMessages[i];
-                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_GRAD2, $"*ARG [{variableNames[i]}]: {errorMessage}");
+                this.chatManager.SendClientMessage(sourcePlayerHandle, ChatColor.COLOR_GRAD2, $"*ARG [{variableNames[i]}]: {errorMessage}");
             }
 
             if (this.errorMessages.Count > 0 && commandSyntax != null)
             {
-                this.chatManager.SendClientMessage(sourceGFPlayer, ChatColor.COLOR_WHITE, commandSyntax);
+                this.chatManager.SendClientMessage(sourcePlayerHandle, ChatColor.COLOR_WHITE, commandSyntax);
             }
             this.nextArgPosition = 1;
             return this.errorMessages.Count == 0;
         }
 
-        public GFPlayer GetTargetGFPlayer()
+        public PlayerHandle GetTargetPlayerHandle()
         {
-            if (this.targetGFPlayer == null)
+            if (this.targetPlayerHandle == null)
             {
-                throw new InvalidOperationException("GetTargetGFPlayer() called without TargetPlayer validation");
+                throw new InvalidOperationException("GetTargetPlayerHandle() called without TargetPlayer validation");
             }
-            return this.targetGFPlayer;
+            return this.targetPlayerHandle;
         }
 
         public TVarType GetVar<TVarType>(string variableName)
@@ -203,34 +239,99 @@ namespace Server.Application
             return null;
         }
 
-        private GFPlayer GetPlayerByIdOrName(string playerStr)
+        private PlayerHandle GetPlayerByIdOrName(string playerStr)
         {
-            bool parseSucceed = Int32.TryParse(playerStr, out var parsedId);
-            var gfPlayerList = this.playerInfo.GetGFPlayerList();
+            bool parseSucceed = int.TryParse(playerStr, out var parsedId);
+            var playerHandleList = this.playerInfo.GetPlayerHandleList();
             if (parseSucceed)
             {
-                foreach (var gfPlayer in gfPlayerList)
+                foreach (var playerHandle in playerHandleList)
                 {
-                    if (Int32.Parse(gfPlayer.Player.Handle) == parsedId)
+                    if (Int32.Parse(playerHandle.Player.Handle) == parsedId)
                     {
-                        return gfPlayer;
+                        return playerHandle;
                     }
                 }
             }
             else
             {
                 var loweredPlayerStr = playerStr.ToLower();
-                foreach (var gfPlayer in gfPlayerList)
+                foreach (var playerHandle in playerHandleList)
                 {
-                    var loweredUsername = gfPlayer.Account.Username.ToLower();
-                    if (loweredUsername.StartsWith(loweredPlayerStr) || loweredUsername == loweredPlayerStr)
+                    var loweredUsername = playerHandle.Account.Username.ToLower();
+                    if (loweredUsername == loweredPlayerStr)
                     {
-                        return gfPlayer;
+                        return playerHandle;
+                    }
+                }
+
+                foreach (var playerHandle in playerHandleList)
+                {
+                    var loweredUsername = playerHandle.Account.Username.ToLower();
+                    if (loweredUsername.StartsWith(loweredPlayerStr))
+                    {
+                        return playerHandle;
                     }
                 }
             }
 
             return null;
+        }
+
+        private GameVehicleHash GetVehicleHashByName(string vehicleStr)
+        {
+            var vehicleList = Enum.GetValues(typeof(GameVehicleHash)).Cast<GameVehicleHash>().ToList();
+            var loweredVehicleStr = vehicleStr.ToLower();
+
+            foreach (var vehicle in vehicleList)
+            {
+                var vehicleName = vehicle.ToString().ToLower();
+
+                if (vehicleName == loweredVehicleStr)
+                {
+                    return vehicle;
+                }
+            }
+
+            foreach (var vehicle in vehicleList)
+            {
+                var vehicleName = vehicle.ToString().ToLower();
+
+                if (vehicleName.StartsWith(loweredVehicleStr))
+                {
+                    return vehicle;
+                }
+            }
+
+            throw new Exception("Vehicle not found");
+        }
+
+        private GameWeaponHash GetWeaponHashByName(string weaponStr)
+        {
+            var weaponList = Enum.GetValues(typeof(GameWeaponHash)).Cast<GameWeaponHash>().ToList();
+            var loweredWeaponStr = weaponStr.ToLower();
+
+            foreach (var weapon in weaponList)
+            {
+                var weaponName = weapon.ToString().ToLower();
+
+                if (weaponName == loweredWeaponStr)
+                {
+                    return weapon;
+                }
+            }
+
+            foreach (var weapon in weaponList)
+            {
+                var vehicleName = weapon.ToString().ToLower();
+
+                if (vehicleName.StartsWith(loweredWeaponStr))
+                {
+                    return weapon;
+                }
+            }
+
+            throw new Exception("Weapon not found");
         }
     }
 }
