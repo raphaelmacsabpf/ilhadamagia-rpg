@@ -213,13 +213,6 @@ namespace Client.Application
             }
         }
 
-        // Commands
-        public async void OnInfo() // TODO: REMOVE THIS COMMAND
-        {
-            API.SendNuiMessage("{\"type\":\"CHARACTERS_SHOW\",\"enable\":true}");
-            Screen.ShowNotification($"~b~ServerInfo~s~: Your are currently on the Tutorial Server By 4444, {Game.Player.Name}!");
-        }
-
         public async void OnNuiEndpointCall(IDictionary<string, object> data, CallbackDelegate callbackResponse)
         {
             var responseType = data["type"].ToString();

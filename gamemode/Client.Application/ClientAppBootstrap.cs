@@ -36,9 +36,6 @@ namespace Client.Application
             EventHandlers["onClientResourceStart"] += new Action<string>(mainClient.OnClientResourceStart);
             EventHandlers["Chat:GF:Client:OnClientText"] += new Action<string>(mainClient.OnClientText);
 
-            // TODO: Remover comando Info
-            EventHandlers["client:Client:Info"] += new Action(mainClient.OnInfo);
-
             // GF Events
             RegisterClientEventHandler(ClientEvent.SendClientMessage, new Action<int, string>(mainClient.GFSendClientMessage));
             RegisterClientEventHandler(ClientEvent.SpawnPlayer, new Action<string, float, float, float, float, bool>(mainClient.GFSpawnPlayer));

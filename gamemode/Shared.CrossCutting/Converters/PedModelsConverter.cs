@@ -613,7 +613,7 @@ namespace Shared.CrossCutting
 
         public static int GetPedModelMaxId()
         {
-            return AllPedsDictionary.Count - 1; // TODO: avaliar se esse menos 1 é valido
+            return AllPedsDictionary.Count; // TODO: avaliar se esse menos 1 é valido
         }
 
         public static Dictionary<string, string> AllPedsDictionary { get; set; }
